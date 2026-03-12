@@ -9,6 +9,8 @@ export const metadata: Metadata = {
     description: 'Automatiza tus recordatorios, agenda y control de pacientes por WhatsApp. Micro-SaaS para clínicas veterinarias y estéticas caninas en México.',
 };
 
+export const dynamic = 'force-dynamic';
+
 export default function RootLayout({
     children,
 }: {

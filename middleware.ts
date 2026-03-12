@@ -4,11 +4,18 @@ import type { NextRequest } from 'next/server';
 
 export async function middleware(req: NextRequest) {
     const res = NextResponse.next();
-    // Crear un cliente de Supabase para el middleware que lee y escribe las cookies
-    const supabase = createMiddlewareClient({ req, res });
+    // Pass URL/Key directly to avoid reliance on mutating process.env in Edge
+    const supabase = createMiddlewareClient({ req, res }, {
+        supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+        supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder'
+    });
 
-    // Refrescar la sesión si el token ha expirado o generar las cookies correctamente
-    await supabase.auth.getSession();
+    try {
+        // Refrescar la sesión si el token ha expirado o generar las cookies correctamente
+        await supabase.auth.getSession();
+    } catch (e) {
+        console.error('Middleware Supabase error:', e);
+    }
 
     return res;
 }
