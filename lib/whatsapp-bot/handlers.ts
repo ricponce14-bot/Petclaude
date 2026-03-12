@@ -1,16 +1,11 @@
 // lib/whatsapp-bot/handlers.ts
 // Handlers para cada estado del bot conversacional
 
-import { createClient } from "@supabase/supabase-js";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { format, parse, addDays } from "date-fns";
 import { es } from "date-fns/locale";
 import { getAvailableDates, getAvailableSlots } from "./availability";
 import type { BotConfig, WhatsappChatSession, ChatState } from "@/lib/supabase/types";
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 export interface HandlerResult {
   reply: string;
@@ -265,14 +260,16 @@ export async function handleConfirmar(
     const scheduledAt = new Date(`${session.selected_date}T${session.selected_time}:00`);
 
     // Buscar si el teléfono pertenece a un owner existente
+    const supabaseAdmin = getSupabaseAdmin();
     const { data: owner } = await supabaseAdmin
       .from("owners")
       .select("id")
       .eq("tenant_id", tenantId)
       .eq("whatsapp", session.phone)
+      .returns<any>()
       .single();
 
-    if (!owner) {
+    if (!owner || !(owner as any).id) {
       return {
         reply: "⚠️ Tu número no está registrado en nuestro sistema.\n\n📞 Por favor contacta directamente a la estética para registrarte y agendar tu primera cita.\n\nEscribe cualquier cosa para volver al menú.",
         newState: "inicio",
@@ -290,6 +287,7 @@ export async function handleConfirmar(
       .select("id, name")
       .eq("owner_id", owner.id)
       .eq("tenant_id", tenantId)
+      .returns<any[]>()
       .limit(1);
 
     const pet = pets?.[0];
@@ -320,8 +318,8 @@ export async function handleConfirmar(
       .from("appointments")
       .insert({
         tenant_id: tenantId,
-        pet_id: pet.id,
-        owner_id: owner.id,
+        pet_id: (pet as any).id,
+        owner_id: (owner as any).id,
         type: apptType,
         status: "scheduled",
         scheduled_at: scheduledAt.toISOString(),
@@ -330,6 +328,7 @@ export async function handleConfirmar(
         notes: "Agendado por Bot WhatsApp"
       } as any)
       .select()
+      .returns<any>()
       .single();
 
     if (apptErr) {
@@ -393,6 +392,7 @@ export async function handleEsperandoConfirmacion(
     // Confirmar asistencia
     if (session.selected_service) {
       // selected_service stores the appointment ID in this context
+      const supabaseAdmin = getSupabaseAdmin();
       await supabaseAdmin
         .from("appointments")
         .update({ status: "confirmed" } as any)
@@ -406,9 +406,10 @@ export async function handleEsperandoConfirmacion(
     };
   }
 
-  if (clean === "2") {
+    if (clean === "2") {
     // Cancelar cita
     if (session.selected_service) {
+      const supabaseAdmin = getSupabaseAdmin();
       await supabaseAdmin
         .from("appointments")
         .update({ status: "cancelled" } as any)
@@ -425,6 +426,7 @@ export async function handleEsperandoConfirmacion(
   if (clean === "3") {
     // Reagendar — cancelar la actual e iniciar el flujo de agendar
     if (session.selected_service) {
+      const supabaseAdmin = getSupabaseAdmin();
       await supabaseAdmin
         .from("appointments")
         .update({ status: "cancelled" } as any)
@@ -458,12 +460,14 @@ async function handleReagendarInicio(
   phone: string,
   config: BotConfig
 ): Promise<HandlerResult> {
+  const supabaseAdmin = getSupabaseAdmin();
   // Buscar owner por teléfono
   const { data: owner } = await supabaseAdmin
     .from("owners")
     .select("id, name")
     .eq("tenant_id", tenantId)
     .eq("whatsapp", phone)
+    .returns<any>()
     .single();
 
   if (!owner) {
@@ -482,6 +486,7 @@ async function handleReagendarInicio(
     .in("status", ["scheduled", "confirmed"])
     .gte("scheduled_at", new Date().toISOString())
     .order("scheduled_at", { ascending: true })
+    .returns<any[]>()
     .limit(5);
 
   if (!appointments || appointments.length === 0) {
@@ -524,12 +529,14 @@ export async function handleReagendarSeleccionar(
     };
   }
 
+  const supabaseAdmin = getSupabaseAdmin();
   // Re-consultar las citas del owner
   const { data: owner } = await supabaseAdmin
     .from("owners")
     .select("id")
     .eq("tenant_id", tenantId)
     .eq("whatsapp", session.phone)
+    .returns<any>()
     .single();
 
   if (!owner) {
@@ -547,6 +554,7 @@ export async function handleReagendarSeleccionar(
     .in("status", ["scheduled", "confirmed"])
     .gte("scheduled_at", new Date().toISOString())
     .order("scheduled_at", { ascending: true })
+    .returns<any[]>()
     .limit(5);
 
   const index = parseInt(clean) - 1;
@@ -604,11 +612,13 @@ export async function handleReagendarFecha(
 
   const selectedDate = dates[index].date;
 
+  const supabaseAdmin = getSupabaseAdmin();
   // Get original appointment to know the duration
   const { data: origAppt } = await supabaseAdmin
     .from("appointments")
     .select("duration_min, type")
     .eq("id", session.selected_service)
+    .returns<any>()
     .single();
 
   const durationMin = (origAppt as any)?.duration_min || config.slot_duration_min;
@@ -649,10 +659,12 @@ export async function handleReagendarHora(
 
   const selectedDate = session.selected_date ? new Date(session.selected_date + "T12:00:00") : new Date();
 
+  const supabaseAdmin = getSupabaseAdmin();
   const { data: origAppt } = await supabaseAdmin
     .from("appointments")
     .select("duration_min")
     .eq("id", session.selected_service)
+    .returns<any>()
     .single();
 
   const durationMin = (origAppt as any)?.duration_min || config.slot_duration_min;
@@ -669,7 +681,6 @@ export async function handleReagendarHora(
 
   const selectedSlot = slots[index];
   const newScheduledAt = new Date(`${session.selected_date}T${selectedSlot.time}:00`);
-
   // Actualizar la cita existente
   const { error: updateErr } = await supabaseAdmin
     .from("appointments")

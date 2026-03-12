@@ -1,12 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { createClient } from "@supabase/supabase-js";
-
-// Usamos Service Role para evitar bloqueos silenciosos de RLS
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export async function POST(req: Request) {
     try {
@@ -23,6 +17,8 @@ export async function POST(req: Request) {
         if (!owner_id || !body) {
             return NextResponse.json({ error: "Cliente y mensaje son requeridos" }, { status: 400 });
         }
+
+        const supabaseAdmin = getSupabaseAdmin();
 
         // Obtener datos del dueño (BYPASS RLS con Admin)
         const { data: owner, error: ownerErr } = await supabaseAdmin
@@ -65,15 +61,17 @@ export async function POST(req: Request) {
 
         // Auto-procesar la cola inmediatamente para que el usuario no tenga que ir a Outbox
         try {
-            const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || req.headers.get("origin") || "http://localhost:3000";
-            fetch(`${baseUrl}/api/whatsapp/process-queue`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${process.env.CRON_SECRET}`
-                },
-                body: JSON.stringify({ messageId: newMsg.id })
-            }).catch(e => console.error("Fallo silencioso al auto-procesar cola:", e));
+            if (newMsg) {
+                const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || req.headers.get("origin") || "http://localhost:3000";
+                fetch(`${baseUrl}/api/whatsapp/process-queue`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${process.env.CRON_SECRET}`
+                    },
+                    body: JSON.stringify({ messageId: (newMsg as any).id })
+                }).catch(e => console.error("Fallo silencioso al auto-procesar cola:", e));
+            }
         } catch (e) { }
 
         return NextResponse.json({ ok: true, message: "Mensaje procesado en la cola de envío" });

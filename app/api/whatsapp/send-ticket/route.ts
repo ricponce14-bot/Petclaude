@@ -1,14 +1,10 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export async function POST(req: Request) {
     try {
         const { appointment_id, tenant_id } = await req.json();
+        const supabase = getSupabaseAdmin();
 
         if (!appointment_id || !tenant_id) {
             return NextResponse.json({ error: "Faltan datos requeridos" }, { status: 400 });
@@ -19,6 +15,7 @@ export async function POST(req: Request) {
             .from("appointments")
             .select("*, pets(name, breed), owners(name, whatsapp)")
             .eq("id", appointment_id)
+            .returns<any>()
             .single();
 
         if (apptErr || !appt) {
@@ -43,9 +40,9 @@ export async function POST(req: Request) {
             other: "📋 Otro servicio"
         };
 
-        const serviceType = typeLabels[appt.type] || appt.type;
-        const price = appt.price ? `$${Number(appt.price).toFixed(2)} MXN` : "Por confirmar";
-        const date = new Date(appt.scheduled_at).toLocaleDateString("es-MX", {
+        const serviceType = typeLabels[(appt as any).type] || (appt as any).type;
+        const price = (appt as any).price ? `$${Number((appt as any).price).toFixed(2)} MXN` : "Por confirmar";
+        const date = new Date((appt as any).scheduled_at).toLocaleDateString("es-MX", {
             weekday: "long",
             year: "numeric",
             month: "long",
@@ -61,21 +58,21 @@ export async function POST(req: Request) {
             `💰 *Total:* ${price}\n` +
             `📅 *Fecha:* ${date}\n` +
             `━━━━━━━━━━━━━━━━━\n` +
-            `${appt.notes ? `📝 *Notas:* ${appt.notes}\n` : ""}` +
+            `${(appt as any).notes ? `📝 *Notas:* ${(appt as any).notes}\n` : ""}` +
             `\n¡Gracias por confiar en nosotros! 🤗\n` +
             `Tu próxima cita la puedes agendar respondiendo a este mensaje.`;
 
         // Insertar en wa_messages
         const { error: insertErr } = await supabase.from("wa_messages").insert({
             tenant_id,
-            owner_id: appt.owner_id,
-            pet_id: appt.pet_id,
+            owner_id: (appt as any).owner_id,
+            pet_id: (appt as any).pet_id,
             appt_id: appointment_id,
             type: "manual",
             phone,
             body: ticketBody,
             status: "pending"
-        });
+        } as any);
 
         if (insertErr) {
             return NextResponse.json({ error: "Error al crear mensaje: " + insertErr.message }, { status: 500 });
@@ -87,6 +84,7 @@ export async function POST(req: Request) {
             .select("instance, status")
             .eq("tenant_id", tenant_id)
             .eq("status", "connected")
+            .returns<any>()
             .single();
 
         if (waSession) {
@@ -94,7 +92,7 @@ export async function POST(req: Request) {
             const apiKey = process.env.EVOLUTION_API_KEY!;
 
             try {
-                const sendRes = await fetch(`${apiUrl}/message/sendText/${waSession.instance}`, {
+                const sendRes = await fetch(`${apiUrl}/message/sendText/${(waSession as any).instance}`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json", apikey: apiKey },
                     body: JSON.stringify({ number: phone, text: ticketBody, delay: 1200 })
@@ -104,7 +102,7 @@ export async function POST(req: Request) {
                     // Actualizar el último mensaje insertado como enviado
                     await supabase
                         .from("wa_messages")
-                        .update({ status: "sent", sent_at: new Date().toISOString() })
+                        .update({ status: "sent", sent_at: new Date().toISOString() } as any)
                         .eq("appt_id", appointment_id)
                         .eq("type", "manual")
                         .eq("status", "pending");

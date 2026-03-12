@@ -2,12 +2,7 @@
 // Cron job para limpiar sesiones de chat expiradas
 
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export async function GET(req: Request) {
   // Proteger con CRON_SECRET
@@ -19,6 +14,7 @@ export async function GET(req: Request) {
   }
 
   try {
+    const supabaseAdmin = getSupabaseAdmin();
     const { data, error } = await supabaseAdmin
       .from("whatsapp_chat_sessions")
       .delete()

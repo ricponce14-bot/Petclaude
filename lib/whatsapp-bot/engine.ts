@@ -1,7 +1,7 @@
 // lib/whatsapp-bot/engine.ts
 // Motor principal del bot — orquesta el flujo de conversación
 
-import { createClient } from "@supabase/supabase-js";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import type { BotConfig, WhatsappChatSession, ChatState } from "@/lib/supabase/types";
 import {
   handleInicio,
@@ -15,11 +15,6 @@ import {
   handleReagendarHora,
   type HandlerResult
 } from "./handlers";
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 export interface BotResponse {
   reply: string;
@@ -89,6 +84,7 @@ export async function startReminderConfirmation(
 // ============================================================
 
 async function getBotConfig(tenantId: string): Promise<BotConfig | null> {
+  const supabaseAdmin = getSupabaseAdmin();
   const { data, error } = await supabaseAdmin
     .from("bot_config")
     .select("*")
@@ -110,6 +106,7 @@ async function getOrCreateSession(
   phone: string,
   tenantId: string
 ): Promise<WhatsappChatSession> {
+  const supabaseAdmin = getSupabaseAdmin();
   // Buscar sesión activa existente
   const { data: existing } = await supabaseAdmin
     .from("whatsapp_chat_sessions")
@@ -135,6 +132,7 @@ async function getOrCreateSession(
       expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString()
     } as any)
     .select()
+    .returns<any>()
     .single();
 
   if (error) {
@@ -149,6 +147,7 @@ async function resetSession(
   tenantId: string,
   phone: string
 ): Promise<WhatsappChatSession> {
+  const supabaseAdmin = getSupabaseAdmin();
   const { data, error } = await supabaseAdmin
     .from("whatsapp_chat_sessions")
     .update({
@@ -162,6 +161,7 @@ async function resetSession(
     } as any)
     .eq("id", sessionId)
     .select()
+    .returns<any>()
     .single();
 
   if (error || !data) {
@@ -175,6 +175,7 @@ async function updateSession(
   sessionId: string,
   updates: Partial<WhatsappChatSession>
 ): Promise<void> {
+  const supabaseAdmin = getSupabaseAdmin();
   await supabaseAdmin
     .from("whatsapp_chat_sessions")
     .update(updates as any)

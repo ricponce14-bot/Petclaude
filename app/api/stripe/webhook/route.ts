@@ -1,15 +1,8 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { createClient } from "@supabase/supabase-js";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
-// Service Role para saltarnos RLS al actualizar de fondo
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
+const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY!);
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 export async function POST(req: Request) {
@@ -17,6 +10,9 @@ export async function POST(req: Request) {
     const sig = req.headers.get("stripe-signature");
 
     let event: Stripe.Event;
+
+    const stripe = getStripe();
+    const supabase = getSupabaseAdmin();
 
     try {
         if (!sig || !endpointSecret) {
@@ -50,6 +46,7 @@ export async function POST(req: Request) {
                             .from("tenants")
                             .select("id")
                             .eq("email", email)
+                            .returns<any>()
                             .single();
 
                         if (tenant) {
@@ -59,10 +56,10 @@ export async function POST(req: Request) {
                                     stripe_customer_id: customerId,
                                     stripe_subscription_id: session.subscription as string,
                                     plan: "active"
-                                })
-                                .eq("id", tenant.id);
+                                } as any)
+                                .eq("id", (tenant as any).id);
 
-                            console.log(`✅ Tenant ${tenant.id} activado con Stripe Customer ${customerId}`);
+                            console.log(`✅ Tenant ${(tenant as any).id} activado con Stripe Customer ${customerId}`);
                         } else {
                             // Crear tenant nuevo si vino desde registro + pago
                             const { data: newTenant } = await supabase
@@ -73,16 +70,17 @@ export async function POST(req: Request) {
                                     plan: "active",
                                     stripe_customer_id: customerId,
                                     stripe_subscription_id: session.subscription as string,
-                                })
+                                } as any)
                                 .select("id")
+                                .returns<any>()
                                 .single();
 
                             if (newTenant && userId) {
                                 // Actualizar app_metadata del usuario con el tenant_id
                                 await supabase.auth.admin.updateUserById(userId, {
-                                    app_metadata: { tenant_id: newTenant.id }
+                                    app_metadata: { tenant_id: (newTenant as any).id }
                                 });
-                                console.log(`✅ Nuevo tenant ${newTenant.id} creado y vinculado a usuario ${userId}`);
+                                console.log(`✅ Nuevo tenant ${(newTenant as any).id} creado y vinculado a usuario ${userId}`);
                             }
                         }
                     }
@@ -106,7 +104,7 @@ export async function POST(req: Request) {
 
                 const { error } = await supabase
                     .from("tenants")
-                    .update({ plan: planStatus })
+                    .update({ plan: planStatus } as any)
                     .eq("stripe_subscription_id", subscription.id);
 
                 if (error) {

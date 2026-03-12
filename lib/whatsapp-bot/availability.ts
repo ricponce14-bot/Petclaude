@@ -1,15 +1,10 @@
 // lib/whatsapp-bot/availability.ts
 // Módulo para consultar disponibilidad de horarios
 
-import { createClient } from "@supabase/supabase-js";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { format, addDays, startOfDay, endOfDay, parse, addMinutes, isBefore, isAfter } from "date-fns";
 import { es } from "date-fns/locale";
 import type { BotConfig, BotBusinessHours, BotDayHours } from "@/lib/supabase/types";
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 const DAY_KEYS: Record<number, string> = {
   0: "dom", 1: "lun", 2: "mar", 3: "mie", 4: "jue", 5: "vie", 6: "sab"
@@ -51,6 +46,7 @@ export async function getAvailableSlots(
   durationMin: number,
   config: BotConfig
 ): Promise<{ time: string; label: string }[]> {
+  const supabaseAdmin = getSupabaseAdmin();
   const dayKey = DAY_KEYS[date.getDay()];
   const hours = config.business_hours[dayKey] as BotDayHours | null;
 
@@ -66,7 +62,8 @@ export async function getAvailableSlots(
     .eq("tenant_id", tenantId)
     .gte("scheduled_at", dayStart)
     .lte("scheduled_at", dayEnd)
-    .in("status", ["scheduled", "confirmed"]);
+    .in("status", ["scheduled", "confirmed"])
+    .returns<any[]>();
 
   // Parsear horarios ocupados
   const busySlots = (existingAppts || []).map(a => ({
