@@ -1,4 +1,4 @@
-// lib/supabase/admin.ts
+// lib/supabase/admin.ts - Utility for lazy loading supabase admin
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
 
