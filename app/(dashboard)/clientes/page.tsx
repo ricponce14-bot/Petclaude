@@ -2,7 +2,7 @@
 // app/(dashboard)/clientes/page.tsx
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Search, Plus, Phone } from "lucide-react";
+import { Search, Plus, Phone, Users } from "lucide-react";
 import Link from "next/link";
 import NewOwnerModal from "@/components/crm/NewOwnerModal";
 import type { Owner } from "@/lib/supabase/types";
@@ -65,7 +65,7 @@ export default function ClientesPage() {
         </div>
       ) : owners.length === 0 ? (
         <div className="text-center py-20 glass rounded-[2rem]">
-          <p className="text-5xl mb-4">👤</p>
+          <Users size={48} className="text-slate-300 mx-auto mb-4" />
           <p className="text-slate-500 font-bold text-lg">No hay clientes todavía</p>
           <button onClick={() => setShowModal(true)} className="mt-4 text-teal-600 font-bold hover:text-teal-500 transition-colors">
             + Registrar el primero
@@ -99,7 +99,7 @@ export default function ClientesPage() {
                 {owner.pets?.length === 0 && <span className="text-xs text-slate-400 font-medium italic">Sin mascotas</span>}
                 {owner.pets?.map((pet: any) => (
                   <span key={pet.id} className="text-[11px] font-bold bg-purple-50 text-purple-600 px-2.5 py-1 rounded-full shadow-sm">
-                    🐾 {pet.name}
+                    {pet.name}
                   </span>
                 ))}
               </div>

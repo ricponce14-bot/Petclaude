@@ -4,12 +4,12 @@ import { X, Loader2, DollarSign } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 const CATEGORIES = [
-    { value: "supplies", label: "🧴 Insumos (shampoos, productos)" },
-    { value: "rent", label: "🏠 Renta del local" },
-    { value: "payroll", label: "👥 Nómina / Sueldos" },
-    { value: "utilities", label: "⚡ Servicios (luz, agua, internet)" },
-    { value: "veterinary", label: "🩺 Gastos veterinarios" },
-    { value: "other", label: "📦 Otro" },
+    { value: "supplies", label: "Insumos (shampoos, productos)" },
+    { value: "rent", label: "Renta del local" },
+    { value: "payroll", label: "Nomina / Sueldos" },
+    { value: "utilities", label: "Servicios (luz, agua, internet)" },
+    { value: "veterinary", label: "Gastos veterinarios" },
+    { value: "other", label: "Otro" },
 ];
 
 interface NewExpenseModalProps {

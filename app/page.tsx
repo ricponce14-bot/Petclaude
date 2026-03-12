@@ -1,7 +1,11 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { Check, Calendar, MessageSquare, Bone, ArrowRight, Star, Heart } from "lucide-react";
+import {
+    Check, Calendar, MessageSquare, ArrowRight, Heart,
+    ClipboardList, Bell, Users, Send, BarChart3, DollarSign,
+    Smartphone, Shield, Zap
+} from "lucide-react";
 import RegisterModal from "@/components/auth/RegisterModal";
 
 export default function LandingPage() {
@@ -14,226 +18,330 @@ export default function LandingPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#FAFAFA] flex flex-col font-sans text-slate-900 overflow-x-hidden">
+        <div className="min-h-screen bg-white flex flex-col font-sans text-slate-900 overflow-x-hidden">
             <RegisterModal
                 isOpen={isRegisterOpen}
                 onClose={() => setIsRegisterOpen(false)}
                 initialPlan={selectedPlan}
             />
 
-            {/* Navbar Premium Orgánico */}
-            <header className="fixed w-full top-0 z-50 transition-all duration-300 bg-white/70 backdrop-blur-xl border-b border-slate-200/50">
-                <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-teal-500 rounded-2xl flex items-center justify-center text-white shadow-[0_8px_16px_-6px_rgba(20,184,166,0.5)] transform -rotate-6">
-                            <span className="text-xl">🐾</span>
-                        </div>
-                        <span className="text-xl font-black tracking-tight text-slate-900">
-                            Ladrido
-                        </span>
-                    </div>
-                    <div className="flex items-center gap-6">
-                        <Link href="/login" className="text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors hidden sm:block">
-                            Iniciar sesión
+            {/* ─── NAVBAR ─── */}
+            <header className="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-100">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex items-center justify-between">
+                    <img src="/images/logo-color.png" alt="Ladrido" className="w-[120px] xs:w-[140px] md:w-[180px] h-auto object-contain" />
+                    <div className="flex items-center gap-3 sm:gap-6">
+                        <a href="#features" className="text-xs sm:text-sm font-semibold text-slate-500 hover:text-slate-900 transition-colors hidden md:block">
+                            Funciones
+                        </a>
+                        <a href="#precios" className="text-xs sm:text-sm font-semibold text-slate-500 hover:text-slate-900 transition-colors hidden md:block">
+                            Precios
+                        </a>
+                        <Link href="/login" className="text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors">
+                            Iniciar sesion
                         </Link>
                         <button
                             onClick={() => openRegister("monthly")}
-                            className="group relative inline-flex items-center justify-center gap-2 text-sm font-bold bg-slate-900 text-white px-6 py-3 rounded-2xl hover:bg-slate-800 transition-all shadow-[0_8px_24px_-8px_rgba(0,0,0,0.3)] hover:shadow-[0_12px_28px_-8px_rgba(0,0,0,0.4)] hover:-translate-y-0.5"
+                            className="group inline-flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm font-bold bg-teal-500 text-white px-3 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl hover:bg-teal-600 transition-all shadow-lg shadow-teal-500/25 hover:shadow-teal-500/40 hover:-translate-y-0.5"
                         >
-                            Probar 7 días gratis
-                            <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                            <span className="hidden xs:inline">Probar 7 dias gratis</span>
+                            <span className="xs:hidden">Probar gratis</span>
+                            <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                         </button>
                     </div>
                 </div>
             </header>
 
-            {/* Hero Section Rediseñado "No-IA" */}
-            <main className="flex-1 flex flex-col items-center relative text-center pt-40 pb-20 md:pt-48 md:pb-32 px-6">
-                {/* Elementos decorativos asimétricos orgánicos */}
-                <div className="absolute top-20 left-10 md:left-20 w-72 h-72 bg-teal-200/40 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob" />
-                <div className="absolute top-40 right-10 md:right-20 w-72 h-72 bg-purple-200/40 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000" />
-                <div className="absolute -bottom-8 left-1/2 w-72 h-72 bg-orange-200/40 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000" />
+            {/* ─── HERO ─── */}
+            <section className="pt-32 pb-20 md:pt-40 md:pb-28 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-teal-50/80 via-white to-emerald-50/50" />
+                <div className="absolute top-20 -right-40 w-[500px] h-[500px] rounded-full bg-teal-100/40 blur-3xl" />
+                <div className="absolute bottom-0 -left-40 w-[400px] h-[400px] rounded-full bg-emerald-100/30 blur-3xl" />
 
-                <div className="relative z-10 flex flex-col items-center max-w-4xl mx-auto">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200/60 shadow-[0_2px_8px_-4px_rgba(0,0,0,0.1)] text-slate-800 text-sm font-semibold mb-8 backdrop-blur-md">
-                        <span className="flex h-2 w-2 relative">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
-                        </span>
-                        El único CRM que envía Whatsapps por ti
-                    </div>
+                <div className="relative z-10 max-w-7xl mx-auto px-6">
+                    <div className="grid lg:grid-cols-2 gap-12 items-center">
+                        <div>
+                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-50 border border-teal-100 text-teal-700 text-sm font-semibold mb-6">
+                                <span className="w-2 h-2 bg-teal-500 rounded-full animate-pulse" />
+                                El CRM que automatiza tu estetica canina
+                            </div>
 
-                    <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-8 leading-[1.1] text-slate-900">
-                        Agenda llena.<br className="hidden md:block" />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-emerald-600">
-                            Cero inasistencias.
-                        </span>
-                    </h1>
+                            <h1 className="text-4xl md:text-6xl font-black tracking-tight mb-6 leading-[1.1]">
+                                Gestiona tu estetica canina de forma
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-emerald-500"> inteligente</span>
+                            </h1>
 
-                    <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed font-medium">
-                        Ladrido es la plataforma premium para estéticas caninas. Agendamos tus citas, guardamos historiales y nuestro robot de WhatsApp confirma asistencias y recupera clientes perdidos automáticamente.
-                    </p>
+                            <p className="text-lg text-slate-600 max-w-lg mb-8 leading-relaxed">
+                                Ladrido es la plataforma todo-en-uno para esteticas caninas. Agenda citas, lleva historiales, controla gastos y envia recordatorios automaticos por WhatsApp.
+                            </p>
 
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full max-w-md mx-auto">
-                        <button
-                            onClick={() => openRegister("monthly")}
-                            className="w-full sm:w-auto px-8 py-4 bg-teal-500 text-white rounded-2xl font-bold text-base transition-all shadow-[0_8px_24px_-8px_rgba(20,184,166,0.6)] hover:shadow-[0_12px_28px_-8px_rgba(20,184,166,0.7)] hover:-translate-y-1 hover:bg-teal-400"
-                        >
-                            Empezar prueba gratis
-                        </button>
-                        <a href="#precios" className="w-full sm:w-auto px-8 py-4 bg-white text-slate-700 rounded-2xl font-bold text-base hover:bg-slate-50 transition-all border border-slate-200 shadow-sm hover:shadow-md">
-                            Ver precios
-                        </a>
-                    </div>
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <button
+                                    onClick={() => openRegister("monthly")}
+                                    className="px-8 py-4 bg-teal-500 text-white rounded-xl font-bold text-base transition-all shadow-lg shadow-teal-500/25 hover:shadow-teal-500/40 hover:-translate-y-0.5 hover:bg-teal-600"
+                                >
+                                    Empezar prueba gratis
+                                </button>
+                                <a href="#features" className="px-8 py-4 bg-white text-slate-700 rounded-xl font-bold text-base hover:bg-slate-50 transition-all border border-slate-200 shadow-sm text-center">
+                                    Conocer funciones
+                                </a>
+                            </div>
 
-                    <div className="mt-8 flex items-center gap-2 text-sm text-slate-500 font-medium">
-                        <div className="flex -space-x-2">
-                            {[1, 2, 3, 4].map(i => (
-                                <img key={i} className="w-8 h-8 rounded-full border-2 border-white" src={`https://i.pravatar.cc/100?img=${10 + i}`} alt="user" />
-                            ))}
+                            <div className="mt-8 flex items-center gap-4 text-sm text-slate-500">
+                                <div className="flex items-center gap-1.5">
+                                    <Check size={16} className="text-teal-500" />
+                                    <span>Sin tarjeta de credito</span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <Check size={16} className="text-teal-500" />
+                                    <span>7 dias gratis</span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <Check size={16} className="text-teal-500" />
+                                    <span>Cancela cuando quieras</span>
+                                </div>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-1 ml-2">
-                            <Star size={16} className="text-yellow-400 fill-yellow-400" />
-                            <Star size={16} className="text-yellow-400 fill-yellow-400" />
-                            <Star size={16} className="text-yellow-400 fill-yellow-400" />
-                            <Star size={16} className="text-yellow-400 fill-yellow-400" />
-                            <Star size={16} className="text-yellow-400 fill-yellow-400" />
+
+                        {/* Hero Image / Dashboard Preview */}
+                        <div className="relative hidden lg:block">
+                            <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-slate-900/10 border border-slate-200/50">
+                                <img
+                                    src="https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=2071&auto=format&fit=crop"
+                                    alt="Dashboard Ladrido"
+                                    className="w-full object-cover aspect-[4/3]"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent" />
+                            </div>
+                            {/* Floating card */}
+                            <div className="absolute -bottom-6 -left-6 bg-white rounded-xl p-4 shadow-xl border border-slate-100 flex items-center gap-3">
+                                <div className="w-10 h-10 bg-teal-50 rounded-lg flex items-center justify-center">
+                                    <Bell size={20} className="text-teal-600" />
+                                </div>
+                                <div>
+                                    <p className="text-xs font-bold text-slate-900">Recordatorio enviado</p>
+                                    <p className="text-[11px] text-slate-400">WhatsApp automatico</p>
+                                </div>
+                            </div>
                         </div>
-                        <span className="ml-1">Veterinarias confiando</span>
                     </div>
                 </div>
+            </section>
 
-                {/* Imagen principal con efecto organic shadow */}
-                <div className="mt-20 w-full max-w-5xl mx-auto relative px-4 z-10">
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#FAFAFA] via-transparent to-transparent z-20 top-1/2" />
-                    <div className="relative rounded-[2rem] p-2 bg-white/40 backdrop-blur-xl border border-white/60 shadow-[0_20px_40px_-16px_rgba(0,0,0,0.1)] overflow-hidden transform perspective-1000 rotateX-2">
-                        <img
-                            src="https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=2071&auto=format&fit=crop"
-                            alt="Dashboard Ladrido Preview"
-                            className="w-full rounded-[1.5rem] object-cover aspect-video max-h-[600px] shadow-inner"
-                        />
-                    </div>
-                </div>
-            </main>
-
-            {/* Grid de Características Orgánico */}
-            <section id="features" className="py-32 relative z-30 bg-white border-y border-slate-100">
-                <div className="max-w-6xl mx-auto px-6">
-                    <div className="text-center mb-20 max-w-2xl mx-auto">
-                        <h2 className="text-4xl font-black text-slate-900 mb-6">El trabajo sucio, automatizado.</h2>
-                        <p className="text-lg text-slate-500 font-medium">Ladrido fue diseñado tras analizar más de 1,000 interacciones en estéticas caninas reales. Es simple, intuitivo y poderoso.</p>
+            {/* ─── FEATURES GRID ─── */}
+            <section id="features" className="py-24 bg-slate-50">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="text-center mb-16 max-w-2xl mx-auto">
+                        <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
+                            Todo lo que necesitas para tu estetica
+                        </h2>
+                        <p className="text-lg text-slate-500">
+                            Una plataforma completa desde la agenda hasta los recordatorios automaticos por WhatsApp.
+                        </p>
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-8">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <FeatureCard
                             icon={Calendar}
-                            color="bg-purple-100 text-purple-600"
-                            shadow="shadow-[0_8px_20px_-8px_rgba(168,85,247,0.3)]"
-                            title="Citas inteligentes"
-                            desc="Anota la cita en segundos. El sistema aparta el espacio y agenda el recordatorio automático al cliente por WhatsApp 24h antes."
+                            title="Agenda de Citas"
+                            desc="Organiza y gestiona tus citas diarias. Vista por dia con duracion, tipo de servicio y datos de la mascota."
+                        />
+                        <FeatureCard
+                            icon={ClipboardList}
+                            title="Historial Clinico"
+                            desc="Registra cada servicio: banos, cortes, vacunas. Ten alergias y temperamento siempre a la mano."
                         />
                         <FeatureCard
                             icon={MessageSquare}
-                            color="bg-teal-100 text-teal-600"
-                            shadow="shadow-[0_8px_20px_-8px_rgba(20,184,166,0.3)]"
-                            title="Motor de WhatsApp"
-                            desc="¿Un cliente lleva 30 días sin venir? Ladrido le enviará un WhatsApp 100% personalizable invitándolo a volver con una promo."
+                            title="WhatsApp Automatico"
+                            desc="Recordatorios de cita, recuperacion de clientes inactivos y felicitaciones de cumpleanos automaticos."
                         />
                         <FeatureCard
-                            icon={Bone}
-                            color="bg-orange-100 text-orange-600"
-                            shadow="shadow-[0_8px_20px_-8px_rgba(249,115,22,0.3)]"
-                            title="Historial Clínico Vital"
-                            desc="Ten a la mano si la mascota es nerviosa, alergias y el detalle de cada baño o vacuna pasada antes de recibirla."
+                            icon={Users}
+                            title="Gestion de Clientes"
+                            desc="Base de datos completa de duenos y mascotas. Busqueda rapida y perfiles detallados."
+                        />
+                        <FeatureCard
+                            icon={Send}
+                            title="Tickets por WhatsApp"
+                            desc="Envia comprobantes de servicio al terminar cada cita directamente al WhatsApp del cliente."
+                        />
+                        <FeatureCard
+                            icon={DollarSign}
+                            title="Control de Gastos"
+                            desc="Registra insumos, renta, nomina y servicios. Desglose por categoria y totales mensuales."
+                        />
+                        <FeatureCard
+                            icon={BarChart3}
+                            title="Indicadores"
+                            desc="Dashboard con metricas clave: citas del dia, clientes activos, ingresos y tendencias."
+                        />
+                        <FeatureCard
+                            icon={Smartphone}
+                            title="Acceso Multi-dispositivo"
+                            desc="Usa Ladrido desde tu laptop, tablet o celular. Funciona desde cualquier navegador."
+                        />
+                        <FeatureCard
+                            icon={Shield}
+                            title="Datos Seguros"
+                            desc="Informacion protegida con cifrado y aislamiento por veterinaria. Solo tu accedes a tus datos."
                         />
                     </div>
                 </div>
             </section>
 
-            {/* Pricing Premium */}
-            <section id="precios" className="py-32 bg-[#FAFAFA] relative">
-                <div className="absolute top-0 right-0 w-1/3 h-full bg-teal-50/50 skew-x-12 transform origin-top-right -z-10" />
+            {/* ─── HOW IT WORKS ─── */}
+            <section className="py-24 bg-white">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
+                            Transforma tu estetica canina con Ladrido
+                        </h2>
+                        <p className="text-lg text-slate-500 max-w-2xl mx-auto">
+                            Descubre como Ladrido optimiza cada aspecto de tu operacion, desde la agenda hasta el seguimiento automatico de clientes.
+                        </p>
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-8">
+                        <StepCard
+                            number="01"
+                            title="Registra tu estetica"
+                            desc="Crea tu cuenta en minutos. Agrega tus clientes, mascotas y empieza a agendar citas desde el primer dia."
+                        />
+                        <StepCard
+                            number="02"
+                            title="Conecta WhatsApp"
+                            desc="Escanea el codigo QR y Ladrido comenzara a enviar recordatorios y notificaciones automaticamente."
+                        />
+                        <StepCard
+                            number="03"
+                            title="Automatiza y crece"
+                            desc="Reduce inasistencias, recupera clientes perdidos y lleva el control financiero de tu negocio."
+                        />
+                    </div>
+                </div>
+            </section>
+
+            {/* ─── SOCIAL PROOF ─── */}
+            <section className="py-20 bg-gradient-to-r from-teal-500 to-emerald-500">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="grid md:grid-cols-3 gap-8 text-center text-white">
+                        <div>
+                            <p className="text-5xl font-black mb-2">100%</p>
+                            <p className="text-teal-100 font-medium">Basado en la nube</p>
+                        </div>
+                        <div>
+                            <p className="text-5xl font-black mb-2">24/7</p>
+                            <p className="text-teal-100 font-medium">Acceso desde cualquier lugar</p>
+                        </div>
+                        <div>
+                            <p className="text-5xl font-black mb-2">100%</p>
+                            <p className="text-teal-100 font-medium">Seguro y confiable</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* ─── PRICING ─── */}
+            <section id="precios" className="py-24 bg-slate-50">
                 <div className="max-w-5xl mx-auto px-6 text-center">
-                    <h2 className="text-4xl font-black text-slate-900 mb-6">Precios simples y transparentes</h2>
-                    <p className="text-lg text-slate-500 mb-16 max-w-xl mx-auto font-medium">Elige el plan que mejor se adapte a tu estética. Ambos incluyen todas las funciones y 7 días de prueba gratis.</p>
+                    <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Precios simples y transparentes</h2>
+                    <p className="text-lg text-slate-500 mb-16 max-w-xl mx-auto">
+                        Elige el plan que mejor se adapte a tu estetica. Todos incluyen 7 dias de prueba gratis.
+                    </p>
 
                     <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto text-left">
-                        {/* Plan Mensual */}
-                        <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.12)] transition-shadow">
+                        {/* Monthly */}
+                        <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm hover:shadow-lg transition-shadow">
                             <div className="mb-8">
-                                <h3 className="text-2xl font-bold text-slate-900 mb-2">Mensual</h3>
-                                <p className="text-slate-500 font-medium">Flexibilidad mes a mes para tu negocio.</p>
+                                <h3 className="text-xl font-bold text-slate-900 mb-1">Mensual</h3>
+                                <p className="text-slate-500 text-sm">Flexibilidad mes a mes para tu negocio.</p>
                             </div>
                             <div className="flex items-baseline gap-1 mb-8">
                                 <span className="text-5xl font-black text-slate-900">$199</span>
-                                <span className="text-lg text-slate-500 font-semibold">MXN / mes</span>
+                                <span className="text-lg text-slate-400 font-medium">MXN / mes</span>
                             </div>
-                            <ul className="space-y-4 mb-8">
-                                {["Goo", "Dueños y mascotas ilimitados", "Recordatorios de citas", "Mensajes automáticos por WhatsApp", "Plantillas 100% editables", "Soporte técnico"].map((item, i) => (
-                                    <li key={i} className="flex items-start gap-3 text-slate-700 font-medium">
-                                        <Check className="text-teal-500 mt-0.5 shrink-0" size={20} />
-                                        <span>{item === "Goo" ? <del className="opacity-50 text-sm">Goo</del> : item}</span>
+                            <ul className="space-y-3 mb-8">
+                                {["Citas ilimitadas", "Clientes y mascotas ilimitados", "Recordatorios de citas por WhatsApp", "Mensajes automaticos", "Plantillas editables", "Control de gastos", "Soporte tecnico"].map((item, i) => (
+                                    <li key={i} className="flex items-start gap-3 text-slate-600 text-sm">
+                                        <Check className="text-teal-500 mt-0.5 shrink-0" size={18} />
+                                        <span>{item}</span>
                                     </li>
                                 ))}
                             </ul>
                             <button
                                 onClick={() => openRegister("monthly")}
-                                className="block w-full py-4 text-center bg-slate-100 text-slate-900 rounded-2xl font-bold hover:bg-slate-200 transition-colors"
+                                className="block w-full py-3.5 text-center bg-slate-100 text-slate-900 rounded-xl font-bold hover:bg-slate-200 transition-colors"
                             >
-                                Empezar 7 días gratis
+                                Empezar 7 dias gratis
                             </button>
                         </div>
 
-                        {/* Plan Anual (Destacado) */}
-                        <div className="relative bg-slate-900 rounded-3xl p-8 border border-slate-800 shadow-[0_20px_40px_-12px_rgba(0,0,0,0.4)] transform md:-translate-y-4">
-                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-teal-400 to-emerald-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-lg flex items-center gap-1">
-                                <Heart size={14} className="fill-white" /> Recomendado
+                        {/* Annual */}
+                        <div className="relative bg-slate-900 rounded-2xl p-8 border border-slate-700 shadow-xl transform md:-translate-y-4">
+                            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-teal-500 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-1.5">
+                                <Heart size={12} className="fill-white" /> Recomendado
                             </div>
                             <div className="mb-8">
-                                <h3 className="text-2xl font-bold text-white mb-2">Anual</h3>
-                                <p className="text-slate-400 font-medium">Ahorras más de 4 meses ($789 MXN)</p>
+                                <h3 className="text-xl font-bold text-white mb-1">Anual</h3>
+                                <p className="text-slate-400 text-sm">Ahorras mas de 4 meses ($789 MXN)</p>
                             </div>
                             <div className="flex items-baseline gap-1 mb-2">
                                 <span className="text-5xl font-black text-white">$1,599</span>
-                                <span className="text-lg text-slate-400 font-semibold">MXN / año</span>
+                                <span className="text-lg text-slate-400 font-medium">MXN / ano</span>
                             </div>
                             <p className="text-teal-400 text-sm font-bold mb-8">Equivale a $133 MXN al mes</p>
 
-                            <ul className="space-y-4 mb-8">
-                                {["Todas las funciones del mensual", "Dueños y mascotas ilimitados", "WhatsApp sin restricciones", "Acceso prioritario a nuevas funciones", "Soporte VIP"].map((item, i) => (
-                                    <li key={i} className="flex items-start gap-3 text-slate-300 font-medium">
-                                        <Check className="text-teal-400 mt-0.5 shrink-0" size={20} />
+                            <ul className="space-y-3 mb-8">
+                                {["Todo lo del plan mensual", "WhatsApp sin restricciones", "Acceso prioritario a nuevas funciones", "Soporte VIP", "Actualizaciones gratuitas"].map((item, i) => (
+                                    <li key={i} className="flex items-start gap-3 text-slate-300 text-sm">
+                                        <Check className="text-teal-400 mt-0.5 shrink-0" size={18} />
                                         <span>{item}</span>
                                     </li>
                                 ))}
                             </ul>
                             <button
                                 onClick={() => openRegister("annual")}
-                                className="block w-full py-4 text-center bg-teal-500 text-white rounded-2xl font-bold hover:bg-teal-400 transition-all shadow-[0_8px_20px_-8px_rgba(20,184,166,0.6)]"
+                                className="block w-full py-3.5 text-center bg-teal-500 text-white rounded-xl font-bold hover:bg-teal-400 transition-all shadow-lg shadow-teal-500/25"
                             >
-                                Empezar 7 días gratis
+                                Empezar 7 dias gratis
                             </button>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* Footer Orgánico */}
-            <footer className="bg-white border-t border-slate-100 pt-16 pb-8">
-                <div className="max-w-6xl mx-auto px-6">
-                    <div className="flex flex-col md:flex-row items-center justify-between text-slate-500 text-sm font-medium">
-                        <div className="flex items-center gap-2 mb-6 md:mb-0">
-                            <div className="w-8 h-8 bg-slate-100 rounded-xl flex items-center justify-center -rotate-6">
-                                <span>🐾</span>
-                            </div>
-                            <span className="text-slate-900 font-bold text-lg">Ladrido</span>
+            {/* ─── CTA ─── */}
+            <section className="py-20 bg-white">
+                <div className="max-w-3xl mx-auto px-6 text-center">
+                    <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
+                        Listo para transformar tu estetica?
+                    </h2>
+                    <p className="text-lg text-slate-500 mb-8">
+                        Unete a las esteticas caninas que ya gestionan su negocio de forma inteligente con Ladrido.
+                    </p>
+                    <button
+                        onClick={() => openRegister("monthly")}
+                        className="inline-flex items-center gap-2 px-8 py-4 bg-teal-500 text-white rounded-xl font-bold text-base transition-all shadow-lg shadow-teal-500/25 hover:shadow-teal-500/40 hover:-translate-y-0.5 hover:bg-teal-600"
+                    >
+                        Empezar ahora <ArrowRight size={18} />
+                    </button>
+                </div>
+            </section>
+
+            {/* ─── FOOTER ─── */}
+            <footer className="bg-slate-900 text-slate-400 pt-16 pb-8">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-slate-800">
+                        <img src="/images/logo-white.png" alt="Ladrido" className="w-[150px] md:w-[200px] h-auto object-contain" />
+                        <div className="flex gap-8 text-sm font-medium">
+                            <a href="#features" className="hover:text-white transition-colors">Funciones</a>
+                            <a href="#precios" className="hover:text-white transition-colors">Precios</a>
+                            <a href="#" className="hover:text-white transition-colors">Terminos</a>
+                            <a href="#" className="hover:text-white transition-colors">Privacidad</a>
                         </div>
-                        <div className="flex gap-6 mb-6 md:mb-0">
-                            <a href="#" className="hover:text-slate-900 transition-colors">Términos</a>
-                            <a href="#" className="hover:text-slate-900 transition-colors">Privacidad</a>
-                            <a href="#" className="hover:text-slate-900 transition-colors">Contacto</a>
-                        </div>
-                        <p className="text-slate-400">© {new Date().getFullYear()} Ladrido Software.</p>
+                    </div>
+                    <div className="pt-8 text-center text-sm">
+                        <p>&copy; {new Date().getFullYear()} Ladrido Software. Todos los derechos reservados.</p>
                     </div>
                 </div>
             </footer>
@@ -241,14 +349,26 @@ export default function LandingPage() {
     );
 }
 
-function FeatureCard({ icon: Icon, title, desc, color, shadow }: any) {
+function FeatureCard({ icon: Icon, title, desc }: { icon: any; title: string; desc: string }) {
     return (
-        <div className="bg-white p-8 rounded-3xl border border-slate-100/50 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.04)] flex flex-col items-start text-left hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.08)] transition-all group">
-            <div className={`w-14 h-14 ${color} rounded-2xl flex items-center justify-center mb-6 ${shadow} transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300`}>
-                <Icon size={28} strokeWidth={2.5} />
+        <div className="bg-white p-6 rounded-xl border border-slate-200 hover:border-teal-200 hover:shadow-lg hover:shadow-teal-50 transition-all group">
+            <div className="w-12 h-12 bg-teal-50 text-teal-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-teal-500 group-hover:text-white transition-colors">
+                <Icon size={24} />
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">{title}</h3>
+            <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
+        </div>
+    );
+}
+
+function StepCard({ number, title, desc }: { number: string; title: string; desc: string }) {
+    return (
+        <div className="text-center p-8">
+            <div className="w-16 h-16 bg-teal-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-black text-teal-500">{number}</span>
             </div>
             <h3 className="text-xl font-bold text-slate-900 mb-3">{title}</h3>
-            <p className="text-slate-500 text-base leading-relaxed font-medium">{desc}</p>
+            <p className="text-slate-500 leading-relaxed">{desc}</p>
         </div>
     );
 }

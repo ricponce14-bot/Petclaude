@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { MessageSquare, Save, Loader2, Info } from "lucide-react";
+import { MessageSquare, Save, Loader2, Info, Sparkles } from "lucide-react";
 
 interface MessageTemplate {
     id: string;
@@ -12,11 +12,19 @@ interface MessageTemplate {
 }
 
 const TEMPLATE_INFO = {
-    reminder: { icon: "⏰", title: "Recordatorio 24h", desc: "Se envía un día antes de la cita programada." },
-    winback: { icon: "🔄", title: "Recuperación (30 días)", desc: "Se envía si la mascota no ha venido en 1 mes." },
-    birthday: { icon: "🎂", title: "Cumpleaños", desc: "Felicitación el día de su cumpleaños." },
-    custom: { icon: "✍️", title: "Personalizada (Manual)", desc: "Plantilla 100% libre para envíos manuales desde el Outbox." }
+    reminder: { icon: "R", title: "Recordatorio 24h", desc: "Se envia un dia antes de la cita programada." },
+    winback: { icon: "W", title: "Recuperacion (30 dias)", desc: "Se envia si la mascota no ha venido en 1 mes." },
+    birthday: { icon: "C", title: "Cumpleanos", desc: "Felicitacion el dia de su cumpleanos." },
+    custom: { icon: "M", title: "Personalizada (Manual)", desc: "Plantilla 100% libre para envios manuales desde el Outbox." }
 };
+
+const MAGIC_VARIABLES = [
+    { label: "Cliente", tag: "{owner_name}" },
+    { label: "Mascota", tag: "{pet_name}" },
+    { label: "Fecha", tag: "{date}" },
+    { label: "Hora", tag: "{time}" },
+    { label: "Clínica", tag: "{clinic_name}" },
+];
 
 export default function MensajesPage() {
     const supabase = createClient();
@@ -39,6 +47,31 @@ export default function MensajesPage() {
     useEffect(() => {
         fetchTemplates();
     }, []);
+
+    const insertVariable = (type: string, variable: string) => {
+        const temp = templates[type];
+        if (!temp || !temp.is_active) return;
+
+        const textarea = document.getElementById(`textarea-${type}`) as HTMLTextAreaElement;
+        if (!textarea) return;
+
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const currentText = temp.body || "";
+
+        const newText = currentText.substring(0, start) + variable + currentText.substring(end);
+
+        setTemplates(prev => ({
+            ...prev,
+            [type]: { ...temp, body: newText }
+        }));
+
+        // Restore focus and cursor position after React re-renders
+        setTimeout(() => {
+            textarea.focus();
+            textarea.setSelectionRange(start + variable.length, start + variable.length);
+        }, 0);
+    };
 
     const handleSave = async (type: string) => {
         setSaving(true);
@@ -73,7 +106,7 @@ export default function MensajesPage() {
                 const button = document.activeElement as HTMLButtonElement;
                 if (button) {
                     const originalText = button.innerText;
-                    button.innerText = "¡Guardado! ✅";
+                    button.innerText = "Guardado";
                     setTimeout(() => button.innerText = originalText, 2000);
                 }
             }
@@ -101,13 +134,22 @@ export default function MensajesPage() {
                 </Link>
             </div>
 
-            <div className="bg-blue-50/50 backdrop-blur-sm border border-blue-100/50 rounded-3xl p-5 flex gap-4 text-sm text-blue-800/80 items-start shadow-sm hover:shadow-md transition-shadow">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50/50 backdrop-blur-sm border border-blue-100/50 rounded-3xl p-5 flex flex-col sm:flex-row gap-4 text-sm text-blue-800/80 items-start shadow-sm hover:shadow-md transition-shadow">
                 <div className="p-2.5 bg-blue-100 rounded-xl shrink-0">
-                    <Info size={22} className="text-blue-500" />
+                    <Sparkles size={22} className="text-blue-500" />
                 </div>
-                <div className="space-y-1.5 pt-1">
-                    <p className="font-bold text-blue-900">Variables dinámicas mágicas:</p>
-                    <p className="font-medium leading-relaxed">Puedes escribir palabras que Ladrido reemplazará automáticamente con la información real de tu cliente en el momento del envío. Ej: <code className="bg-white text-blue-700 px-2 py-1 rounded-lg shadow-sm border border-blue-100 text-xs font-bold leading-none mx-0.5">&#123;owner_name&#125;</code>, <code className="bg-white text-blue-700 px-2 py-1 rounded-lg shadow-sm border border-blue-100 text-xs font-bold leading-none mx-0.5">&#123;pet_name&#125;</code>, <code className="bg-white text-blue-700 px-2 py-1 rounded-lg shadow-sm border border-blue-100 text-xs font-bold leading-none mx-0.5">&#123;time&#125;</code>.</p>
+                <div className="space-y-2 pt-1">
+                    <p className="font-bold text-blue-900 text-base">Variables Dinámicas Mágicas</p>
+                    <p className="font-medium leading-relaxed max-w-2xl">
+                        Haz clic en los botones debajo de cada campo de texto para insertar automáticamente etiquetas especiales. Ladrido las reemplazará automáticamente con la información real del cliente al momento de enviar el mensaje.
+                    </p>
+                    <div className="flex gap-2 flex-wrap pt-1">
+                        {MAGIC_VARIABLES.map(v => (
+                            <span key={v.tag} className="bg-white text-blue-700 px-2.5 py-1 rounded-lg shadow-sm border border-blue-100/50 text-xs font-bold font-mono">
+                                {v.tag}
+                            </span>
+                        ))}
+                    </div>
                 </div>
             </div>
 
@@ -121,20 +163,22 @@ export default function MensajesPage() {
                         const temp = templates[type] || { id: "", type, body: "", is_active: false };
 
                         return (
-                            <div key={type} className="bg-white/80 backdrop-blur-xl border text-sm border-slate-100 rounded-[2rem] p-6 shadow-sm hover:shadow-soft-teal hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-teal-50/50 rounded-bl-[4rem] opacity-0 group-hover:opacity-100 transition-all duration-700 -z-10 transform translate-x-10 -translate-y-10 group-hover:translate-x-0 group-hover:translate-y-0" />
+                            <div key={type} className={`bg-white/90 backdrop-blur-xl border-2 rounded-[2rem] p-6 transition-all duration-300 relative overflow-hidden group ${temp.is_active ? 'border-teal-400 shadow-xl shadow-teal-500/10 -translate-y-1' : 'border-slate-100 shadow-sm hover:shadow-md'}`}>
+                                {temp.is_active && (
+                                    <div className="absolute top-0 right-0 w-48 h-48 bg-teal-400/10 rounded-bl-[6rem] -z-10 blur-2xl" />
+                                )}
 
                                 <div className="flex items-start justify-between mb-5">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center text-3xl shadow-sm transform -rotate-3 group-hover:rotate-0 transition-transform">
+                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-sm transform -rotate-3 transition-all duration-500 ${temp.is_active ? 'bg-teal-500 text-white font-black scale-110 rotate-0' : 'bg-slate-50 border border-slate-100 text-slate-400'}`}>
                                             {info.icon}
                                         </div>
                                         <div>
-                                            <h3 className="font-black text-slate-900 text-lg">{info.title}</h3>
+                                            <h3 className={`font-black text-lg transition-colors ${temp.is_active ? 'text-teal-900' : 'text-slate-900'}`}>{info.title}</h3>
                                             <p className="text-slate-500 font-medium text-xs mt-0.5 max-w-[180px] leading-snug">{info.desc}</p>
                                         </div>
                                     </div>
-                                    <label className="flex items-center cursor-pointer pt-2">
+                                    <label className="flex items-center cursor-pointer pt-2 shrink-0">
                                         <div className="relative shadow-sm rounded-full">
                                             <input
                                                 type="checkbox"
@@ -151,17 +195,35 @@ export default function MensajesPage() {
                                     </label>
                                 </div>
 
-                                <div className="relative mt-2">
+                                <div className="relative mt-4">
                                     <textarea
+                                        id={`textarea-${type}`}
                                         value={temp.body}
                                         onChange={(e) => setTemplates(prev => ({
                                             ...prev,
                                             [type]: { ...temp, body: e.target.value }
                                         }))}
-                                        className="w-full text-[15px] font-medium leading-relaxed h-32 p-4 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-teal-500/20 focus:border-teal-500 outline-none resize-none bg-slate-50 focus:bg-white text-slate-800 transition-all shadow-inner"
+                                        className={`w-full text-[15px] font-medium leading-relaxed h-36 p-4 border-2 rounded-2xl outline-none resize-none transition-all ${temp.is_active ? 'border-teal-100 bg-white focus:ring-4 focus:ring-teal-500/20 focus:border-teal-400 shadow-inner' : 'border-slate-100 bg-slate-50 text-slate-500'}`}
                                         placeholder={`Escribe aquí tu mensaje de ${info.title.toLowerCase()}...`}
                                         disabled={!temp.is_active}
                                     />
+
+                                    {temp.is_active && (
+                                        <div className="flex gap-2 flex-wrap mt-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                            {MAGIC_VARIABLES.map(variable => (
+                                                <button
+                                                    key={variable.tag}
+                                                    onClick={() => insertVariable(type, variable.tag)}
+                                                    className="flex items-center gap-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors border border-indigo-100/50 hover:border-indigo-200 focus:ring-2 focus:ring-indigo-500/30 outline-none"
+                                                    title={`Insertar ${variable.tag}`}
+                                                >
+                                                    <Sparkles size={12} className="text-indigo-400" />
+                                                    {variable.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+
                                     {!temp.is_active && (
                                         <div className="absolute inset-0 bg-white/60 flex items-center justify-center rounded-2xl backdrop-blur-[2px]">
                                             <span className="bg-slate-900 text-white text-xs px-4 py-2 rounded-full font-bold shadow-soft-purple">Automatización Inactiva</span>
@@ -169,11 +231,14 @@ export default function MensajesPage() {
                                     )}
                                 </div>
 
-                                <div className="flex justify-end mt-5">
+                                <div className="flex justify-end mt-6">
                                     <button
                                         onClick={() => handleSave(type)}
                                         disabled={saving || !temp.is_active}
-                                        className="flex items-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-teal-500 transition-all disabled:opacity-50 disabled:hover:bg-slate-900 shadow-sm hover:shadow-md hover:-translate-y-0.5 w-full justify-center sm:w-auto"
+                                        className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm w-full justify-center sm:w-auto ${temp.is_active
+                                            ? 'bg-slate-900 text-white hover:bg-teal-500 hover:shadow-md hover:-translate-y-0.5'
+                                            : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                                            }`}
                                     >
                                         {saving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
                                         Guardar plantilla

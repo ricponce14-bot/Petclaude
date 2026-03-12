@@ -59,6 +59,20 @@ export default function OutboxPage() {
         }
     };
 
+    const handleDelete = async (id: string) => {
+        if (!confirm("¿Estás seguro de que deseas eliminar este mensaje de la cola?")) return;
+        
+        setProcessingId(id);
+        const { error } = await supabase.from("wa_messages").delete().eq("id", id);
+        
+        if (error) {
+            alert("Error al eliminar: " + error.message);
+        } else {
+            fetchMessages();
+        }
+        setProcessingId(null);
+    };
+
     const TABS = [
         { id: "pending", label: "En Cola", icon: Clock },
         { id: "sent", label: "Enviados", icon: CheckCircle2 },
@@ -176,7 +190,7 @@ export default function OutboxPage() {
                                         </span>
                                         {msg.pets && (
                                             <span className="text-[10px] bg-orange-50 text-orange-600 px-2 py-0.5 rounded-sm font-bold">
-                                                🐾 {msg.pets.name}
+                                                {msg.pets.name}
                                             </span>
                                         )}
                                     </div>
@@ -197,7 +211,7 @@ export default function OutboxPage() {
                                 </div>
 
                                 {/* Action Buttons */}
-                                {(activeTab === "pending" || activeTab === "failed") && (
+                                {(activeTab === "pending" || activeTab === "failed" || activeTab === "sent") && (
                                     <div className="flex sm:flex-col items-center justify-end gap-2 shrink-0 border-t sm:border-t-0 sm:border-l border-slate-100/50 pt-4 sm:pt-0 sm:pl-5">
                                         <button
                                             onClick={() => handleForceSend(msg.id)}
@@ -209,7 +223,16 @@ export default function OutboxPage() {
                                             ) : (
                                                 <Send size={16} />
                                             )}
-                                            {activeTab === "failed" ? "Reintentar" : "Enviar ahora"}
+                                            {activeTab === "sent" ? "Volver a enviar" : activeTab === "failed" ? "Reintentar" : "Enviar ahora"}
+                                        </button>
+                                        
+                                        <button
+                                            onClick={() => handleDelete(msg.id)}
+                                            disabled={processingId === msg.id}
+                                            className="flex items-center justify-center gap-2 w-full sm:w-auto bg-red-50 text-red-600 hover:bg-red-500 hover:text-white px-4 py-3 rounded-xl font-bold text-sm transition-all shadow-sm disabled:opacity-50"
+                                        >
+                                            <XCircle size={16} />
+                                            Borrar
                                         </button>
                                     </div>
                                 )}

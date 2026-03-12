@@ -35,7 +35,7 @@ export default async function DashboardPage() {
     <div className="p-6 max-w-5xl mx-auto space-y-8">
       {/* Header Premium */}
       <div className="mb-10 relative">
-        <h1 className="text-4xl font-black text-gradient tracking-tight">Buenos días 👋</h1>
+        <h1 className="text-4xl font-black text-gradient tracking-tight">Buenos días</h1>
         <p className="text-slate-500 font-semibold text-base mt-2">{format(today, "EEEE d 'de' MMMM, yyyy", { locale: es })}</p>
       </div>
 

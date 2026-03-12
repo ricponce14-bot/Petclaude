@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { CalendarDays, Users, PawPrint, MessageCircle, LayoutDashboard, QrCode, LogOut, CreditCard, DollarSign } from "lucide-react";
+import { CalendarDays, Users, PawPrint, MessageCircle, LayoutDashboard, QrCode, LogOut, CreditCard, DollarSign, Bot, Inbox } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 
@@ -14,6 +14,8 @@ const links = [
   { href: "/whatsapp", label: "WhatsApp", icon: QrCode },
   { href: "/mensajes", label: "Mensajes", icon: MessageCircle },
   { href: "/mensajes/outbox", label: "Seguimiento", icon: MessageCircle },
+  { href: "/bot", label: "Bot WhatsApp", icon: Bot },
+  { href: "/conversaciones", label: "Conversaciones", icon: Inbox },
   { href: "/membresia", label: "Membresía", icon: CreditCard },
 ];
 
@@ -31,8 +33,8 @@ export default function Sidebar() {
   return (
     <aside className="w-56 bg-gray-900 text-white flex flex-col">
       {/* Logo */}
-      <div className="px-5 py-5 border-b border-gray-800">
-        <span className="text-lg font-bold text-teal-400">🐾 Ladrido</span>
+      <div className="px-5 py-3 border-b border-gray-800 flex justify-center">
+        <img src="/images/logo-white.png" alt="Ladrido" className="w-[140px] h-auto object-contain" />
       </div>
 
       {/* Nav */}

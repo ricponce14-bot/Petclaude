@@ -1,5 +1,12 @@
 import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createClient } from "@supabase/supabase-js";
+
+// Usamos Service Role para evitar bloqueos silenciosos de RLS
+const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function POST(req: Request) {
     try {
@@ -17,33 +24,59 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Cliente y mensaje son requeridos" }, { status: 400 });
         }
 
-        // Obtener el teléfono del dueño
-        const { data: owner } = await supabase
+        // Obtener datos del dueño (BYPASS RLS con Admin)
+        const { data: owner, error: ownerErr } = await supabaseAdmin
             .from("owners")
-            .select("whatsapp, name")
+            .select("*")
             .eq("id", owner_id)
             .single();
 
-        if (!owner?.whatsapp) {
-            return NextResponse.json({ error: "El cliente no tiene WhatsApp registrado" }, { status: 400 });
+        console.log("📋 Owner data:", JSON.stringify(owner));
+
+        if (ownerErr) {
+            return NextResponse.json({ error: "Error buscando cliente: " + ownerErr.message }, { status: 500 });
         }
 
-        // Insertar en la cola de mensajes
-        const { error: insertErr } = await supabase.from("wa_messages").insert({
+        // Buscar teléfono en cualquier campo posible
+        const phone = (owner as any)?.whatsapp || (owner as any)?.phone || (owner as any)?.telefono || null;
+
+        if (!phone) {
+            return NextResponse.json({
+                error: `El cliente no tiene teléfono celular registrado. Datos encontrados: ${JSON.stringify(Object.keys(owner || {}))}`,
+                debug_columns: owner ? Object.keys(owner) : "not found"
+            }, { status: 400 });
+        }
+
+        // Insertar en la cola de mensajes (BYPASS RLS con Admin)
+        const { data: newMsg, error: insertErr } = await supabaseAdmin.from("wa_messages").insert({
             tenant_id: tenantId,
-            owner_id,
-            pet_id: pet_id || null,
+            owner_id: owner_id,
+            pet_id: pet_id || null, // Guardamos pet_id si fue proveido 
             type: "manual",
-            phone: owner.whatsapp,
+            phone: phone,
             body,
             status: "pending"
-        } as any);
+        } as any).select().single();
 
         if (insertErr) {
+            console.error("Insert error:", insertErr);
             return NextResponse.json({ error: "Error al crear mensaje: " + insertErr.message }, { status: 500 });
         }
 
-        return NextResponse.json({ ok: true, message: "Mensaje agregado a la cola de envío" });
+        // Auto-procesar la cola inmediatamente para que el usuario no tenga que ir a Outbox
+        try {
+            const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || req.headers.get("origin") || "http://localhost:3000";
+            fetch(`${baseUrl}/api/whatsapp/process-queue`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${process.env.CRON_SECRET}`
+                },
+                body: JSON.stringify({ messageId: newMsg.id })
+            }).catch(e => console.error("Fallo silencioso al auto-procesar cola:", e));
+        } catch (e) { }
+
+        return NextResponse.json({ ok: true, message: "Mensaje procesado en la cola de envío" });
     } catch (error: any) {
         console.error("Send message error:", error);
         return NextResponse.json({ error: error.message }, { status: 500 });

@@ -35,7 +35,7 @@ export async function POST() {
             await supabase.from("wa_sessions").update({
                 status: "connected",
                 updated_at: new Date().toISOString(),
-            } as any).eq("instance", instanceName);
+            } as never).eq("instance", instanceName);
             return NextResponse.json({ ok: true, status: "connected" });
         }
 

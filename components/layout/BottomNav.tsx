@@ -2,14 +2,13 @@
 // components/layout/BottomNav.tsx
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Users, PawPrint, QrCode, MessageCircle, DollarSign } from "lucide-react";
-
+import { CalendarDays, Users, PawPrint, MessageCircle, DollarSign, LayoutDashboard, Bot } from "lucide-react";
 const navItems = [
+    { href: "/dashboard", icon: LayoutDashboard, label: "Inicio" },
     { href: "/agenda", icon: CalendarDays, label: "Agenda" },
-    { href: "/clientes", icon: Users, label: "Clientes" },
-    { href: "/gastos", icon: DollarSign, label: "Gastos" },
-    { href: "/mensajes/outbox", icon: MessageCircle, label: "Mensajes" },
-    { href: "/whatsapp", icon: QrCode, label: "WhatsApp" },
+    { href: "/mascotas", icon: PawPrint, label: "Mascotas" },
+    { href: "/bot", icon: Bot, label: "Bot" },
+    { href: "/mensajes/outbox", icon: MessageCircle, label: "Enviados" },
 ];
 
 export default function BottomNav() {
@@ -24,7 +23,7 @@ export default function BottomNav() {
                         <Link
                             key={href}
                             href={href}
-                            className="flex flex-col items-center justify-center w-16 gap-1 relative group"
+                            className="flex flex-col items-center justify-center flex-1 gap-1 relative group"
                         >
                             <div
                                 className={`flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 ${isActive

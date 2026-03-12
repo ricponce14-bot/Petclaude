@@ -7,12 +7,12 @@ import { es } from "date-fns/locale";
 import NewExpenseModal from "@/components/gastos/NewExpenseModal";
 
 const CATEGORY_CONFIG: Record<string, { label: string; icon: string; color: string; bg: string }> = {
-    supplies: { label: "Insumos", icon: "🧴", color: "text-blue-700", bg: "bg-blue-50" },
-    rent: { label: "Renta", icon: "🏠", color: "text-purple-700", bg: "bg-purple-50" },
-    payroll: { label: "Nómina", icon: "👥", color: "text-green-700", bg: "bg-green-50" },
-    utilities: { label: "Servicios", icon: "⚡", color: "text-yellow-700", bg: "bg-yellow-50" },
-    veterinary: { label: "Veterinario", icon: "🩺", color: "text-rose-700", bg: "bg-rose-50" },
-    other: { label: "Otro", icon: "📦", color: "text-slate-700", bg: "bg-slate-50" },
+    supplies: { label: "Insumos", icon: "IN", color: "text-blue-700", bg: "bg-blue-50" },
+    rent: { label: "Renta", icon: "RE", color: "text-purple-700", bg: "bg-purple-50" },
+    payroll: { label: "Nomina", icon: "NM", color: "text-green-700", bg: "bg-green-50" },
+    utilities: { label: "Servicios", icon: "SV", color: "text-yellow-700", bg: "bg-yellow-50" },
+    veterinary: { label: "Veterinario", icon: "VT", color: "text-rose-700", bg: "bg-rose-50" },
+    other: { label: "Otro", icon: "OT", color: "text-slate-700", bg: "bg-slate-50" },
 };
 
 interface Expense {
@@ -160,7 +160,7 @@ export default function GastosPage() {
                                 const pct = grandTotal ? (total / grandTotal) * 100 : 0;
                                 return (
                                     <div key={cat} className="flex items-center gap-3">
-                                        <span className="text-xl w-8 text-center">{config?.icon}</span>
+                                        <span className="text-xs font-black w-8 text-center">{config?.icon}</span>
                                         <span className="text-sm font-bold text-slate-700 w-24">{config?.label}</span>
                                         <div className="flex-1 bg-slate-100 rounded-full h-3 overflow-hidden">
                                             <div
@@ -185,7 +185,7 @@ export default function GastosPage() {
                 </div>
             ) : expenses.length === 0 ? (
                 <div className="text-center py-20 glass rounded-[2rem]">
-                    <p className="text-5xl mb-4">💸</p>
+                    <DollarSign size={48} className="text-slate-300 mx-auto mb-4" />
                     <p className="text-slate-500 font-bold text-lg">No hay gastos registrados este mes</p>
                     <button onClick={() => setShowModal(true)} className="mt-4 text-teal-600 text-sm font-bold hover:underline">
                         + Registrar primer gasto
@@ -197,8 +197,8 @@ export default function GastosPage() {
                         const config = CATEGORY_CONFIG[exp.category];
                         return (
                             <div key={exp.id} className="bg-white/80 backdrop-blur-xl border border-slate-100 rounded-2xl p-4 shadow-sm hover:shadow-soft-teal hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-4 group">
-                                <div className={`w-12 h-12 ${config?.bg || "bg-slate-50"} rounded-xl flex items-center justify-center text-2xl shrink-0 transform -rotate-3 group-hover:rotate-0 transition-transform`}>
-                                    {config?.icon || "📦"}
+                                <div className={`w-12 h-12 ${config?.bg || "bg-slate-50"} rounded-xl flex items-center justify-center text-xs font-black shrink-0 transform -rotate-3 group-hover:rotate-0 transition-transform ${config?.color || "text-slate-500"}`}>
+                                    {config?.icon || "OT"}
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 mb-0.5">

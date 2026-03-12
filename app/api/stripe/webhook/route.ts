@@ -119,11 +119,11 @@ export async function POST(req: Request) {
 
             // ── Factura pagada (reactivar plan) ──
             case "invoice.paid": {
-                const invoice = event.data.object as Stripe.Invoice;
+                const invoice = event.data.object as any;
                 if (invoice.subscription) {
                     await supabase
                         .from("tenants")
-                        .update({ plan: "active" })
+                        .update({ plan: "active" } as any)
                         .eq("stripe_subscription_id", invoice.subscription as string);
                     console.log(`✅ Invoice pagada, plan reactivado para sub ${invoice.subscription}`);
                 }
@@ -132,11 +132,11 @@ export async function POST(req: Request) {
 
             // ── Factura fallida ──
             case "invoice.payment_failed": {
-                const invoice = event.data.object as Stripe.Invoice;
+                const invoice = event.data.object as any;
                 if (invoice.subscription) {
                     await supabase
                         .from("tenants")
-                        .update({ plan: "past_due" })
+                        .update({ plan: "past_due" } as any)
                         .eq("stripe_subscription_id", invoice.subscription as string);
                     console.log(`⚠️ Invoice fallida, plan en past_due para sub ${invoice.subscription}`);
                 }

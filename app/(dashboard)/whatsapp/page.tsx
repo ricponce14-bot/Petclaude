@@ -2,7 +2,7 @@
 // app/(dashboard)/whatsapp/page.tsx
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { QrCode, Wifi, WifiOff, RefreshCw, Loader2 } from "lucide-react";
+import { QrCode, Wifi, WifiOff, RefreshCw, Loader2, Bell, Calendar } from "lucide-react";
 import type { WaSession } from "@/lib/supabase/types";
 
 export default function WhatsAppPage() {
@@ -22,7 +22,7 @@ export default function WhatsAppPage() {
     fetchSession();
     // Polling suave: solo verificar estado, NO reconectar
     const interval = setInterval(async () => {
-      if (session?.status === "qr_needed" || session?.status === "connecting") {
+      if (session?.status === "qr_needed" || (session as any)?.status === "connecting") {
         // Solo verificar si cambió el estado (sin llamar connect)
         try {
           await fetch("/api/whatsapp/fetch-qr", { method: "POST" });
@@ -77,7 +77,7 @@ export default function WhatsAppPage() {
           {session?.status === "connected" ? (
             <><Wifi size={20} className="text-green-500" />
               <div>
-                <p className="font-semibold text-green-700">Conectado ✅</p>
+                <p className="font-semibold text-green-700">Conectado</p>
                 <p className="text-xs text-gray-400">Instancia: {session.instance}</p>
               </div>
             </>
@@ -124,7 +124,7 @@ export default function WhatsAppPage() {
               disabled={creating}
               className="mt-2 bg-teal-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-60"
             >
-              {creating ? "Regenerando..." : "🔄 Regenerar QR"}
+              {creating ? "Regenerando..." : "Regenerar QR"}
             </button>
           </div>
         )}
@@ -151,7 +151,7 @@ export default function WhatsAppPage() {
 
         {session?.status === "connected" && (
           <div className="bg-green-50 rounded-xl p-4 text-sm text-green-700">
-            🎉 Las automatizaciones están activas. Los recordatorios, win-backs y cumpleaños se enviarán automáticamente.
+            Las automatizaciones estan activas. Los recordatorios, win-backs y cumpleanos se enviaran automaticamente.
           </div>
         )}
       </div>
@@ -159,12 +159,12 @@ export default function WhatsAppPage() {
       {/* Info cards */}
       <div className="grid grid-cols-1 gap-3">
         {[
-          { emoji: "⏰", title: "Recordatorio 24h", desc: "Se envía automáticamente un día antes de cada cita" },
-          { emoji: "🔄", title: "Win-back 30 días", desc: "Mensaje automático si una mascota no visita en 30 días" },
-          { emoji: "🎂", title: "Cumpleaños", desc: "Felicitación con descuento a las 9:00 AM del cumpleaños" },
+          { icon: Bell, title: "Recordatorio 24h", desc: "Se envia automaticamente un dia antes de cada cita" },
+          { icon: RefreshCw, title: "Win-back 30 dias", desc: "Mensaje automatico si una mascota no visita en 30 dias" },
+          { icon: Calendar, title: "Cumpleanos", desc: "Felicitacion con descuento a las 9:00 AM del cumpleanos" },
         ].map(item => (
           <div key={item.title} className="flex gap-3 bg-white rounded-xl border border-gray-100 px-4 py-3">
-            <span className="text-xl shrink-0">{item.emoji}</span>
+            <item.icon size={20} className="text-teal-500 shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-medium text-gray-800">{item.title}</p>
               <p className="text-xs text-gray-400">{item.desc}</p>

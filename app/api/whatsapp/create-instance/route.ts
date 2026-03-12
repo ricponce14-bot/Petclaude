@@ -85,7 +85,28 @@ export async function POST() {
       }
     }
 
-    // 6. Guardar en Supabase
+    // 6. Configurar webhook para recepción de mensajes del bot
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL;
+    if (appUrl) {
+      try {
+        await fetch(`${apiUrl}/webhook/set/${instance}`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            url: `${appUrl}/api/whatsapp/webhook`,
+            webhook_by_events: true,
+            events: ["MESSAGES_UPSERT"],
+            enabled: true
+          })
+        });
+        console.log(`[WhatsApp] Webhook configurado para ${instance}`);
+      } catch (e) {
+        console.warn("[WhatsApp] No se pudo configurar webhook:", e);
+        // No fallar si el webhook no se configura — es una funcionalidad extra
+      }
+    }
+
+    // 7. Guardar en Supabase
     await supabase.from("wa_sessions").upsert({
       tenant_id: tenantId,
       instance,
@@ -94,8 +115,23 @@ export async function POST() {
       updated_at: new Date().toISOString(),
     } as any, { onConflict: "tenant_id" });
 
+    // 8. Crear configuración por defecto del bot si no existe
+    const { data: existingBotConfig } = await supabase
+      .from("bot_config")
+      .select("id")
+      .eq("tenant_id", tenantId)
+      .single();
+
+    if (!existingBotConfig) {
+      await supabase.from("bot_config").insert({
+        tenant_id: tenantId,
+        is_enabled: false,
+      } as any);
+    }
+
     return NextResponse.json({ ok: true, instance, qr_code: qrCode });
   } catch (err: any) {
     return NextResponse.json({ error: "Fallo al contactar Evolution API en Hetzner: " + err.message }, { status: 500 });
   }
 }
+

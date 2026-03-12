@@ -5,30 +5,51 @@ import { createClient } from "@/lib/supabase/client";
 import { notFound, useParams } from "next/navigation";
 import { Phone, Mail, MapPin, PawPrint, Calendar, ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import EditOwnerModal from "@/components/crm/EditOwnerModal";
 
 export default function ClienteDetailPage() {
     const { id } = useParams();
     const supabase = createClient();
     const [owner, setOwner] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [deleting, setDeleting] = useState(false);
+    const router = useRouter();
+
+    const fetchOwner = async () => {
+        setLoading(true);
+        const { data, error } = await supabase
+            .from("owners")
+            .select("*, pets(*)")
+            .eq("id", id)
+            .single();
+
+        if (error || !data) {
+            setLoading(false);
+            return;
+        }
+        setOwner(data);
+        setLoading(false);
+    };
 
     useEffect(() => {
-        async function fetchOwner() {
-            const { data, error } = await supabase
-                .from("owners")
-                .select("*, pets(*)")
-                .eq("id", id)
-                .single();
-
-            if (error || !data) {
-                setLoading(false);
-                return;
-            }
-            setOwner(data);
-            setLoading(false);
-        }
         fetchOwner();
     }, [id, supabase]);
+
+    const handleDelete = async () => {
+        if (!confirm(`¿Estás seguro de que deseas eliminar permanentemente a ${owner.name}? Esta acción también borrará a sus mascotas y citas.`)) return;
+
+        setDeleting(true);
+        const { error } = await supabase.from("owners").delete().eq("id", owner.id);
+
+        if (error) {
+            alert("Error al eliminar cliente: " + error.message);
+            setDeleting(false);
+        } else {
+            router.push("/clientes");
+        }
+    };
 
     if (loading) {
         return (
@@ -55,13 +76,32 @@ export default function ClienteDetailPage() {
                     <div className="bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-teal-50 rounded-bl-full -z-10" />
 
-                        <div className="flex items-center gap-6 mb-8">
-                            <div className="w-20 h-20 rounded-[2rem] bg-teal-500 text-white flex items-center justify-center text-3xl font-black shadow-lg shadow-teal-100 transform -rotate-3">
-                                {owner.name.charAt(0).toUpperCase()}
+                        <div className="flex items-start justify-between mb-8">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+                                <div className="w-20 h-20 rounded-[2rem] bg-teal-500 text-white flex shrink-0 items-center justify-center text-3xl font-black shadow-lg shadow-teal-100 transform -rotate-3">
+                                    {owner.name.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                    <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">{owner.name}</h1>
+                                    <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-1">Cliente desde {new Date(owner.created_at).getFullYear()}</p>
+                                </div>
                             </div>
-                            <div>
-                                <h1 className="text-3xl font-black text-slate-900 tracking-tight">{owner.name}</h1>
-                                <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-1">Cliente desde {new Date(owner.created_at).getFullYear()}</p>
+
+                            {/* Action Menu */}
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => setShowEditModal(true)}
+                                    className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-4 py-2 rounded-xl transition-colors shadow-sm"
+                                >
+                                    Editar
+                                </button>
+                                <button
+                                    onClick={handleDelete}
+                                    disabled={deleting}
+                                    className="bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold px-4 py-2 rounded-xl transition-colors shadow-sm border border-red-100 disabled:opacity-50"
+                                >
+                                    {deleting ? 'Borrando...' : 'Eliminar'}
+                                </button>
                             </div>
                         </div>
 
@@ -134,8 +174,8 @@ export default function ClienteDetailPage() {
                                     className="group block bg-white border border-slate-100 rounded-3xl p-4 shadow-sm hover:shadow-soft-purple hover:-translate-y-1 transition-all duration-300"
                                 >
                                     <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-2xl bg-purple-50 text-2xl flex items-center justify-center transform group-hover:scale-110 transition-transform">
-                                            {pet.species === 'cat' ? '🐱' : '🐶'}
+                                        <div className="w-12 h-12 rounded-2xl bg-purple-50 text-lg font-black text-purple-600 flex items-center justify-center transform group-hover:scale-110 transition-transform">
+                                            {pet.species === 'cat' ? 'G' : 'P'}
                                         </div>
                                         <div>
                                             <h4 className="font-bold text-slate-900 leading-none">{pet.name}</h4>
@@ -148,6 +188,14 @@ export default function ClienteDetailPage() {
                     </div>
                 </div>
             </div>
+
+            {showEditModal && (
+                <EditOwnerModal
+                    owner={owner}
+                    onClose={() => setShowEditModal(false)}
+                    onUpdated={fetchOwner}
+                />
+            )}
         </div>
     );
 }

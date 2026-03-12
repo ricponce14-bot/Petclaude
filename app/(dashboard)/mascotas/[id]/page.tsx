@@ -24,8 +24,8 @@ export default async function MascotaPage({ params }: { params: { id: string } }
       {/* Pet header */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
         <div className="flex items-start gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center text-3xl shrink-0">
-            {p.species === "cat" ? "🐱" : "🐶"}
+          <div className="w-16 h-16 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center text-xl font-black shrink-0">
+            {p.species === "cat" ? "G" : "P"}
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 flex-wrap">
@@ -36,7 +36,7 @@ export default async function MascotaPage({ params }: { params: { id: string } }
                 </span>
               )}
               {p.temperament === "nervous" && (
-                <span className="text-xs bg-yellow-100 text-yellow-600 px-2 py-1 rounded-full font-bold">😰 Nervioso</span>
+                <span className="text-xs bg-yellow-100 text-yellow-600 px-2 py-1 rounded-full font-bold">Nervioso</span>
               )}
             </div>
             <p className="text-sm text-gray-500 mt-1">
@@ -44,7 +44,7 @@ export default async function MascotaPage({ params }: { params: { id: string } }
             </p>
             {p.birthdate && (
               <p className="text-xs text-gray-400 mt-1">
-                🎂 {format(new Date(p.birthdate), "d 'de' MMMM, yyyy", { locale: es })}
+                {format(new Date(p.birthdate), "d 'de' MMMM, yyyy", { locale: es })}
               </p>
             )}
           </div>
@@ -82,8 +82,8 @@ export default async function MascotaPage({ params }: { params: { id: string } }
                 <li key={r.id} className="flex gap-4 px-5 py-2.5 relative">
                   {/* Dot */}
                   <div className="w-8 h-8 rounded-full bg-teal-50 border-2 border-teal-200 flex items-center justify-center shrink-0 relative z-10">
-                    <span className="text-sm">
-                      {r.type === "bath" ? "🛁" : r.type === "vaccine" ? "💉" : r.type === "checkup" ? "🔍" : "✂️"}
+                    <span className="text-xs font-black">
+                      {r.type === "bath" ? "B" : r.type === "vaccine" ? "V" : r.type === "checkup" ? "C" : "S"}
                     </span>
                   </div>
                   <div className="flex-1 pt-1">
@@ -94,8 +94,8 @@ export default async function MascotaPage({ params }: { params: { id: string } }
                       </span>
                     </div>
                     {r.description && <p className="text-xs text-gray-500 mt-0.5">{r.description}</p>}
-                    {r.weight_kg && <p className="text-xs text-blue-500 mt-0.5">⚖️ {r.weight_kg} kg</p>}
-                    {r.products && <p className="text-xs text-purple-500 mt-0.5">🧴 {r.products}</p>}
+                    {r.weight_kg && <p className="text-xs text-blue-500 mt-0.5">{r.weight_kg} kg</p>}
+                    {r.products && <p className="text-xs text-purple-500 mt-0.5">Productos: {r.products}</p>}
                   </div>
                 </li>
               ))}

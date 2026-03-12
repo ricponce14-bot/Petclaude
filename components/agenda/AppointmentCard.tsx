@@ -80,7 +80,7 @@ export default function AppointmentCard({
             <span className="text-lg font-black text-slate-900">{appt.pets?.name}</span>
             {appt.pets?.allergies && (
               <span className="text-[10px] uppercase font-bold tracking-wider bg-red-100 text-red-700 px-2 py-0.5 rounded-full inline-flex items-center gap-1 shadow-sm">
-                ⚠ Alergias
+                Alergias
               </span>
             )}
             {appt.pets?.temperament === "aggressive" && (
@@ -140,7 +140,7 @@ export default function AppointmentCard({
               {sendingTicket ? (
                 <Loader2 size={14} className="animate-spin" />
               ) : ticketSent ? (
-                <>✅ Ticket enviado</>
+                <>Ticket enviado</>
               ) : (
                 <>
                   <Send size={14} /> Enviar ticket por WA

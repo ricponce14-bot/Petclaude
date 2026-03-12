@@ -29,9 +29,8 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 w-full max-w-sm p-8">
-        <div className="text-center mb-8">
-          <p className="text-4xl mb-3">🐾</p>
-          <h1 className="text-2xl font-bold text-gray-900">Ladrido</h1>
+        <div className="text-center mb-6">
+          <img src="/images/logo-color.png" alt="Ladrido" className="w-[160px] md:w-[180px] h-auto mx-auto mb-4 object-contain" />
           <p className="text-gray-400 text-sm mt-1">Ingresa a tu cuenta</p>
         </div>
 

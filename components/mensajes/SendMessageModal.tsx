@@ -44,8 +44,14 @@ export default function SendMessageModal({ onClose, onSent }: SendMessageModalPr
 
     useEffect(() => {
         const fetchOwners = async () => {
-            const { data } = await supabase.from("owners").select("id, name, whatsapp").order("name");
-            setOwners((data as Owner[]) || []);
+            const { data } = await supabase.from("owners").select("*").order("name");
+            // Mapear a nuestro tipo, usando whatsapp o phone
+            const mapped = (data || []).map((o: any) => ({
+                id: o.id,
+                name: o.name,
+                whatsapp: o.whatsapp || o.phone || "",
+            }));
+            setOwners(mapped);
         };
         fetchOwners();
     }, []);
@@ -54,7 +60,7 @@ export default function SendMessageModal({ onClose, onSent }: SendMessageModalPr
         if (searchTerm.length >= 1) {
             const filtered = owners.filter(o =>
                 o.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                o.whatsapp.includes(searchTerm)
+                (o.whatsapp && o.whatsapp.includes(searchTerm))
             );
             setFilteredOwners(filtered);
             setShowDropdown(true);
@@ -151,7 +157,7 @@ export default function SendMessageModal({ onClose, onSent }: SendMessageModalPr
                     )}
                     {success && (
                         <div className="p-3 bg-green-50 text-green-600 rounded-xl text-sm font-bold border border-green-100">
-                            ✅ Mensaje agregado a la cola de envío
+                            Mensaje agregado a la cola de envio
                         </div>
                     )}
 
@@ -213,7 +219,7 @@ export default function SendMessageModal({ onClose, onSent }: SendMessageModalPr
                             >
                                 <option value="">Sin mascota específica</option>
                                 {pets.map(p => (
-                                    <option key={p.id} value={p.id}>🐾 {p.name}</option>
+                                    <option key={p.id} value={p.id}>{p.name}</option>
                                 ))}
                             </select>
                         </div>
@@ -242,7 +248,7 @@ export default function SendMessageModal({ onClose, onSent }: SendMessageModalPr
                             {loading ? (
                                 <Loader2 size={18} className="animate-spin" />
                             ) : success ? (
-                                "✅ Enviado"
+                                "Enviado"
                             ) : (
                                 <>
                                     <Send size={16} /> Enviar a cola

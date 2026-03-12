@@ -10,13 +10,13 @@ import { X } from "lucide-react";
 import type { Owner, Pet } from "@/lib/supabase/types";
 
 const schema = z.object({
-  owner_id:     z.string().uuid("Selecciona un cliente"),
-  pet_id:       z.string().uuid("Selecciona una mascota"),
-  type:         z.enum(["bath", "haircut", "bath_haircut", "vaccine", "checkup", "other"]),
+  owner_id: z.string().uuid("Selecciona un cliente"),
+  pet_id: z.string().uuid("Selecciona una mascota"),
+  type: z.enum(["bath", "haircut", "bath_haircut", "vaccine", "checkup", "other"]),
   scheduled_at: z.string().min(1, "Requerido"),
   duration_min: z.coerce.number().min(15).max(480),
-  price:        z.coerce.number().optional(),
-  notes:        z.string().optional(),
+  price: z.coerce.number().optional(),
+  notes: z.string().optional(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -24,9 +24,9 @@ type FormData = z.infer<typeof schema>;
 export default function NewAppointmentModal({
   defaultDate, onClose, onCreated,
 }: { defaultDate: Date; onClose: () => void; onCreated: () => void }) {
-  const supabase  = createClient();
+  const supabase = createClient();
   const [owners, setOwners] = useState<Owner[]>([]);
-  const [pets, setPets]     = useState<Pet[]>([]);
+  const [pets, setPets] = useState<Pet[]>([]);
   const [saving, setSaving] = useState(false);
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm<FormData>({
@@ -55,12 +55,27 @@ export default function NewAppointmentModal({
 
   const onSubmit = async (values: FormData) => {
     setSaving(true);
+    const { data: { session } } = await supabase.auth.getSession();
+    const tenant_id = session?.user.app_metadata?.tenant_id || session?.user.user_metadata?.tenant_id;
+
+    if (!tenant_id) {
+      alert("Error de sesión: No se encontró la veterinaria.");
+      setSaving(false);
+      return;
+    }
+
     const { error } = await supabase.from("appointments").insert({
       ...values,
+      tenant_id,
       scheduled_at: new Date(values.scheduled_at).toISOString(),
-    });
+    } as any);
     setSaving(false);
-    if (!error) { onCreated(); onClose(); }
+    if (!error) {
+      onCreated();
+      onClose();
+    } else {
+      alert("Error al agendar cita: " + error.message);
+    }
   };
 
   return (

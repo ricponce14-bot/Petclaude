@@ -71,8 +71,8 @@ export default function RegistroPage() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
             <div className="bg-white/80 backdrop-blur-xl rounded-[2rem] shadow-soft-purple border border-slate-100 w-full max-w-sm p-8 hover:-translate-y-1 transition-all duration-300">
-                <div className="text-center mb-8">
-                    <p className="text-5xl mb-4 transform hover:scale-110 transition-transform">🐾</p>
+                <div className="text-center mb-6">
+                    <img src="/images/logo-color.png" alt="Ladrido" className="w-[160px] md:w-[180px] h-auto mx-auto mb-4 object-contain" />
                     <h1 className="text-2xl font-black text-slate-900 tracking-tight">Crea tu cuenta</h1>
                     <p className="text-slate-500 font-medium text-sm mt-1 mb-2">Comienza tus 7 días de prueba gratis</p>
                 </div>

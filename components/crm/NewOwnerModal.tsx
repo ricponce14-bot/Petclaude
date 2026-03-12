@@ -10,7 +10,7 @@ import { X } from "lucide-react";
 const schema = z.object({
   // Owner
   owner_name: z.string().min(2, "Mínimo 2 caracteres"),
-  whatsapp: z.string().regex(/^521\d{10}$/, "Formato: 521XXXXXXXXXX (13 dígitos)"),
+  whatsapp: z.string().min(10, "Mínimo 10 dígitos").regex(/^\d{10,15}$/, "Solo números, 10-15 dígitos"),
   owner_notes: z.string().optional(),
   // Pet
   pet_name: z.string().min(1, "Requerido"),
@@ -48,35 +48,41 @@ export default function NewOwnerModal({ onClose, onCreated }: { onClose: () => v
       return;
     }
 
+    // Normalizar número: si son 10 dígitos, agregar 521
+    let phone = values.whatsapp.replace(/\D/g, '');
+    if (phone.length === 10) phone = '521' + phone;
+
     // 1. Crear owner
     const { data: owner, error: ownerErr } = await supabase
       .from("owners")
       .insert({
         tenant_id,
         name: values.owner_name,
-        whatsapp: values.whatsapp,
+        whatsapp: phone,
         notes: values.owner_notes || null
-      })
+      } as any)
       .select()
       .single();
 
     if (ownerErr) { setError(ownerErr.message); setSaving(false); return; }
 
     // 2. Crear mascota
-    const { error: petErr } = await supabase.from("pets").insert({
-      tenant_id,
-      owner_id: owner.id,
-      name: values.pet_name,
-      breed: values.breed || null,
-      birthdate: values.birthdate || null,
-      species: values.species,
-      allergies: values.allergies || null,
-      temperament: values.temperament,
-      notes: values.pet_notes || null,
-    });
+    if ((owner as any)?.id) {
+       const { error: petErr } = await supabase.from("pets").insert({
+         tenant_id,
+         owner_id: (owner as any).id,
+         name: values.pet_name,
+         breed: values.breed || null,
+         birthdate: values.birthdate || null,
+         species: values.species,
+         allergies: values.allergies || null,
+         temperament: values.temperament,
+         notes: values.pet_notes || null,
+       } as never);
+       if (petErr) { setError(petErr.message); setSaving(false); return; }
+    }
 
     setSaving(false);
-    if (petErr) { setError(petErr.message); return; }
     onCreated();
     onClose();
   };
@@ -102,13 +108,13 @@ export default function NewOwnerModal({ onClose, onCreated }: { onClose: () => v
         <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-5 space-y-5">
           {/* Owner section */}
           <div>
-            <p className="text-xs font-bold text-teal-600 uppercase tracking-wider mb-3">👤 Dueño</p>
+            <p className="text-xs font-bold text-teal-600 uppercase tracking-wider mb-3">Dueno</p>
             <div className="space-y-3">
               <Field label="Nombre completo" error={errors.owner_name?.message}>
                 <input {...register("owner_name")} placeholder="Ej. Lupita Hernández" className={inputCls} />
               </Field>
-              <Field label="WhatsApp (521XXXXXXXXXX)" error={errors.whatsapp?.message}>
-                <input {...register("whatsapp")} placeholder="5213317001234" className={inputCls} />
+              <Field label="WhatsApp" error={errors.whatsapp?.message}>
+                <input {...register("whatsapp")} placeholder="3317001234 o 5213317001234" className={inputCls} />
               </Field>
             </div>
           </div>
@@ -117,7 +123,7 @@ export default function NewOwnerModal({ onClose, onCreated }: { onClose: () => v
 
           {/* Pet section */}
           <div>
-            <p className="text-xs font-bold text-purple-600 uppercase tracking-wider mb-3">🐾 Mascota</p>
+            <p className="text-xs font-bold text-purple-600 uppercase tracking-wider mb-3">Mascota</p>
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <Field label="Nombre" error={errors.pet_name?.message}>
@@ -144,7 +150,7 @@ export default function NewOwnerModal({ onClose, onCreated }: { onClose: () => v
                   <select {...register("temperament")} className={inputCls}>
                     <option value="friendly">Amigable</option>
                     <option value="nervous">Nervioso</option>
-                    <option value="aggressive">Agresivo ⚠</option>
+                    <option value="aggressive">Agresivo</option>
                   </select>
                 </Field>
                 <Field label="Alergias">

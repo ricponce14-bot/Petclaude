@@ -3,8 +3,9 @@
 
 export type AppointmentStatus = "scheduled" | "confirmed" | "completed" | "cancelled" | "no_show";
 export type AppointmentType   = "bath" | "haircut" | "bath_haircut" | "vaccine" | "checkup" | "other";
-export type WaMessageType     = "reminder" | "winback" | "birthday" | "manual";
+export type WaMessageType     = "reminder" | "winback" | "birthday" | "manual" | "bot_reply" | "bot_incoming";
 export type WaStatus          = "pending" | "sent" | "failed";
+export type ChatState         = "inicio" | "seleccionar_servicio" | "seleccionar_fecha" | "seleccionar_hora" | "confirmar" | "finalizado" | "esperando_confirmacion" | "reagendar_seleccionar" | "reagendar_fecha" | "reagendar_hora";
 
 export interface Tenant {
   id: string;
@@ -82,6 +83,7 @@ export interface WaMessage {
   phone: string;
   body: string;
   status: WaStatus;
+  direction: "inbound" | "outbound";
   sent_at: string | null;
   error: string | null;
   created_at: string;
@@ -96,17 +98,66 @@ export interface WaSession {
   updated_at: string;
 }
 
+// ============================================================
+// Bot conversacional
+// ============================================================
+
+export interface BotService {
+  key: string;
+  label: string;
+  duration_min: number;
+  price: number;
+}
+
+export interface BotDayHours {
+  open: string;  // "09:00"
+  close: string; // "18:00"
+}
+
+export type BotBusinessHours = Record<string, BotDayHours | null>;
+
+export interface BotConfig {
+  id: string;
+  tenant_id: string;
+  is_enabled: boolean;
+  welcome_message: string;
+  services: BotService[];
+  business_hours: BotBusinessHours;
+  slot_duration_min: number;
+  confirmation_template: string;
+  price_list_message: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WhatsappChatSession {
+  id: string;
+  tenant_id: string;
+  phone: string;
+  owner_id: string | null;
+  state: ChatState;
+  selected_service: string | null;
+  selected_date: string | null;
+  selected_time: string | null;
+  selected_pet_id: string | null;
+  last_message_at: string;
+  expires_at: string;
+  created_at: string;
+}
+
 // Supabase Database shape (para genéricos del cliente)
 export interface Database {
   public: {
     Tables: {
-      tenants:          { Row: Tenant;          Insert: Omit<Tenant, "id" | "created_at">;          Update: Partial<Tenant> };
-      owners:           { Row: Owner;           Insert: Omit<Owner, "id" | "created_at">;           Update: Partial<Owner> };
-      pets:             { Row: Pet;             Insert: Omit<Pet, "id" | "created_at">;             Update: Partial<Pet> };
-      appointments:     { Row: Appointment;     Insert: Omit<Appointment, "id" | "created_at">;     Update: Partial<Appointment> };
-      clinical_records: { Row: ClinicalRecord;  Insert: Omit<ClinicalRecord, "id" | "created_at">; Update: Partial<ClinicalRecord> };
-      wa_messages:      { Row: WaMessage;       Insert: Omit<WaMessage, "id" | "created_at">;      Update: Partial<WaMessage> };
-      wa_sessions:      { Row: WaSession;       Insert: Omit<WaSession, "id">;                     Update: Partial<WaSession> };
+      tenants:                  { Row: Tenant;               Insert: Omit<Tenant, "id" | "created_at">;               Update: Partial<Tenant> };
+      owners:                   { Row: Owner;                Insert: Omit<Owner, "id" | "created_at">;                Update: Partial<Owner> };
+      pets:                     { Row: Pet;                  Insert: Omit<Pet, "id" | "created_at">;                  Update: Partial<Pet> };
+      appointments:             { Row: Appointment;          Insert: Omit<Appointment, "id" | "created_at">;          Update: Partial<Appointment> };
+      clinical_records:         { Row: ClinicalRecord;       Insert: Omit<ClinicalRecord, "id" | "created_at">;      Update: Partial<ClinicalRecord> };
+      wa_messages:              { Row: WaMessage;            Insert: Omit<WaMessage, "id" | "created_at">;           Update: Partial<WaMessage> };
+      wa_sessions:              { Row: WaSession;            Insert: Omit<WaSession, "id">;                          Update: Partial<WaSession> };
+      bot_config:               { Row: BotConfig;            Insert: Omit<BotConfig, "id" | "created_at">;           Update: Partial<BotConfig> };
+      whatsapp_chat_sessions:   { Row: WhatsappChatSession;  Insert: Omit<WhatsappChatSession, "id" | "created_at">; Update: Partial<WhatsappChatSession> };
     };
   };
 }

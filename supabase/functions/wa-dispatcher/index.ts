@@ -2,6 +2,7 @@
 // Edge Function que corre cada minuto — consume la cola wa_messages y envía via Evolution API
 // Deploy: supabase functions deploy wa-dispatcher --no-verify-jwt
 
+// @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 

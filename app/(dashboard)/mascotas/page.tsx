@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Search, Plus, User, Info } from "lucide-react";
+import { Search, Plus, User, Info, PawPrint } from "lucide-react";
 import Link from "next/link";
 import type { Pet } from "@/lib/supabase/types";
 
@@ -29,12 +29,12 @@ export default function MascotasPage() {
         fetchPets();
     }, [search]);
 
-    // Función para renderizar el emoji de especie
-    const getSpeciesEmoji = (species: string) => {
+    // Funcion para renderizar inicial de especie
+    const getSpeciesLabel = (species: string) => {
         switch (species) {
-            case "dog": return "🐶";
-            case "cat": return "🐱";
-            default: return "🐾";
+            case "dog": return "D";
+            case "cat": return "G";
+            default: return "M";
         }
     };
 
@@ -84,7 +84,7 @@ export default function MascotasPage() {
                 </div>
             ) : pets.length === 0 ? (
                 <div className="text-center py-20 glass rounded-[2rem]">
-                    <p className="text-5xl mb-4">🪹</p>
+                    <PawPrint size={48} className="text-slate-300 mx-auto mb-4" />
                     <p className="text-slate-500 font-bold text-lg">No se encontraron mascotas</p>
                 </div>
             ) : (
@@ -98,11 +98,11 @@ export default function MascotasPage() {
                             <div className="absolute top-0 right-0 w-20 h-20 bg-orange-50 rounded-bl-full opacity-50 transition-transform group-hover:scale-110 -z-10" />
 
                             {/* Avatar Orgánico */}
-                            <div className="w-16 h-16 rounded-2xl bg-orange-100/50 text-orange-500 flex items-center justify-center text-3xl shrink-0 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 overflow-hidden shadow-sm">
+                            <div className="w-16 h-16 rounded-2xl bg-orange-100/50 text-orange-600 flex items-center justify-center text-xl font-black shrink-0 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 overflow-hidden shadow-sm">
                                 {pet.photo_url ? (
                                     <img src={pet.photo_url} alt={pet.name} className="w-full h-full object-cover" />
                                 ) : (
-                                    getSpeciesEmoji(pet.species)
+                                    getSpeciesLabel(pet.species)
                                 )}
                             </div>
 

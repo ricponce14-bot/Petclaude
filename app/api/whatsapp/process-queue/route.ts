@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 
-// Service Role para acceso a todos los tenants sin RLS
-const supabase = createClient(
+// Service Role para acceso a todos los tenants sin RLS (necesario para leer config de sesiones ajenas/backend)
+const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
@@ -17,18 +19,36 @@ export async function POST(req: Request) {
 
 async function processQueue(req: Request) {
     try {
-        // Proteger con CRON_SECRET (Vercel Cron envía Authorization: Bearer <secret>)
+        const supabaseAuth = createRouteHandlerClient({ cookies });
+        const { data: { session } } = await supabaseAuth.auth.getSession();
+
+        let reqBody: any = {};
+        if (req.method === "POST") {
+            try {
+                reqBody = await req.json();
+            } catch (e) { }
+        }
+
+        // Proteger con CRON_SECRET o Sesion
         const authHeader = req.headers.get("authorization");
-        if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+        const isCron = process.env.CRON_SECRET && authHeader === `Bearer ${process.env.CRON_SECRET}`;
+
+        if (!isCron && !session) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        // Obtener hasta 50 mensajes pendientes
-        const { data: pendingMessages, error: msgErr } = await supabase
+        let query = supabaseAdmin
             .from("wa_messages")
-            .select("*")
-            .eq("status", "pending")
-            .limit(50);
+            .select("*");
+
+        if (reqBody.messageId) {
+            query = query.eq("id", reqBody.messageId);
+        } else {
+            query = query.eq("status", "pending");
+        }
+
+        // Obtener hasta 50 mensajes
+        const { data: pendingMessages, error: msgErr } = await query.limit(50);
 
         if (msgErr) throw new Error("Error fetching pending messages: " + msgErr.message);
         if (!pendingMessages || pendingMessages.length === 0) {
@@ -37,7 +57,7 @@ async function processQueue(req: Request) {
 
         // Extraer tenant_ids únicos y obtener sus instancias conectadas
         const tenantIds = Array.from(new Set(pendingMessages.map(m => m.tenant_id)));
-        const { data: sessions } = await supabase
+        const { data: sessions } = await supabaseAdmin
             .from("wa_sessions")
             .select("tenant_id, instance, status")
             .in("tenant_id", tenantIds)
@@ -59,7 +79,7 @@ async function processQueue(req: Request) {
 
             if (!instanceName) {
                 // WhatsApp no conectado — marcar como fallido
-                await supabase
+                await supabaseAdmin
                     .from("wa_messages")
                     .update({
                         status: "failed",
@@ -86,21 +106,21 @@ async function processQueue(req: Request) {
                 });
 
                 if (sendRes.ok) {
-                    await supabase
+                    await supabaseAdmin
                         .from("wa_messages")
                         .update({ status: "sent", sent_at: new Date().toISOString(), error: null })
                         .eq("id", msg.id);
                     results.sent++;
                 } else {
                     const errData = await sendRes.text();
-                    await supabase
+                    await supabaseAdmin
                         .from("wa_messages")
                         .update({ status: "failed", error: errData, sent_at: new Date().toISOString() })
                         .eq("id", msg.id);
                     results.failed++;
                 }
             } catch (e: any) {
-                await supabase
+                await supabaseAdmin
                     .from("wa_messages")
                     .update({ status: "failed", error: e.message, sent_at: new Date().toISOString() })
                     .eq("id", msg.id);
