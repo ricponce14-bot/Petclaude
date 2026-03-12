@@ -4,15 +4,11 @@
 import { NextResponse } from "next/server";
 import { processMessage } from "@/lib/whatsapp-bot/engine";
 import { sendBotReply, logBotMessage } from "@/lib/whatsapp-bot/sender";
-import { createClient } from "@supabase/supabase-js";
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export async function POST(req: Request) {
   try {
+    const supabaseAdmin = getSupabaseAdmin();
     // 1. Verificar autenticación — Evolution API envía la apikey en el header
     const apiKey = req.headers.get("apikey");
     if (apiKey !== process.env.EVOLUTION_API_KEY) {
@@ -64,6 +60,7 @@ export async function POST(req: Request) {
       .select("tenant_id, instance")
       .eq("instance", instanceName)
       .eq("status", "connected")
+      .returns<any>()
       .single();
 
     if (!waSession) {
@@ -71,7 +68,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true, ignored: "no tenant" });
     }
 
-    const tenantId = waSession.tenant_id;
+    const tenantId = (waSession as any).tenant_id;
 
     // 6. Loguear el mensaje entrante
     await logBotMessage(tenantId, phone, messageContent, "inbound");

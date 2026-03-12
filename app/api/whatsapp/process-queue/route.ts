@@ -4,10 +4,7 @@ import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 
 // Service Role para acceso a todos los tenants sin RLS (necesario para leer config de sesiones ajenas/backend)
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export async function GET(req: Request) {
     return processQueue(req);
@@ -19,6 +16,7 @@ export async function POST(req: Request) {
 
 async function processQueue(req: Request) {
     try {
+        const supabaseAdmin = getSupabaseAdmin();
         const supabaseAuth = createRouteHandlerClient({ cookies });
         const { data: { session } } = await supabaseAuth.auth.getSession();
 
@@ -39,7 +37,7 @@ async function processQueue(req: Request) {
 
         let query = supabaseAdmin
             .from("wa_messages")
-            .select("*");
+            .select("*") as any;
 
         if (reqBody.messageId) {
             query = query.eq("id", reqBody.messageId);
@@ -61,7 +59,8 @@ async function processQueue(req: Request) {
             .from("wa_sessions")
             .select("tenant_id, instance, status")
             .in("tenant_id", tenantIds)
-            .eq("status", "connected");
+            .eq("status", "connected")
+            .returns<any[]>();
 
         // Mapa rápido de tenants a su instancia conectada
         const tenantSessions = (sessions || []).reduce((acc: Record<string, string>, session: any) => {
@@ -85,7 +84,7 @@ async function processQueue(req: Request) {
                         status: "failed",
                         error: "WhatsApp no conectado para esta veterinaria",
                         sent_at: new Date().toISOString()
-                    })
+                    } as any)
                     .eq("id", msg.id);
                 results.failed++;
                 continue;
@@ -108,21 +107,21 @@ async function processQueue(req: Request) {
                 if (sendRes.ok) {
                     await supabaseAdmin
                         .from("wa_messages")
-                        .update({ status: "sent", sent_at: new Date().toISOString(), error: null })
+                        .update({ status: "sent", sent_at: new Date().toISOString(), error: null } as any)
                         .eq("id", msg.id);
                     results.sent++;
                 } else {
                     const errData = await sendRes.text();
                     await supabaseAdmin
                         .from("wa_messages")
-                        .update({ status: "failed", error: errData, sent_at: new Date().toISOString() })
+                        .update({ status: "failed", error: errData, sent_at: new Date().toISOString() } as any)
                         .eq("id", msg.id);
                     results.failed++;
                 }
             } catch (e: any) {
                 await supabaseAdmin
                     .from("wa_messages")
-                    .update({ status: "failed", error: e.message, sent_at: new Date().toISOString() })
+                    .update({ status: "failed", error: e.message, sent_at: new Date().toISOString() } as any)
                     .eq("id", msg.id);
                 results.failed++;
             }

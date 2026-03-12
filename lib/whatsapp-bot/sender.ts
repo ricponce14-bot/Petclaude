@@ -4,10 +4,7 @@
 import { createClient } from "@supabase/supabase-js";
 import type { WaMessageType } from "@/lib/supabase/types";
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 /**
  * Envía un mensaje directamente a Evolution API (sin pasar por la cola)
@@ -59,6 +56,7 @@ export async function logBotMessage(
   type: WaMessageType = direction === "inbound" ? "bot_incoming" : "bot_reply"
 ): Promise<void> {
   try {
+    const supabaseAdmin = getSupabaseAdmin();
     await supabaseAdmin.from("wa_messages").insert({
       tenant_id: tenantId,
       type: type,
