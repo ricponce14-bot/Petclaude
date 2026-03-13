@@ -275,8 +275,7 @@ export async function handleConfirmar(
       };
     }
 
-    const scheduledAt = new Date(`${selected_date}T${selected_time}:00`);
-    // Buscar si el teléfono pertenece a un owner existente
+    const scheduledAt = new Date(`${selected_date}T${selected_time}:00-06:00`);    // Buscar si el teléfono pertenece a un owner existente
     const supabaseAdmin = getSupabaseAdmin();
     const { data: owner } = await supabaseAdmin
       .from("owners")
