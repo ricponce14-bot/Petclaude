@@ -64,7 +64,7 @@ export async function logBotMessage(
       body: text,
       direction: direction,
       status: direction === "outbound" ? "sent" : "sent",
-      sent_at: new Date().toISOString()
+
     } as any);
   } catch (err: any) {
     // Log pero no fallar — el mensaje ya se envió, el log es secundario
