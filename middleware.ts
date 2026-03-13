@@ -1,14 +1,59 @@
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export async function middleware(req: NextRequest) {
-    const res = NextResponse.next();
-    // Pass URL/Key directly to avoid reliance on mutating process.env in Edge
-    const supabase = createMiddlewareClient({ req, res }, {
-        supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
-        supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder'
+    let res = NextResponse.next({
+        request: {
+            headers: req.headers,
+        },
     });
+
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: {
+                get(name: string) {
+                    return req.cookies.get(name)?.value;
+                },
+                set(name: string, value: string, options: CookieOptions) {
+                    req.cookies.set({
+                        name,
+                        value,
+                        ...options,
+                    });
+                    res = NextResponse.next({
+                        request: {
+                            headers: req.headers,
+                        },
+                    });
+                    res.cookies.set({
+                        name,
+                        value,
+                        ...options,
+                    });
+                },
+                remove(name: string, options: CookieOptions) {
+                    req.cookies.set({
+                        name,
+                        value: '',
+                        ...options,
+                    });
+                    res = NextResponse.next({
+                        request: {
+                            headers: req.headers,
+                        },
+                    });
+                    res.cookies.set({
+                        name,
+                        value: '',
+                        ...options,
+                    });
+                },
+            },
+        }
+    );
 
     try {
         // Refrescar la sesión si el token ha expirado o generar las cookies correctamente
