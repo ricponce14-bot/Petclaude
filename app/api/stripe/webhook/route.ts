@@ -2,16 +2,25 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
-const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY!);
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+// Eliminamos la inicialización fuera del handler para asegurar que tome las variables en runtime
 
 export async function POST(req: Request) {
+    const stripeSecret = process.env.STRIPE_SECRET_KEY?.trim();
+    const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    if (!stripeSecret) {
+        console.error("❌ Stripe webhook error: Falta STRIPE_SECRET_KEY");
+        return new NextResponse("Stripe secret key missing", { status: 500 });
+    }
+
     const body = await req.text();
     const sig = req.headers.get("stripe-signature");
 
     let event: Stripe.Event;
 
-    const stripe = getStripe();
+    const stripe = new Stripe(stripeSecret, {
+        apiVersion: "2024-06-20" as any,
+    });
     const supabase = getSupabaseAdmin();
 
     try {

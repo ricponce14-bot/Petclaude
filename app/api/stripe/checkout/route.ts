@@ -1,9 +1,23 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_placeholder");
+// Eliminamos la inicialización fuera del handler
 
 export async function POST(req: Request) {
+    const stripeSecret = process.env.STRIPE_SECRET_KEY?.trim();
+
+    if (!stripeSecret || stripeSecret.includes("placeholder")) {
+        return NextResponse.json({ 
+            error: "Configuración de Stripe incompleta", 
+            details: "La clave secreta (STRIPE_SECRET_KEY) no está configurada o es inválida en Vercel." 
+        }, { status: 500 });
+    }
+
+    // Inicializamos Stripe dentro del handler para asegurar que tome las variables de entorno de Vercel runtime
+    const stripe = new Stripe(stripeSecret, {
+        apiVersion: "2024-06-20" as any, // Forzamos una versión estable
+    });
+
     try {
         const { email, id, plan } = await req.json();
 
