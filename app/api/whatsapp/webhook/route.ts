@@ -19,9 +19,9 @@ export async function POST(req: Request) {
     const payload = await req.json();
 
     // Evolution API envía diferentes eventos, solo nos interesan mensajes nuevos
-    const event = payload.event;
-    if (event !== "messages.upsert") {
-      return NextResponse.json({ ok: true, ignored: true });
+    const event = payload.event?.toLowerCase();
+    if (event !== "messages.upsert" && payload.event !== "MESSAGES_UPSERT") {
+      return NextResponse.json({ ok: true, ignored: true, event: payload.event });
     }
 
     const data = payload.data;
@@ -78,7 +78,7 @@ export async function POST(req: Request) {
     const botResponse = await processMessage(phone, messageContent, tenantId);
 
     if (!botResponse) {
-      // Bot desactivado o error → no responder
+      console.log(`[Webhook] Bot disabled or no response for ${phone}`);
       return NextResponse.json({ ok: true, bot_disabled: true });
     }
 

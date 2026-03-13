@@ -63,8 +63,7 @@ export default function ConversacionesPage() {
     // Get unique phones with their latest message from wa_messages
     const { data: msgs } = await supabase
       .from("wa_messages")
-      .select("phone, body, direction, created_at, type")
-      .in("type", ["bot_reply", "bot_incoming", "manual"])
+      .in("type", ["bot_reply", "bot_incoming", "manual", "reminder", "winback", "birthday"])
       .order("created_at", { ascending: false })
       .limit(500);
 
@@ -130,9 +129,7 @@ export default function ConversacionesPage() {
     setLoadingMessages(true);
     const { data } = await supabase
       .from("wa_messages")
-      .select("id, phone, body, direction, type, status, created_at")
-      .eq("phone", phone)
-      .in("type", ["bot_reply", "bot_incoming", "manual"])
+      .in("type", ["bot_reply", "bot_incoming", "manual", "reminder", "winback", "birthday"])
       .order("created_at", { ascending: true })
       .limit(100);
 

@@ -246,10 +246,10 @@ export default function MensajesPage() {
                                 <div className="flex justify-end mt-6">
                                     <button
                                         onClick={() => handleSave(type)}
-                                        disabled={saving || !temp.is_active}
-                                        className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm w-full justify-center sm:w-auto ${temp.is_active
-                                            ? 'bg-slate-900 text-white hover:bg-teal-500 hover:shadow-md hover:-translate-y-0.5'
-                                            : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                                        disabled={saving}
+                                        className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm w-full justify-center sm:w-auto ${saving
+                                            ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                                            : 'bg-slate-900 text-white hover:bg-teal-500 hover:shadow-md hover:-translate-y-0.5'
                                             }`}
                                     >
                                         {saving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
