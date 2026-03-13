@@ -176,10 +176,16 @@ async function updateSession(
   updates: Partial<WhatsappChatSession>
 ): Promise<void> {
   const supabaseAdmin = getSupabaseAdmin();
-  await supabaseAdmin
+  const { error } = await supabaseAdmin
     .from("whatsapp_chat_sessions")
     .update(updates as any)
     .eq("id", sessionId);
+
+  if (error) {
+    console.error("[Engine] Error updating session:", error);
+  } else {
+    console.log("[Engine] Session updated:", sessionId, updates);
+  }
 }
 
 async function routeToHandler(
