@@ -64,8 +64,9 @@ export async function logBotMessage(
       body: text,
       direction: direction,
       status: direction === "outbound" ? "sent" : "sent",
-    } catch (err: any) {
-      // Log pero no fallar — el mensaje ya se envió, el log es secundario
-      console.error(`[Bot Sender] Error logging message:`, err.message);
-    }
+    } as any);
+  } catch (err: any) {
+    // Log pero no fallar — el mensaje ya se envió, el log es secundario
+    console.error(`[Bot Sender] Error logging message:`, err.message);
   }
+}
