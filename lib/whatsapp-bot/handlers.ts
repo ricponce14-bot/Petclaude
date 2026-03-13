@@ -361,9 +361,8 @@ export async function handleConfirmar(
     }
 
     // Formatear mensaje de confirmación
-    const dateLabel = format(scheduledAt, "EEEE d 'de' MMMM", { locale: es });
-    const timeLabel = format(scheduledAt, "h:mm a");
-
+    const dateLabel = format(new Date(`${selected_date}T${selected_time}:00`), "EEEE d 'de' MMMM", { locale: es });
+    const timeLabel = format(new Date(`${selected_date}T${selected_time}:00`), "h:mm a");
     const confirmation = config.confirmation_template
       .replace("{servicio}", service?.label || session.selected_service || "")
       .replace("{fecha}", dateLabel)
