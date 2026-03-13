@@ -29,6 +29,13 @@ export async function POST(req: Request) {
             ? process.env.STRIPE_PRICE_ID_ANNUAL
             : process.env.STRIPE_PRICE_ID_MONTHLY;
 
+        if (!priceId) {
+            return NextResponse.json({ 
+                error: "Configuración de precios incompleta", 
+                details: `No se encontró el ID del precio para el plan "${plan}". Verifica que STRIPE_PRICE_ID_MONTHLY o STRIPE_PRICE_ID_ANNUAL estén en Vercel.` 
+            }, { status: 500 });
+        }
+
         const customer = await stripe.customers.create({
             email,
             metadata: { supabase_user_id: id },
