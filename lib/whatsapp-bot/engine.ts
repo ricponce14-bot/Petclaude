@@ -47,184 +47,191 @@ export async function processMessage(
   const result = await routeToHandler(session, text, config, tenantId);
 
   // 5. Actualizar la sesión con el nuevo estado
-  await updateSession(session.id, {
+  const sessionUpdates = {
     state: result.newState,
     last_message_at: new Date().toISOString(),
-    expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(), // renovar TTL
-    ...result.updates
-  });
-
-  return {
-    reply: result.reply,
-    sessionId: session.id
+    expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+    ...(result.updates || {})
   };
-}
 
-/**
- * Inicia una sesión de confirmación de recordatorio para una cita específica.
- * Llamado por el cron de recordatorios mejorado.
- */
-export async function startReminderConfirmation(
-  phone: string,
-  tenantId: string,
-  appointmentId: string
-): Promise<void> {
-  let session = await getOrCreateSession(phone, tenantId);
+  await updateSession(session.id, sessionUpdates);
 
-  await updateSession(session.id, {
-    state: "esperando_confirmacion" as ChatState,
-    selected_service: appointmentId, // reutilizamos el campo para guardar el appointment ID
-    last_message_at: new Date().toISOString(),
-    expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24h TTL para confirmaciones
-  });
-}
+  /**
+   * Inicia una sesión de confirmación de recordatorio para una cita específica.
+   * Llamado por el cron de recordatorios mejorado.
+   */
+  export async function startReminderConfirmation(
+    phone: string,
+    tenantId: string,
+    appointmentId: string
+  ): Promise<void> {
+    let session = await getOrCreateSession(phone, tenantId);
 
-// ============================================================
-// Funciones internas
-// ============================================================
-
-async function getBotConfig(tenantId: string): Promise<BotConfig | null> {
-  const supabaseAdmin = getSupabaseAdmin();
-  const { data, error } = await supabaseAdmin
-    .from("bot_config")
-    .select("*")
-    .eq("tenant_id", tenantId)
-    .single();
-
-  if (error || !data) return null;
-
-  // Parsear JSONB si viene como string
-  const config = data as any;
-  return {
-    ...config,
-    services: typeof config.services === "string" ? JSON.parse(config.services) : config.services,
-    business_hours: typeof config.business_hours === "string" ? JSON.parse(config.business_hours) : config.business_hours,
-  } as BotConfig;
-}
-
-async function getOrCreateSession(
-  phone: string,
-  tenantId: string
-): Promise<WhatsappChatSession> {
-  const supabaseAdmin = getSupabaseAdmin();
-  // Buscar sesión activa existente
-  const { data: existing } = await supabaseAdmin
-    .from("whatsapp_chat_sessions")
-    .select("*")
-    .eq("phone", phone)
-    .eq("tenant_id", tenantId)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .single();
-
-  if (existing) {
-    return existing as WhatsappChatSession;
-  }
-
-  // Crear nueva sesión
-  const { data: newSession, error } = await supabaseAdmin
-    .from("whatsapp_chat_sessions")
-    .insert({
-      tenant_id: tenantId,
-      phone: phone,
-      state: "inicio" as ChatState,
+    await updateSession(session.id, {
+      state: "esperando_confirmacion" as ChatState,
+      selected_service: appointmentId, // reutilizamos el campo para guardar el appointment ID
       last_message_at: new Date().toISOString(),
-      expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString()
-    } as any)
-    .select()
-    .returns<any>()
-    .single();
-
-  if (error) {
-    throw new Error(`Error creating chat session: ${error.message}`);
+      expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24h TTL para confirmaciones
+    });
   }
 
-  return newSession as WhatsappChatSession;
-}
+  // ============================================================
+  // Funciones internas
+  // ============================================================
 
-async function resetSession(
-  sessionId: string,
-  tenantId: string,
-  phone: string
-): Promise<WhatsappChatSession> {
-  const supabaseAdmin = getSupabaseAdmin();
-  const { data, error } = await supabaseAdmin
-    .from("whatsapp_chat_sessions")
-    .update({
-      state: "inicio",
-      selected_service: null,
-      selected_date: null,
-      selected_time: null,
-      selected_pet_id: null,
-      last_message_at: new Date().toISOString(),
-      expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString()
-    } as any)
-    .eq("id", sessionId)
-    .select()
-    .returns<any>()
-    .single();
+  async function getBotConfig(tenantId: string): Promise<BotConfig | null> {
+    const supabaseAdmin = getSupabaseAdmin();
+    const { data, error } = await supabaseAdmin
+      .from("bot_config")
+      .select("*")
+      .eq("tenant_id", tenantId)
+      .single();
 
-  if (error || !data) {
-    throw new Error(`Error resetting session: ${error?.message}`);
+    if (error || !data) return null;
+
+    // Parsear JSONB si viene como string
+    const config = data as any;
+    return {
+      ...config,
+      services: typeof config.services === "string" ? JSON.parse(config.services) : config.services,
+      business_hours: typeof config.business_hours === "string" ? JSON.parse(config.business_hours) : config.business_hours,
+    } as BotConfig;
   }
 
-  return data as WhatsappChatSession;
-}
+  async function getOrCreateSession(
+    phone: string,
+    tenantId: string
+  ): Promise<WhatsappChatSession> {
+    const supabaseAdmin = getSupabaseAdmin();
+    // Buscar sesión activa existente
+    const { data: existing } = await supabaseAdmin
+      .from("whatsapp_chat_sessions")
+      .select("*")
+      .eq("phone", phone)
+      .eq("tenant_id", tenantId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .single();
 
-async function updateSession(
-  sessionId: string,
-  updates: Partial<WhatsappChatSession>
-): Promise<void> {
-  const supabaseAdmin = getSupabaseAdmin();
-  const { error } = await supabaseAdmin
-    .from("whatsapp_chat_sessions")
-    .update(updates as any)
-    .eq("id", sessionId);
+    if (existing) {
+      return existing as WhatsappChatSession;
+    }
 
-  if (error) {
-    console.error("[Engine] Error updating session:", error);
-  } else {
-    console.log("[Engine] Session updated:", sessionId, updates);
+    // Crear nueva sesión
+    const { data: newSession, error } = await supabaseAdmin
+      .from("whatsapp_chat_sessions")
+      .insert({
+        tenant_id: tenantId,
+        phone: phone,
+        state: "inicio" as ChatState,
+        last_message_at: new Date().toISOString(),
+        expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString()
+      } as any)
+      .select()
+      .returns<any>()
+      .single();
+
+    if (error) {
+      throw new Error(`Error creating chat session: ${error.message}`);
+    }
+
+    return newSession as WhatsappChatSession;
   }
-}
 
-async function routeToHandler(
-  session: WhatsappChatSession,
-  text: string,
-  config: BotConfig,
-  tenantId: string
-): Promise<HandlerResult> {
-  switch (session.state) {
-    case "inicio":
-    case "finalizado":
-      return handleInicio(text, config, tenantId, session.phone);
+  async function resetSession(
+    sessionId: string,
+    tenantId: string,
+    phone: string
+  ): Promise<WhatsappChatSession> {
+    const supabaseAdmin = getSupabaseAdmin();
+    const { data, error } = await supabaseAdmin
+      .from("whatsapp_chat_sessions")
+      .update({
+        state: "inicio",
+        selected_service: null,
+        selected_date: null,
+        selected_time: null,
+        selected_pet_id: null,
+        last_message_at: new Date().toISOString(),
+        expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString()
+      } as any)
+      .eq("id", sessionId)
+      .select()
+      .returns<any>()
+      .single();
 
-    case "seleccionar_servicio":
-      return handleSeleccionarServicio(text, config);
+    if (error || !data) {
+      throw new Error(`Error resetting session: ${error?.message}`);
+    }
 
-    case "seleccionar_fecha":
-      return handleSeleccionarFecha(text, config, tenantId, session);
-
-    case "seleccionar_hora":
-      return handleSeleccionarHora(text, config, tenantId, session);
-
-    case "confirmar":
-      return handleConfirmar(text, config, tenantId, session);
-
-    case "esperando_confirmacion":
-      return handleEsperandoConfirmacion(text, config, tenantId, session);
-
-    case "reagendar_seleccionar":
-      return handleReagendarSeleccionar(text, config, tenantId, session);
-
-    case "reagendar_fecha":
-      return handleReagendarFecha(text, config, tenantId, session);
-
-    case "reagendar_hora":
-      return handleReagendarHora(text, config, tenantId, session);
-
-    default:
-      return handleInicio(text, config, tenantId, session.phone);
+    return data as WhatsappChatSession;
   }
-}
+
+  async function updateSession(
+    sessionId: string,
+    updates: Partial<WhatsappChatSession>
+  ): Promise<void> {
+    const supabaseAdmin = getSupabaseAdmin();
+    const { error } = await supabaseAdmin
+      .from("whatsapp_chat_sessions")
+      .update(updates as any)
+      .eq("id", sessionId);
+
+    if (error) {
+      console.error("[Engine] Error updating session:", error);
+    } else {
+      console.log("[Engine] Session updated:", sessionId, updates);
+    }
+  }
+
+  async function routeToHandler(
+    session: WhatsappChatSession,
+    text: string,
+    config: BotConfig,
+    tenantId: string
+  ): Promise<HandlerResult> {
+    // Re-leer sesión fresca para estados críticos
+    if (session.state === "confirmar") {
+      const supabaseAdmin = getSupabaseAdmin();
+      const { data: freshSession } = await supabaseAdmin
+        .from("whatsapp_chat_sessions")
+        .select("*")
+        .eq("id", session.id)
+        .single();
+      if (freshSession) session = freshSession as WhatsappChatSession;
+    }
+
+    switch (session.state) {
+      case "inicio":
+      case "finalizado":
+        return handleInicio(text, config, tenantId, session.phone);
+
+      case "seleccionar_servicio":
+        return handleSeleccionarServicio(text, config);
+
+      case "seleccionar_fecha":
+        return handleSeleccionarFecha(text, config, tenantId, session);
+
+      case "seleccionar_hora":
+        return handleSeleccionarHora(text, config, tenantId, session);
+
+      case "confirmar":
+        return handleConfirmar(text, config, tenantId, session);
+
+      case "esperando_confirmacion":
+        return handleEsperandoConfirmacion(text, config, tenantId, session);
+
+      case "reagendar_seleccionar":
+        return handleReagendarSeleccionar(text, config, tenantId, session);
+
+      case "reagendar_fecha":
+        return handleReagendarFecha(text, config, tenantId, session);
+
+      case "reagendar_hora":
+        return handleReagendarHora(text, config, tenantId, session);
+
+      default:
+        return handleInicio(text, config, tenantId, session.phone);
+    }
+  }
 
