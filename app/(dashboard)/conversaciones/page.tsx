@@ -7,6 +7,8 @@ import {
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
+import NewMessageModal from "@/components/conversaciones/NewMessageModal";
+import { Paperclip, Image as ImageIcon, Smile } from "lucide-react";
 
 interface Conversation {
   phone: string;
@@ -51,6 +53,9 @@ export default function ConversacionesPage() {
   const [manualMessage, setManualMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [search, setSearch] = useState("");
+  const [showNewMessageModal, setShowNewMessageModal] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch conversations (grouped by phone)
@@ -176,6 +181,55 @@ export default function ConversacionesPage() {
     setSending(false);
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !selectedPhone) return;
+
+    setUploading(true);
+    try {
+      // 1. Upload to Supabase Storage
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${selectedPhone}_${Date.now()}.${fileExt}`;
+      const { data, error } = await supabase.storage
+        .from('chat-media')
+        .upload(fileName, file);
+
+      if (error) throw error;
+
+      // 2. Get Public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('chat-media')
+        .getPublicUrl(fileName);
+
+      // 3. Send message with image URL
+      const { data: owner } = await supabase
+        .from("owners")
+        .select("id")
+        .eq("whatsapp", selectedPhone)
+        .single();
+
+      const res = await fetch("/api/whatsapp/send-message", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          owner_id: (owner as any)?.id || null,
+          media_url: publicUrl,
+          body: "📷 Foto enviada",
+        }),
+      });
+
+      if (res.ok) {
+        setTimeout(() => fetchMessages(selectedPhone), 1500);
+      } else {
+        alert("Error al enviar imagen");
+      }
+    } catch (e: any) {
+      alert("Error: " + e.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   useEffect(() => {
     fetchConversations();
     // Poll every 10 seconds
@@ -209,6 +263,12 @@ export default function ConversacionesPage() {
             <MessageCircle className="text-teal-500" size={24} />
             Conversaciones
           </h1>
+          <button
+            onClick={() => setShowNewMessageModal(true)}
+            className="w-full mb-3 flex items-center justify-center gap-2 bg-slate-900 text-white py-2.5 rounded-xl text-sm font-bold shadow-soft-purple hover:bg-teal-500 transition-all active:scale-[0.98]"
+          >
+            <Send size={16} /> Nuevo mensaje
+          </button>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
             <input
@@ -351,11 +411,17 @@ export default function ConversacionesPage() {
                           )}
                         </div>
                         {/* Message body */}
-                        <p className={`text-sm whitespace-pre-wrap leading-relaxed ${
-                          isInbound ? "text-slate-800" : "text-white"
-                        }`}>
-                          {msg.body}
-                        </p>
+                        {msg.body.startsWith("http") && (msg.body.includes(".jpg") || msg.body.includes(".png") || msg.body.includes(".jpeg") || msg.body.includes(".webp")) ? (
+                          <div className="mb-2 rounded-lg overflow-hidden border border-black/5">
+                            <img src={msg.body} alt="Adjunto" className="max-w-full h-auto" />
+                          </div>
+                        ) : (
+                          <p className={`text-sm whitespace-pre-wrap leading-relaxed ${
+                            isInbound ? "text-slate-800" : "text-white"
+                          }`}>
+                            {msg.body}
+                          </p>
+                        )}
                         {/* Time + status */}
                         <div className={`flex items-center gap-1 mt-1 ${isInbound ? "text-slate-300" : "text-white/60"}`}>
                           <Clock size={10} />
@@ -376,6 +442,21 @@ export default function ConversacionesPage() {
             {/* Manual Message Input */}
             <div className="bg-white border-t border-slate-100 p-3 flex items-center gap-2 safe-area-bottom">
               <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept="image/*"
+                onChange={handleFileUpload}
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="p-2.5 text-slate-400 hover:text-teal-500 hover:bg-teal-50 rounded-xl transition-all"
+                title="Adjuntar foto"
+              >
+                {uploading ? <Loader2 size={20} className="animate-spin" /> : <Paperclip size={20} />}
+              </button>
+              <input
                 type="text"
                 value={manualMessage}
                 onChange={(e) => setManualMessage(e.target.value)}
@@ -384,8 +465,14 @@ export default function ConversacionesPage() {
                 className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-medium outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-500/20"
               />
               <button
+                onClick={() => setManualMessage(prev => prev + "😊")}
+                className="p-2 hidden sm:block text-slate-300 hover:text-amber-500 transition-colors"
+              >
+                <Smile size={20} />
+              </button>
+              <button
                 onClick={sendManual}
-                disabled={sending || !manualMessage.trim()}
+                disabled={sending || (!manualMessage.trim() && !uploading)}
                 className="p-2.5 bg-teal-500 text-white rounded-xl hover:bg-teal-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
               >
                 {sending ? <Loader2 size={20} className="animate-spin" /> : <Send size={20} />}
@@ -394,6 +481,16 @@ export default function ConversacionesPage() {
           </>
         )}
       </div>
+
+      {showNewMessageModal && (
+        <NewMessageModal
+          onClose={() => setShowNewMessageModal(false)}
+          onSuccess={(phone) => {
+            setSelectedPhone(phone);
+            fetchConversations();
+          }}
+        />
+      )}
     </div>
   );
 }

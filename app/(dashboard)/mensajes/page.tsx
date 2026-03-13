@@ -34,11 +34,27 @@ export default function MensajesPage() {
 
     const fetchTemplates = async () => {
         setLoading(true);
-        const { data } = await supabase.from("message_templates").select("*");
+        const { data: { session } } = await supabase.auth.getSession();
+        const tenant_id = session?.user.app_metadata?.tenant_id || session?.user.user_metadata?.tenant_id;
+
+        if (!tenant_id) {
+            setLoading(false);
+            return;
+        }
+
+        const { data } = await supabase
+            .from("message_templates")
+            .select("*")
+            .eq("tenant_id", tenant_id);
 
         if (data) {
             const map: Record<string, MessageTemplate> = {};
-            data.forEach((t: any) => map[t.type] = t);
+            data.forEach((t: any) => map[t.type] = {
+                id: t.id,
+                type: t.type,
+                body: t.body,
+                is_active: t.is_active
+            });
             setTemplates(map);
         }
         setLoading(false);
@@ -102,13 +118,9 @@ export default function MensajesPage() {
                 console.error("Error saving template:", error);
                 alert("Error al guardar: " + error.message);
             } else {
-                // Notificar éxito al usuario
-                const button = document.activeElement as HTMLButtonElement;
-                if (button) {
-                    const originalText = button.innerText;
-                    button.innerText = "Guardado";
-                    setTimeout(() => button.innerText = originalText, 2000);
-                }
+                // Actualizar estado local para asegurar que tenemos el ID si era nuevo
+                await fetchTemplates();
+                alert("✅ Plantilla guardada y activada correctamente.");
             }
         }
         setSaving(false);

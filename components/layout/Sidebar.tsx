@@ -1,7 +1,8 @@
 "use client";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { CalendarDays, Users, PawPrint, MessageCircle, LayoutDashboard, QrCode, LogOut, CreditCard, DollarSign, Bot, Inbox } from "lucide-react";
+import { CalendarDays, Users, PawPrint, MessageCircle, LayoutDashboard, QrCode, LogOut, CreditCard, DollarSign, Bot, Inbox, Package } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 
@@ -11,18 +12,19 @@ const links = [
   { href: "/clientes", label: "Clientes", icon: Users },
   { href: "/mascotas", label: "Mascotas", icon: PawPrint },
   { href: "/gastos", label: "Gastos", icon: DollarSign },
+  { href: "/inventario", label: "Inventario", icon: Package },
   { href: "/whatsapp", label: "WhatsApp", icon: QrCode },
-  { href: "/mensajes", label: "Mensajes", icon: MessageCircle },
+  { href: "/conversaciones", label: "Chats en vivo", icon: Inbox },
+  { href: "/mensajes", label: "Plantillas", icon: MessageCircle },
   { href: "/mensajes/outbox", label: "Seguimiento", icon: MessageCircle },
-  { href: "/bot", label: "Bot WhatsApp", icon: Bot },
-  { href: "/conversaciones", label: "Conversaciones", icon: Inbox },
+  { href: "/bot", label: "Bot Automático", icon: Bot },
   { href: "/membresia", label: "Membresía", icon: CreditCard },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
 
   const handleLogout = async () => {
     await supabase.auth.signOut();

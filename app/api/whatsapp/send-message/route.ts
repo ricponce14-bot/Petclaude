@@ -8,49 +8,52 @@ export async function POST(req: Request) {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-        const { owner_id, pet_id, body } = await req.json();
+        const { owner_id, pet_id, phone: manualPhone, body, media_url } = await req.json();
         const tenantId = session.user.app_metadata?.tenant_id || session.user.user_metadata?.tenant_id;
 
         if (!tenantId) {
             return NextResponse.json({ error: "No se encontró tu veterinaria" }, { status: 400 });
         }
-        if (!owner_id || !body) {
+        if ((!owner_id && !manualPhone) || !body) {
             return NextResponse.json({ error: "Cliente y mensaje son requeridos" }, { status: 400 });
         }
 
         const supabaseAdmin = getSupabaseAdmin();
+        let finalPhone = manualPhone;
 
-        // Obtener datos del dueño (BYPASS RLS con Admin)
-        const { data: owner, error: ownerErr } = await supabaseAdmin
-            .from("owners")
-            .select("*")
-            .eq("id", owner_id)
-            .single();
+        if (owner_id) {
+            // Obtener datos del dueño (BYPASS RLS con Admin)
+            const { data: owner, error: ownerErr } = await supabaseAdmin
+                .from("owners")
+                .select("*")
+                .eq("id", owner_id)
+                .single();
 
-        console.log("📋 Owner data:", JSON.stringify(owner));
+            if (ownerErr) {
+                return NextResponse.json({ error: "Error buscando cliente: " + ownerErr.message }, { status: 500 });
+            }
 
-        if (ownerErr) {
-            return NextResponse.json({ error: "Error buscando cliente: " + ownerErr.message }, { status: 500 });
+            finalPhone = (owner as any)?.whatsapp || (owner as any)?.phone || (owner as any)?.telefono || null;
         }
 
-        // Buscar teléfono en cualquier campo posible
-        const phone = (owner as any)?.whatsapp || (owner as any)?.phone || (owner as any)?.telefono || null;
-
-        if (!phone) {
+        if (!finalPhone) {
             return NextResponse.json({
-                error: `El cliente no tiene teléfono celular registrado. Datos encontrados: ${JSON.stringify(Object.keys(owner || {}))}`,
-                debug_columns: owner ? Object.keys(owner) : "not found"
+                error: "No se encontró un número de teléfono válido para este envío.",
             }, { status: 400 });
         }
+
+        // Limpiar teléfono
+        finalPhone = finalPhone.replace(/\D/g, "");
 
         // Insertar en la cola de mensajes (BYPASS RLS con Admin)
         const { data: newMsg, error: insertErr } = await supabaseAdmin.from("wa_messages").insert({
             tenant_id: tenantId,
-            owner_id: owner_id,
-            pet_id: pet_id || null, // Guardamos pet_id si fue proveido 
+            owner_id: owner_id || null,
+            pet_id: pet_id || null, 
             type: "manual",
-            phone: phone,
+            phone: finalPhone,
             body,
+            media_url: media_url || null,
             status: "pending"
         } as any).select().single();
 

@@ -69,8 +69,9 @@ export async function POST(req: Request) {
     }
 
     const tenantId = (waSession as any).tenant_id;
+    console.log(`[Webhook] Routing message to tenant: ${tenantId}`);
 
-    // 6. Loguear el mensaje entrante
+    // 6. Loguear el mensaje entrante inmediatamente (para que aparezca en el chat en vivo aunque el bot no responda)
     await logBotMessage(tenantId, phone, messageContent, "inbound");
 
     // 7. Procesar con el motor del bot

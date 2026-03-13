@@ -56,6 +56,25 @@ export default function WhatsAppPage() {
     }
   };
 
+  const disconnectInstance = async () => {
+    if (!confirm("¿Estás seguro de que deseas desconectar WhatsApp? Esto pausará todas las automatizaciones.")) return;
+    setCreating(true);
+    try {
+      const res = await fetch("/api/whatsapp/delete-instance", { method: "POST" });
+      if (res.ok) {
+        setSession(null);
+        fetchSession();
+      } else {
+        const errorData = await res.json();
+        alert(`Error desconectando: ${errorData.error}`);
+      }
+    } catch (e: any) {
+      alert(`Error de red: ${e.message}`);
+    } finally {
+      setCreating(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -150,8 +169,18 @@ export default function WhatsAppPage() {
         )}
 
         {session?.status === "connected" && (
-          <div className="bg-green-50 rounded-xl p-4 text-sm text-green-700">
-            Las automatizaciones estan activas. Los recordatorios, win-backs y cumpleanos se enviaran automaticamente.
+          <div className="space-y-4">
+            <div className="bg-green-50 rounded-xl p-4 text-sm text-green-700">
+              Las automatizaciones estan activas. Los recordatorios, win-backs y cumpleanos se enviaran automaticamente.
+            </div>
+            <button
+              onClick={disconnectInstance}
+              disabled={creating}
+              className="w-full flex items-center justify-center gap-2 text-red-500 hover:text-red-700 font-bold text-sm py-2 transition-colors"
+            >
+              {creating ? <Loader2 className="animate-spin" size={16} /> : <WifiOff size={16} />}
+              Desconectar WhatsApp
+            </button>
           </div>
         )}
       </div>

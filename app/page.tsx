@@ -4,7 +4,7 @@ import Link from "next/link";
 import {
     Check, Calendar, MessageSquare, ArrowRight, Heart,
     ClipboardList, Bell, Users, Send, BarChart3, DollarSign,
-    Smartphone, Shield, Zap
+    Smartphone, Shield, Zap, Package
 } from "lucide-react";
 import RegisterModal from "@/components/auth/RegisterModal";
 
@@ -71,7 +71,7 @@ export default function LandingPage() {
                             </h1>
 
                             <p className="text-lg text-slate-600 max-w-lg mb-8 leading-relaxed">
-                                Ladrido es la plataforma todo-en-uno para esteticas caninas. Agenda citas, lleva historiales, controla gastos y envia recordatorios automaticos por WhatsApp.
+                                Ladrido es la plataforma todo-en-uno para esteticas caninas. Agenda citas, lleva historiales, controla gastos, gestiona tu inventario y deja que nuestro bot de IA atienda a tus clientes por WhatsApp 24/7.
                             </p>
 
                             <div className="flex flex-col sm:flex-row gap-4">
@@ -169,6 +169,11 @@ export default function LandingPage() {
                             icon={DollarSign}
                             title="Control de Gastos"
                             desc="Registra insumos, renta, nomina y servicios. Desglose por categoria y totales mensuales."
+                        />
+                        <FeatureCard
+                            icon={Package}
+                            title="Inventario Simple"
+                            desc="Control de stock de tus productos y alertas cuando te estes quedando sin insumos."
                         />
                         <FeatureCard
                             icon={BarChart3}

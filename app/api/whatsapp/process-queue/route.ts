@@ -91,17 +91,26 @@ async function processQueue(req: Request) {
             }
 
             try {
-                const sendRes = await fetch(`${apiUrl}/message/sendText/${instanceName}`, {
+                const endpoint = msg.media_url ? "/message/sendMedia/" : "/message/sendText/";
+                const payload = msg.media_url ? {
+                    number: msg.phone,
+                    media: msg.media_url,
+                    caption: msg.body,
+                    mediatype: "image", // Por ahora solo soportamos imagen en el chat
+                    delay: 1200
+                } : {
+                    number: msg.phone,
+                    text: msg.body,
+                    delay: 1200
+                };
+
+                const sendRes = await fetch(`${apiUrl}${endpoint}${instanceName}`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                         "apikey": apiKey
                     },
-                    body: JSON.stringify({
-                        number: msg.phone,
-                        text: msg.body,
-                        delay: 1200
-                    })
+                    body: JSON.stringify(payload)
                 });
 
                 if (sendRes.ok) {

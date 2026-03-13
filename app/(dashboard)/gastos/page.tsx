@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { DollarSign, Plus, Trash2, Filter, TrendingDown, TrendingUp } from "lucide-react";
+import { DollarSign, Plus, Trash2, Filter, TrendingDown, TrendingUp, Package } from "lucide-react";
 import { format, startOfMonth, endOfMonth, subMonths, addMonths } from "date-fns";
 import { es } from "date-fns/locale";
 import NewExpenseModal from "@/components/gastos/NewExpenseModal";
@@ -25,7 +25,7 @@ interface Expense {
 }
 
 export default function GastosPage() {
-    const supabase = createClient();
+    const [supabase] = useState(() => createClient());
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -125,19 +125,18 @@ export default function GastosPage() {
 
             {/* Summary Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-white/80 backdrop-blur-xl border border-slate-100 rounded-3xl p-5 shadow-sm relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-50 rounded-bl-full opacity-60" />
+                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl md:col-span-1 col-span-2">
                     <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Total del mes</p>
-                    <p className="text-2xl font-black text-emerald-600">${grandTotal.toLocaleString("es-MX", { minimumFractionDigits: 2 })}</p>
+                    <p className="text-2xl font-black text-emerald-400">${grandTotal.toLocaleString("es-MX", { minimumFractionDigits: 2 })}</p>
                 </div>
                 <div className="bg-white/80 backdrop-blur-xl border border-slate-100 rounded-3xl p-5 shadow-sm">
                     <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Registros</p>
                     <p className="text-2xl font-black text-slate-700">{expenses.length}</p>
                 </div>
                 <div className="bg-white/80 backdrop-blur-xl border border-slate-100 rounded-3xl p-5 shadow-sm">
-                    <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Mayor gasto</p>
-                    <p className="text-lg font-black text-slate-700">
-                        {topCategory ? `${CATEGORY_CONFIG[topCategory[0]]?.icon} ${CATEGORY_CONFIG[topCategory[0]]?.label}` : "—"}
+                    <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Cerca de stock bajo</p>
+                    <p className="text-2xl font-black text-amber-600 flex items-center gap-2">
+                        <Package size={20} /> <span className="text-slate-400 text-xs font-bold underline cursor-pointer" onClick={() => window.location.href='/inventario'}>Ver inventario</span>
                     </p>
                 </div>
                 <div className="bg-white/80 backdrop-blur-xl border border-slate-100 rounded-3xl p-5 shadow-sm">
