@@ -10,10 +10,7 @@ export async function POST(req: Request) {
   try {
     const supabaseAdmin = getSupabaseAdmin();
     // 1. Verificar autenticación — Evolution API envía la apikey en el header
-    const apiKey = req.headers.get("apikey");
-    if (apiKey !== process.env.EVOLUTION_API_KEY) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+
 
     // 2. Parsear el payload de Evolution API
     const payload = await req.json();
