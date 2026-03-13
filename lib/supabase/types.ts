@@ -82,6 +82,7 @@ export interface WaMessage {
   type: WaMessageType;
   phone: string;
   body: string;
+  media_url: string | null;
   status: WaStatus;
   direction: "inbound" | "outbound";
   sent_at: string | null;

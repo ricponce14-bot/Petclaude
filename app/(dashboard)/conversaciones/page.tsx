@@ -60,17 +60,25 @@ export default function ConversacionesPage() {
 
   // Fetch conversations (grouped by phone)
   const fetchConversations = async () => {
-    // Get unique phones with their latest message from wa_messages
-    const { data: msgs } = await supabase
-      .from("wa_messages")
-      .in("type", ["bot_reply", "bot_incoming", "manual", "reminder", "winback", "birthday"])
-      .order("created_at", { ascending: false })
-      .limit(500);
+    try {
+      // Get unique phones with their latest message from wa_messages
+      const { data: msgs, error } = await supabase
+        .from("wa_messages")
+        .select("phone, body, direction, created_at, type")
+        .in("type", ["bot_reply", "bot_incoming", "manual", "reminder", "winback", "birthday"])
+        .order("created_at", { ascending: false })
+        .limit(500);
 
-    if (!msgs) {
-      setLoading(false);
-      return;
-    }
+      if (error) {
+        console.error("Error fetching conversations:", error);
+        setLoading(false);
+        return;
+      }
+
+      if (!msgs) {
+        setLoading(false);
+        return;
+      }
 
     // Group by phone
     const phoneMap = new Map<string, Conversation>();
@@ -122,24 +130,35 @@ export default function ConversacionesPage() {
 
     setConversations(sorted);
     setLoading(false);
+    } catch (error) {
+      console.error("Unexpected error in fetchConversations:", error);
+      setLoading(false);
+    }
   };
 
   // Fetch messages for a specific phone
   const fetchMessages = async (phone: string) => {
     setLoadingMessages(true);
-    const { data } = await supabase
-      .from("wa_messages")
-      .in("type", ["bot_reply", "bot_incoming", "manual", "reminder", "winback", "birthday"])
-      .order("created_at", { ascending: true })
-      .limit(100);
+    try {
+      const { data, error } = await supabase
+        .from("wa_messages")
+        .select("id, phone, body, direction, type, status, created_at")
+        .eq("phone", phone)
+        .in("type", ["bot_reply", "bot_incoming", "manual", "reminder", "winback", "birthday"])
+        .order("created_at", { ascending: true })
+        .limit(100);
 
-    setMessages((data as Message[]) || []);
-    setLoadingMessages(false);
+      if (error) {
+        console.error("Error fetching messages:", error);
+      } else {
+        setMessages((data as Message[]) || []);
+      }
+    } catch (e) {
+      console.error("Unexpected error in fetchMessages:", e);
 
-    // Scroll to bottom
-    setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
+    } finally {
+      setLoadingMessages(false);
+    }
   };
 
   // Send manual message
