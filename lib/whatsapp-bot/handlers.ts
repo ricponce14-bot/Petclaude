@@ -257,8 +257,25 @@ export async function handleConfirmar(
     const service = config.services.find(s => s.key === session.selected_service);
 
     // Construir el datetime de la cita
-    const scheduledAt = new Date(`${session.selected_date}T${session.selected_time}:00`);
+    const supabaseAdmin2 = getSupabaseAdmin();
+    const { data: freshData } = await supabaseAdmin2
+      .from("whatsapp_chat_sessions")
+      .select("selected_date, selected_time, selected_service")
+      .eq("id", session.id)
+      .single();
 
+    const selected_date = freshData?.selected_date || session.selected_date;
+    const selected_time = (freshData?.selected_time || session.selected_time || "").toString().slice(0, 5);
+
+    if (!selected_date || !selected_time) {
+      return {
+        reply: "⚠️ Hubo un problema con tu sesión. Por favor vuelve a agendar desde el inicio.",
+        newState: "inicio",
+        updates: { selected_service: null, selected_date: null, selected_time: null }
+      };
+    }
+
+    const scheduledAt = new Date(`${selected_date}T${selected_time}:00`);
     // Buscar si el teléfono pertenece a un owner existente
     const supabaseAdmin = getSupabaseAdmin();
     const { data: owner } = await supabaseAdmin
@@ -406,7 +423,7 @@ export async function handleEsperandoConfirmacion(
     };
   }
 
-    if (clean === "2") {
+  if (clean === "2") {
     // Cancelar cita
     if (session.selected_service) {
       const supabaseAdmin = getSupabaseAdmin();
