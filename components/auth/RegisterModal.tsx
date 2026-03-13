@@ -46,16 +46,18 @@ export default function RegisterModal({ isOpen, onClose, initialPlan = "monthly"
                     body: JSON.stringify({ email: authData.user.email, id: authData.user.id, plan: initialPlan })
                 });
 
-                const { url, error: checkoutError } = await res.json();
+                const resData = await res.json();
+                const checkoutError = resData.error;
+                const details = resData.details;
 
                 if (checkoutError) {
-                    setError(checkoutError);
+                    setError(details ? `${checkoutError}: ${details}` : checkoutError);
                     setLoading(false);
                     return;
                 }
 
-                if (url) {
-                    window.location.href = url;
+                if (resData.url) {
+                    window.location.href = resData.url;
                 }
             } catch (err) {
                 console.error(err);

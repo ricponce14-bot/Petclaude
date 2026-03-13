@@ -15,11 +15,9 @@ export async function POST(req: Request) {
             ? process.env.STRIPE_PRICE_ID_ANNUAL
             : process.env.STRIPE_PRICE_ID_MONTHLY;
 
-        // 1. Buscamos si ya existe el cliente en Stripe, si no lo creamos.
-        // Usamos el ID del usuario como metadata para vincularlo fácilmente en el webhook
         const customer = await stripe.customers.create({
             email,
-            metadata: { supbase_user_id: id },
+            metadata: { supabase_user_id: id },
         });
 
         // 2. Creamos la sesión de Checkout con 7 días de prueba
@@ -43,6 +41,9 @@ export async function POST(req: Request) {
         return NextResponse.json({ url: session.url });
     } catch (err: any) {
         console.error("Error creating stripe checkout:", err);
-        return NextResponse.json({ error: "Error en la pasarela de pago" }, { status: 500 });
+        return NextResponse.json({ 
+            error: "Error en la pasarela de pago",
+            details: err.message 
+        }, { status: 500 });
     }
 }
