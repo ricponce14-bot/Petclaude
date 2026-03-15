@@ -14,9 +14,11 @@ export async function POST(req: Request) {
 
     // 2. Parsear el payload de Evolution API
     const payload = await req.json();
-
-    // Evolution API envía diferentes eventos
     const event = (payload.event || "").toLowerCase();
+
+    // Log completo para diagnóstico
+    console.log(`[Webhook] Received event: "${payload.event || event}" from instance: "${payload.instance}"`);
+    console.log(`[Webhook] Payload keys: ${Object.keys(payload).join(", ")}`);
 
     // Manejar eventos de conexión para actualizar el estado de la sesión
     if (
@@ -39,8 +41,10 @@ export async function POST(req: Request) {
     }
 
     if (event !== "messages.upsert" && payload.event !== "MESSAGES_UPSERT") {
+      console.log(`[Webhook] Ignoring event: ${payload.event}`);
       return NextResponse.json({ ok: true, ignored: true, event: payload.event });
     }
+    console.log(`[Webhook] Processing MESSAGES_UPSERT`);
 
     const data = payload.data;
     if (!data) {
@@ -61,6 +65,9 @@ export async function POST(req: Request) {
       || "";
 
     if (!instanceName || !remoteJid || !messageContent) {
+      console.warn(`[Webhook] Incomplete data — instance: ${instanceName}, jid: ${remoteJid}, content: "${messageContent}"`);
+      console.log(`[Webhook] Full data keys: ${JSON.stringify(Object.keys(data || {}))}`);
+      console.log(`[Webhook] message keys: ${JSON.stringify(Object.keys(data?.message || {}))}`);
       return NextResponse.json({ ok: true, ignored: "incomplete data" });
     }
 
@@ -98,7 +105,8 @@ export async function POST(req: Request) {
     const tenantId = (waSession as any).tenant_id;
     console.log(`[Webhook] Routing message to tenant: ${tenantId}`);
 
-    // 6. Loguear el mensaje entrante inmediatamente (para que aparezca en el chat en vivo aunque el bot no responda)
+    // 6. Loguear el mensaje entrante inmediatamente
+    console.log(`[Webhook] Logging inbound message from ${phone}: "${messageContent.slice(0, 50)}"`);
     await logBotMessage(tenantId, phone, messageContent, "inbound");
 
     // 7. Procesar con el motor del bot

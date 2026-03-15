@@ -89,11 +89,17 @@ export default function ConversacionesPage() {
   // ── Fetch conversations ──────────────────────────────────────
   const fetchConversations = async () => {
     try {
-      const { data: msgs } = await supabase
+      const { data: msgs, error: msgsErr } = await supabase
         .from("wa_messages")
-        .select("phone, body, direction, created_at, type")
+        .select("*")
         .order("created_at", { ascending: false })
         .limit(500);
+
+      if (msgsErr) {
+        console.error("[Conversaciones] Error fetching messages:", msgsErr.message);
+        setLoading(false);
+        return;
+      }
 
       if (!msgs) { setLoading(false); return; }
 
@@ -153,12 +159,13 @@ export default function ConversacionesPage() {
   // ── Fetch messages ───────────────────────────────────────────
   const fetchMessages = async (phone: string) => {
     setLoadingMessages(true);
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("wa_messages")
-      .select("id, phone, body, direction, type, status, created_at")
+      .select("*")
       .eq("phone", phone)
       .order("created_at", { ascending: true })
       .limit(150);
+    if (error) console.error("[Chat] Error fetching messages:", error.message);
     setMessages((data as Message[]) || []);
     setLoadingMessages(false);
     setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
