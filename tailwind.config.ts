@@ -16,7 +16,19 @@ const config: Config = {
                 background: "var(--background)",
                 foreground: "var(--foreground)",
                 border: "var(--border)",
-                // Paleta Premium
+                // Paleta Spa Canino
+                mint: {
+                    DEFAULT: "#4DA18A",
+                    dark: "#3d8a75",
+                    light: "#6ab8a1",
+                },
+                sand: {
+                    DEFAULT: "#E7A977",
+                    dark: "#d4935f",
+                    light: "#f0bf96",
+                },
+                ink: "#2D3748",
+                // Legacy (footer, annual card)
                 charcoal: {
                     DEFAULT: "#1a1a2e",
                     mid: "#16213e",

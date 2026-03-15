@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from 'next';
-import { Outfit } from 'next/font/google';
+import { Nunito } from 'next/font/google';
 import './globals.css';
 
-const outfit = Outfit({ subsets: ['latin'] });
+const nunito = Nunito({ subsets: ['latin'], weight: ['400', '600', '700', '800', '900'] });
 
 export const metadata: Metadata = {
     title: 'Ladrido | Gestión de Estéticas Caninas y Veterinarias',
@@ -29,7 +29,7 @@ export default function RootLayout({
 }) {
     return (
         <html lang="es" className="scroll-smooth">
-            <body className={`${outfit.className} bg-slate-50 text-slate-900 selection:bg-teal-200 selection:text-teal-900`}>
+            <body className={`${nunito.className} bg-gray-50 text-ink selection:bg-mint/20 selection:text-mint-dark`}>
                 {children}
             </body>
         </html>

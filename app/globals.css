@@ -3,49 +3,34 @@
 @tailwind utilities;
 
 /* ─────────────────────────────────────────────────
-   TOKENS — Light Mode (default)
+   TOKENS — Spa Canino Light Mode
 ───────────────────────────────────────────────── */
 @layer base {
   :root {
-    --background:   #fafafa;
-    --foreground:   #0f172a;
-    --border:       #f1f5f9;
+    --background:   #F9FAFB;
+    --foreground:   #2D3748;
+    --border:       #e2e8f0;
     --input:        #f1f5f9;
-    --ring:         rgba(20, 184, 166, 0.4);
-    --radius:       1.5rem;
+    --ring:         rgba(77, 161, 138, 0.4);
+    --radius:       0.75rem;
 
-    --primary:            #14b8a6;
+    --primary:            #4DA18A;
     --primary-foreground: #ffffff;
-    --secondary:          #a78bfa;
+    --secondary:          #E7A977;
     --secondary-foreground: #ffffff;
-    --accent:             #f97316;
+    --accent:             #E7A977;
     --accent-foreground:  #ffffff;
     --destructive:        #ef4444;
     --destructive-foreground: #ffffff;
     --muted:              #f8fafc;
     --muted-foreground:   #64748b;
 
-    /* Premium palette — light */
+    /* Legacy tokens */
     --cream:         #f5f0e8;
     --cream-warm:    #ede8dc;
     --charcoal:      #1a1a2e;
     --charcoal-mid:  #16213e;
     --lavender:      #a78bfa;
-  }
-
-  /* Dark Mode */
-  .dark {
-    --background:   #1a1a2e;
-    --foreground:   #f5f0e8;
-    --border:       #ffffff14;
-    --input:        #16213e;
-    --ring:         rgba(20, 184, 166, 0.5);
-
-    --muted:              #16213e;
-    --muted-foreground:   #94a3b8;
-
-    --cream:         #f5f0e8;
-    --cream-warm:    #ede8dc;
   }
 }
 
@@ -95,17 +80,17 @@
     @apply bg-charcoal-mid border border-white/10 rounded-3xl;
   }
 
-  /* Text gradients */
+  /* Text accent — color sólido, sin gradientes */
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-br from-slate-900 via-slate-700 to-slate-800;
+    @apply text-ink;
   }
 
   .text-gradient-primary {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-emerald-500;
+    @apply text-mint;
   }
 
   .text-gradient-premium {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-teal-400 via-emerald-400 to-lavender;
+    @apply text-mint;
   }
 
   /* Color shadows */
@@ -123,40 +108,46 @@
 
   /* Bento card base */
   .bento-card {
-    @apply rounded-3xl border overflow-hidden transition-all duration-300;
+    @apply rounded-xl border overflow-hidden transition-all duration-300;
   }
 
   .bento-card-light {
-    @apply bento-card bg-white border-slate-100 hover:shadow-lg hover:shadow-slate-100 hover:-translate-y-0.5;
+    @apply bento-card bg-white border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.10)] hover:-translate-y-0.5;
   }
 
   .bento-card-dark {
-    @apply bento-card bg-charcoal border-white/10 hover:shadow-xl hover:shadow-black/20 hover:-translate-y-0.5;
+    @apply bento-card bg-mint border-mint/20 shadow-[0_4px_24px_rgba(77,161,138,0.15)] hover:shadow-[0_8px_32px_rgba(77,161,138,0.25)] hover:-translate-y-0.5;
   }
 
   .bento-card-teal {
-    @apply bento-card bg-gradient-to-br from-teal-500 to-emerald-500 border-teal-400/30 hover:-translate-y-0.5;
+    @apply bento-card bg-mint border-mint/20 hover:-translate-y-0.5;
   }
 
   .bento-card-lavender {
-    @apply bento-card bg-gradient-to-br from-violet-500/10 to-purple-500/10 border-violet-200 hover:-translate-y-0.5;
+    @apply bento-card bg-white border-sand/30 shadow-[0_4px_24px_rgba(231,169,119,0.08)] hover:-translate-y-0.5;
   }
 
-  /* Micro-interactions */
+  /* Botones — Spa Canino */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-teal-500 text-white rounded-2xl font-bold text-sm
-           shadow-lg shadow-teal-500/25 hover:bg-teal-600 hover:shadow-teal-500/40 hover:-translate-y-0.5
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-mint text-white rounded-xl font-bold text-sm
+           shadow-md shadow-mint/20 hover:bg-mint-dark hover:-translate-y-0.5
            active:scale-[0.97] active:translate-y-0 transition-all duration-200;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-slate-700 rounded-2xl font-bold text-sm
-           border border-slate-200 hover:bg-slate-50 hover:border-slate-300 hover:-translate-y-0.5
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-mint rounded-xl font-bold text-sm
+           border border-mint hover:bg-mint/5 hover:-translate-y-0.5
            active:scale-[0.97] active:translate-y-0 transition-all duration-200;
   }
 
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-1.5 text-sm font-semibold text-mint
+           border border-mint/40 rounded-xl px-4 py-1.5
+           hover:bg-mint/8 transition-colors duration-200;
+  }
+
   .btn-dark {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-charcoal text-cream rounded-2xl font-bold text-sm
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-charcoal text-cream rounded-xl font-bold text-sm
            hover:bg-charcoal-mid hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200;
   }
 
