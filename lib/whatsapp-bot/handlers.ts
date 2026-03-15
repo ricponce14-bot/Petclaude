@@ -558,7 +558,7 @@ export async function handleReagendarSeleccionar(
     .eq("tenant_id", tenantId)
     .eq("whatsapp", session.phone)
     .returns<any>()
-    .single();
+    .maybeSingle();
 
   if (!owner) {
     return {

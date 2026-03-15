@@ -56,7 +56,7 @@ async function runReminders1h(req: Request) {
                 if (!ownerPhone) continue;
 
                 const apptMexicoTime = toZonedTime(new Date(appt.scheduled_at), MEXICO_TZ);
-                const horaStr = format(apptMexicoTime, "h:mm a", { timeZone: MEXICO_TZ });
+                const horaStr = format(apptMexicoTime, "h:mm a");
                 const petName: string = appt.pet?.name ?? "tu mascota";
 
                 const body =

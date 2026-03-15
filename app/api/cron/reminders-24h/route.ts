@@ -29,10 +29,10 @@ async function runReminders(req: Request) {
     try {
         const supabaseAdmin = getSupabaseAdmin();
 
-        // Ventana: citas que ocurren entre 23h y 25h desde ahora
+        // Ventana amplia: 22h–26h para no perder citas si el cron se ejecuta con minutos de diferencia
         const now = new Date();
-        const windowStart = new Date(now.getTime() + 23 * 60 * 60 * 1000);
-        const windowEnd = new Date(now.getTime() + 25 * 60 * 60 * 1000);
+        const windowStart = new Date(now.getTime() + 22 * 60 * 60 * 1000);
+        const windowEnd = new Date(now.getTime() + 26 * 60 * 60 * 1000);
 
         // Buscar citas pendientes que NO tienen reminder_sent y están en la ventana
         const { data: appointments, error } = await supabaseAdmin
@@ -65,9 +65,10 @@ async function runReminders(req: Request) {
                 }
 
                 // Formatear fecha/hora en timezone México
+                // toZonedTime ya convierte al timezone — format no necesita timeZone de nuevo
                 const apptMexicoTime = toZonedTime(new Date(appt.scheduled_at), MEXICO_TZ);
-                const fechaStr = format(apptMexicoTime, "EEEE d 'de' MMMM", { locale: es, timeZone: MEXICO_TZ });
-                const horaStr = format(apptMexicoTime, "h:mm a", { timeZone: MEXICO_TZ });
+                const fechaStr = format(apptMexicoTime, "EEEE d 'de' MMMM", { locale: es });
+                const horaStr = format(apptMexicoTime, "h:mm a");
                 const petName: string = appt.pet?.name ?? "tu mascota";
                 const serviceLabel: string = appt.type ?? "servicio";
 

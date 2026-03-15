@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     const stripe = new Stripe(stripeSecret, {
         apiVersion: "2024-06-20" as any,
     });
-    const supabase = getSupabaseAdmin();
+    const supabase = getSupabaseAdmin() as any;
 
     try {
         if (!sig || !endpointSecret) {
@@ -55,7 +55,6 @@ export async function POST(req: Request) {
                             .from("tenants")
                             .select("id")
                             .eq("email", email)
-                            .returns<any>()
                             .single();
 
                         if (tenant) {
@@ -65,10 +64,10 @@ export async function POST(req: Request) {
                                     stripe_customer_id: customerId,
                                     stripe_subscription_id: session.subscription as string,
                                     plan: "active"
-                                } as any)
-                                .eq("id", (tenant as any).id);
+                                })
+                                .eq("id", tenant.id);
 
-                            console.log(`✅ Tenant ${(tenant as any).id} activado con Stripe Customer ${customerId}`);
+                            console.log(`✅ Tenant ${tenant.id} activado con Stripe Customer ${customerId}`);
                         } else {
                             // Crear tenant nuevo si vino desde registro + pago
                             const { data: newTenant } = await supabase
@@ -79,17 +78,15 @@ export async function POST(req: Request) {
                                     plan: "active",
                                     stripe_customer_id: customerId,
                                     stripe_subscription_id: session.subscription as string,
-                                } as any)
+                                })
                                 .select("id")
-                                .returns<any>()
                                 .single();
 
                             if (newTenant && userId) {
-                                // Actualizar app_metadata del usuario con el tenant_id
                                 await supabase.auth.admin.updateUserById(userId, {
-                                    app_metadata: { tenant_id: (newTenant as any).id }
+                                    app_metadata: { tenant_id: newTenant.id }
                                 });
-                                console.log(`✅ Nuevo tenant ${(newTenant as any).id} creado y vinculado a usuario ${userId}`);
+                                console.log(`✅ Nuevo tenant ${newTenant.id} creado y vinculado a usuario ${userId}`);
                             }
                         }
                     }
@@ -101,19 +98,21 @@ export async function POST(req: Request) {
             case "customer.subscription.updated":
             case "customer.subscription.deleted": {
                 const subscription = event.data.object as Stripe.Subscription;
-                let planStatus = "active";
-
-                if (["canceled", "unpaid", "incomplete_expired"].includes(subscription.status)) {
-                    planStatus = "cancelled";
-                } else if (subscription.status === "past_due") {
-                    planStatus = "past_due";
-                } else if (subscription.status === "trialing") {
-                    planStatus = "trial";
-                }
+                const statusMap: Record<string, string> = {
+                    "active":             "active",
+                    "trialing":           "trial",
+                    "past_due":           "past_due",
+                    "canceled":           "cancelled",
+                    "unpaid":             "cancelled",
+                    "incomplete_expired": "cancelled",
+                    "incomplete":         "past_due",
+                    "paused":             "cancelled",
+                };
+                const planStatus = statusMap[subscription.status] ?? "active";
 
                 const { error } = await supabase
                     .from("tenants")
-                    .update({ plan: planStatus } as any)
+                    .update({ plan: planStatus })
                     .eq("stripe_subscription_id", subscription.id);
 
                 if (error) {
@@ -130,7 +129,7 @@ export async function POST(req: Request) {
                 if (invoice.subscription) {
                     await supabase
                         .from("tenants")
-                        .update({ plan: "active" } as any)
+                        .update({ plan: "active" })
                         .eq("stripe_subscription_id", invoice.subscription as string);
                     console.log(`✅ Invoice pagada, plan reactivado para sub ${invoice.subscription}`);
                 }
@@ -143,7 +142,7 @@ export async function POST(req: Request) {
                 if (invoice.subscription) {
                     await supabase
                         .from("tenants")
-                        .update({ plan: "past_due" } as any)
+                        .update({ plan: "past_due" })
                         .eq("stripe_subscription_id", invoice.subscription as string);
                     console.log(`⚠️ Invoice fallida, plan en past_due para sub ${invoice.subscription}`);
                 }

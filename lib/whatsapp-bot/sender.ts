@@ -63,7 +63,7 @@ export async function logBotMessage(
       phone: phone,
       body: text,
       direction: direction,
-      status: direction === "outbound" ? "sent" : "sent",
+      status: "sent", // "sent" aplica a salientes; entrantes ya llegaron (no hay status "received" en WaStatus)
     } as any);
   } catch (err: any) {
     // Log pero no fallar — el mensaje ya se envió, el log es secundario

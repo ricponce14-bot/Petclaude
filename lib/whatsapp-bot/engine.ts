@@ -161,11 +161,12 @@ async function getOrCreateSession(
 
 async function resetSession(
   sessionId: string,
-  tenantId: string,
-  phone: string
+  _tenantId: string,
+  _phone: string
 ): Promise<WhatsappChatSession> {
   const supabaseAdmin = getSupabaseAdmin();
-  const { data, error } = await supabaseAdmin
+  const db = supabaseAdmin as any;
+  const { data, error } = await db
     .from("whatsapp_chat_sessions")
     .update({
       state: "inicio",
@@ -175,10 +176,9 @@ async function resetSession(
       selected_pet_id: null,
       last_message_at: new Date().toISOString(),
       expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString()
-    } as any)
+    })
     .eq("id", sessionId)
     .select()
-    .returns<any>()
     .single();
 
   if (error || !data) {
@@ -193,9 +193,10 @@ async function updateSession(
   updates: Partial<WhatsappChatSession>
 ): Promise<void> {
   const supabaseAdmin = getSupabaseAdmin();
-  const { error } = await supabaseAdmin
+  const db = supabaseAdmin as any;
+  const { error } = await db
     .from("whatsapp_chat_sessions")
-    .update(updates as any)
+    .update(updates)
     .eq("id", sessionId);
 
   if (error) {
@@ -219,7 +220,7 @@ async function routeToHandler(
       .from("whatsapp_chat_sessions")
       .select("*")
       .eq("id", session.id)
-      .single();
+      .maybeSingle();
     if (freshSession) session = freshSession as WhatsappChatSession;
   }
 

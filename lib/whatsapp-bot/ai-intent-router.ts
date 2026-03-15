@@ -74,6 +74,10 @@ Usa "low" si el mensaje es ambiguo. Nunca respondas con texto adicional.`;
     if (!raw) return null;
 
     const parsed = JSON.parse(raw) as { intent: string; confidence: string };
+    if (!parsed?.intent || !parsed?.confidence) {
+      console.warn("[AI Router] Respuesta malformada de OpenAI:", raw);
+      return null;
+    }
     const validIntents: Intent[] = [
       "agendar_cita",
       "reagendar_cita",
