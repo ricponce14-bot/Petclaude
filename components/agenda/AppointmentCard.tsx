@@ -1,27 +1,26 @@
 "use client";
-// components/agenda/AppointmentCard.tsx
 import { useState } from "react";
 import { format } from "date-fns";
+import { motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
-import { Check, X, Phone, Send, Loader2 } from "lucide-react";
+import { Check, X, Phone, Send, Loader2, Clock } from "lucide-react";
 import type { Appointment } from "@/lib/supabase/types";
 
 const TYPE_LABELS: Record<string, string> = {
-  bath: "Baño", haircut: "Corte", bath_haircut: "Baño + Corte",
-  vaccine: "Vacuna", checkup: "Revisión", other: "Otro",
+  bath:         "🛁 Baño",
+  haircut:      "✂️ Corte",
+  bath_haircut: "🛁✂️ Baño + Corte",
+  vaccine:      "💉 Vacuna",
+  checkup:      "🔍 Revisión",
+  other:        "Otro",
 };
 
-const STATUS_STYLES: Record<string, string> = {
-  scheduled: "bg-yellow-100 text-yellow-700",
-  confirmed: "bg-green-100  text-green-700",
-  completed: "bg-gray-100   text-gray-500",
-  cancelled: "bg-red-100    text-red-600",
-  no_show: "bg-orange-100 text-orange-600",
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  scheduled: "Agendada", confirmed: "Confirmada",
-  completed: "Completada", cancelled: "Cancelada", no_show: "No asistió",
+const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
+  scheduled: { label: "Agendada",   bg: "bg-orange-50",  text: "text-[#FF8C42]" },
+  confirmed: { label: "Confirmada", bg: "bg-teal-50",    text: "text-[#00C4AA]" },
+  completed: { label: "Completada", bg: "bg-[#F0F0F0]",  text: "text-[#888]"    },
+  cancelled: { label: "Cancelada",  bg: "bg-red-50",     text: "text-red-500"   },
+  no_show:   { label: "No asistió", bg: "bg-red-50",     text: "text-red-400"   },
 };
 
 export default function AppointmentCard({
@@ -32,8 +31,7 @@ export default function AppointmentCard({
   const [ticketSent, setTicketSent] = useState(false);
 
   const updateStatus = async (status: string) => {
-    // @ts-ignore: supabase auto-generated type issue with literal union
-    await supabase.from("appointments").update({ status }).eq("id", appt.id);
+    await supabase.from("appointments").update({ status } as any).eq("id", appt.id);
     onUpdate();
   };
 
@@ -42,13 +40,11 @@ export default function AppointmentCard({
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const tenantId = session?.user?.app_metadata?.tenant_id || session?.user?.user_metadata?.tenant_id;
-
       const res = await fetch("/api/whatsapp/send-ticket", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ appointment_id: appt.id, tenant_id: tenantId })
+        body: JSON.stringify({ appointment_id: appt.id, tenant_id: tenantId }),
       });
-
       if (res.ok) {
         setTicketSent(true);
         setTimeout(() => setTicketSent(false), 3000);
@@ -56,106 +52,151 @@ export default function AppointmentCard({
         const data = await res.json();
         alert(data.error || "Error al enviar ticket");
       }
-    } catch (e) {
-      alert("Error de conexión");
-    } finally {
-      setSendingTicket(false);
-    }
+    } catch { alert("Error de conexión"); }
+    finally { setSendingTicket(false); }
   };
 
+  const st = STATUS_CONFIG[appt.status] ?? STATUS_CONFIG.scheduled;
+
   return (
-    <div className="bg-white/90 backdrop-blur-md rounded-[1.5rem] border border-slate-100 shadow-sm hover:shadow-soft-purple hover:-translate-y-1 transition-all duration-300 overflow-hidden group">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 p-5">
-        {/* Time */}
-        <div className="text-center min-w-[64px] bg-slate-50 p-3 rounded-2xl group-hover:bg-teal-50 transition-colors">
-          <p className="text-xl font-black text-slate-800 leading-none">
+    <motion.div
+      whileHover={{ y: -3, boxShadow: "0 16px 48px rgba(0,0,0,0.09)" }}
+      transition={{ type: "spring", stiffness: 300, damping: 28 }}
+      className="bg-white border border-[#F0E6D8] rounded-[28px]
+                 shadow-[0_4px_24px_rgba(0,0,0,0.06)] overflow-hidden"
+    >
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-5">
+
+        {/* ── Hora ──────────────────────────────────── */}
+        <div className="flex flex-col items-center justify-center min-w-[64px]
+                        bg-[#FFF4EC] border border-orange-100
+                        rounded-[18px] px-3 py-3 shrink-0">
+          <p className="text-xl font-black text-[#FF8C42] leading-none">
             {format(new Date(appt.scheduled_at), "HH:mm")}
           </p>
-          <p className="text-xs text-slate-500 font-bold mt-1 border-t border-slate-100/50 pt-1">{appt.duration_min} min</p>
+          <div className="flex items-center gap-1 mt-1.5 text-[10px] font-bold text-[#9e8a7a]">
+            <Clock size={9} />
+            {appt.duration_min} min
+          </div>
         </div>
 
-        {/* Info */}
+        {/* ── Info ──────────────────────────────────── */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap mb-1">
-            <span className="text-lg font-black text-slate-900">{appt.pets?.name}</span>
+          {/* Nombre + alertas */}
+          <div className="flex items-center gap-2 flex-wrap mb-1.5">
+            <span className="text-base font-black text-[#1A1A1A]">{appt.pets?.name}</span>
             {appt.pets?.allergies && (
-              <span className="text-[10px] uppercase font-bold tracking-wider bg-red-100 text-red-700 px-2 py-0.5 rounded-full inline-flex items-center gap-1 shadow-sm">
-                Alergias
+              <span className="text-[10px] uppercase font-bold tracking-wide
+                               bg-red-50 text-red-500 px-2 py-0.5 rounded-full">
+                Alergia
               </span>
             )}
             {appt.pets?.temperament === "aggressive" && (
-              <span className="text-[10px] uppercase font-bold tracking-wider bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full shadow-sm">Agresivo</span>
+              <span className="text-[10px] uppercase font-bold tracking-wide
+                               bg-orange-50 text-[#FF8C42] px-2 py-0.5 rounded-full">
+                Agresivo
+              </span>
             )}
             {appt.pets?.temperament === "nervous" && (
-              <span className="text-[10px] uppercase font-bold tracking-wider bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full shadow-sm">Nervioso</span>
+              <span className="text-[10px] uppercase font-bold tracking-wide
+                               bg-[#FFF4EC] text-[#FF8C42] px-2 py-0.5 rounded-full">
+                Nervioso
+              </span>
             )}
           </div>
-          <p className="text-sm text-slate-500 font-medium">
-            <span className="text-teal-600 font-bold bg-teal-50 px-2.5 py-0.5 rounded-md inline-block mb-1 sm:inline sm:mb-0 mr-2">{TYPE_LABELS[appt.type]}</span>
-            {appt.owners?.name}
+
+          {/* Tipo + dueño */}
+          <p className="text-sm text-[#9e8a7a] font-medium flex items-center gap-2 flex-wrap">
+            <span className="bg-teal-50 text-[#00C4AA] font-bold text-xs
+                             px-2.5 py-1 rounded-full">
+              {TYPE_LABELS[appt.type] ?? appt.type}
+            </span>
+            <span>{appt.owners?.name}</span>
           </p>
-          {appt.notes && <p className="text-xs text-slate-400 mt-2 truncate bg-slate-50 p-2 rounded-lg italic">"{appt.notes}"</p>}
+
+          {appt.notes && (
+            <p className="text-xs text-[#9e8a7a] mt-2 italic bg-[#FFF9F0]
+                           border border-[#F0E6D8] rounded-[12px] px-3 py-1.5 truncate">
+              "{appt.notes}"
+            </p>
+          )}
         </div>
 
-        {/* Status + Actions */}
-        <div className="flex flex-col sm:items-end gap-3 mt-4 sm:mt-0 w-full sm:w-auto border-t sm:border-0 border-slate-100 pt-4 sm:pt-0">
-          <span className={`text-[10px] uppercase tracking-wider px-3 py-1 rounded-full font-black self-start sm:self-end shadow-sm ${STATUS_STYLES[appt.status]}`}>
-            {STATUS_LABELS[appt.status]}
+        {/* ── Status + Acciones ─────────────────────── */}
+        <div className="flex flex-col sm:items-end gap-2.5 w-full sm:w-auto
+                        border-t sm:border-0 border-[#F0E6D8] pt-3 sm:pt-0">
+          <span className={`text-[10px] uppercase tracking-wide font-black
+                            px-3 py-1.5 rounded-full self-start sm:self-end
+                            ${st.bg} ${st.text}`}>
+            {st.label}
           </span>
 
           {(appt.status === "scheduled" || appt.status === "confirmed") && (
             <div className="flex gap-2 self-start sm:self-end">
-              <a
+              <motion.a
+                whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.92 }}
                 href={`https://wa.me/${appt.owners?.whatsapp}`}
                 target="_blank"
-                className="p-2.5 bg-green-50 text-green-600 hover:bg-green-500 hover:text-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5"
+                className="w-9 h-9 flex items-center justify-center rounded-[14px]
+                           bg-teal-50 text-[#00C4AA]
+                           hover:bg-[#00C4AA] hover:text-white
+                           border border-teal-50 transition-colors"
                 title="WhatsApp"
               >
-                <Phone size={16} />
-              </a>
-              <button
+                <Phone size={15} />
+              </motion.a>
+              <motion.button
+                whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.92 }}
                 onClick={() => updateStatus("completed")}
-                className="p-2.5 bg-teal-50 text-teal-600 hover:bg-teal-500 hover:text-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5"
+                className="w-9 h-9 flex items-center justify-center rounded-[14px]
+                           bg-teal-50 text-[#00C4AA]
+                           hover:bg-[#00C4AA] hover:text-white
+                           border border-teal-50 transition-colors"
                 title="Marcar completada"
               >
-                <Check size={16} />
-              </button>
-              <button
+                <Check size={15} />
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.92 }}
                 onClick={() => updateStatus("no_show")}
-                className="p-2.5 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5"
+                className="w-9 h-9 flex items-center justify-center rounded-[14px]
+                           bg-red-50 text-red-400
+                           hover:bg-red-500 hover:text-white
+                           border border-red-50 transition-colors"
                 title="No asistió"
               >
-                <X size={16} />
-              </button>
+                <X size={15} />
+              </motion.button>
             </div>
           )}
 
-          {/* Botón de ticket para citas completadas */}
           {appt.status === "completed" && (
-            <button
+            <motion.button
+              whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
               onClick={sendTicket}
               disabled={sendingTicket || ticketSent}
-              className="flex items-center gap-2 px-3 py-2 bg-teal-50 text-teal-600 hover:bg-teal-500 hover:text-white rounded-xl text-xs font-bold shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-60 self-start sm:self-end"
+              className="flex items-center gap-2 px-3.5 py-2 rounded-[14px] text-xs font-bold
+                         bg-teal-50 text-[#00C4AA]
+                         hover:bg-[#00C4AA] hover:text-white
+                         border border-teal-50 transition-colors
+                         disabled:opacity-60 self-start sm:self-end"
             >
-              {sendingTicket ? (
-                <Loader2 size={14} className="animate-spin" />
-              ) : ticketSent ? (
-                <>Ticket enviado</>
-              ) : (
-                <>
-                  <Send size={14} /> Enviar ticket por WA
-                </>
-              )}
-            </button>
+              {sendingTicket ? <Loader2 size={13} className="animate-spin" />
+               : ticketSent   ? "Ticket enviado ✓"
+               : <><Send size={13} /> Enviar ticket</>}
+            </motion.button>
           )}
         </div>
       </div>
 
       {appt.price && (
-        <div className="border-t border-slate-100/50 px-5 py-3 bg-slate-50/50">
-          <p className="text-xs text-slate-500 font-medium">Precio total: <span className="font-bold text-slate-800 ml-1">${appt.price} MXN</span></p>
+        <div className="border-t border-[#F0E6D8] px-5 py-3 bg-[#FFF9F0]">
+          <p className="text-xs text-[#9e8a7a] font-medium">
+            Precio:{" "}
+            <span className="font-black text-[#1A1A1A]">${appt.price} MXN</span>
+          </p>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
