@@ -15,6 +15,7 @@ import {
   handleReagendarHora,
   type HandlerResult
 } from "./handlers";
+import { classifyIntent } from "./ai-intent-router";
 
 export interface BotResponse {
   reply: string;
@@ -220,6 +221,41 @@ async function routeToHandler(
       .eq("id", session.id)
       .single();
     if (freshSession) session = freshSession as WhatsappChatSession;
+  }
+
+  // AI Intent Router — solo activo en estados de entrada libre
+  if (session.state === "inicio" || session.state === "finalizado") {
+    const aiResult = await classifyIntent(text, config.welcome_message.split("*")[1] ?? "Ladrido", config.services);
+    if (aiResult && aiResult.confidence === "high") {
+      switch (aiResult.intent) {
+        case "agendar_cita":
+          // Saltar el menú e ir directo a selección de servicio
+          return handleSeleccionarServicio("__ai_trigger__", config);
+        case "reagendar_cita":
+          // Ir directo al flujo de reagendar
+          return handleReagendarSeleccionar("1", config, tenantId, { ...session, state: "reagendar_seleccionar" });
+        case "consultar_precios":
+          // Construir lista de precios desde bot_config
+          const priceLines = config.services
+            .map((s) => `• ${s.label}: $${s.price} MXN`)
+            .join("\n");
+          return {
+            reply: `💈 *Servicios y precios*\n\n${priceLines}\n\n¿Quieres agendar una cita? Responde *1* o escríbeme 🐾`,
+            newState: "inicio",
+          };
+        case "cancelar_cita":
+          return {
+            reply: `Para cancelar tu cita, escríbenos directamente o llámanos. Si necesitas reagendar, responde *4* y te ayudamos 🐾`,
+            newState: "inicio",
+          };
+        case "fuera_de_scope":
+          return {
+            reply: `Hola 👋 Solo puedo ayudarte con citas y servicios de tu estética canina. ¿En qué te ayudo?\n\n1️⃣ Agendar una cita\n2️⃣ Ver precios\n4️⃣ Reagendar cita`,
+            newState: "inicio",
+          };
+        // "menu" y casos no manejados: caen al flujo normal
+      }
+    }
   }
 
   switch (session.state) {
