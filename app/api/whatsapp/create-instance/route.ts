@@ -125,7 +125,7 @@ export async function POST() {
     if (!existingBotConfig) {
       await supabase.from("bot_config").insert({
         tenant_id: tenantId,
-        is_enabled: false,
+        is_enabled: true,
       } as any);
     }
 

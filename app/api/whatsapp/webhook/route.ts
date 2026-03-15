@@ -15,8 +15,29 @@ export async function POST(req: Request) {
     // 2. Parsear el payload de Evolution API
     const payload = await req.json();
 
-    // Evolution API envía diferentes eventos, solo nos interesan mensajes nuevos
-    const event = payload.event?.toLowerCase();
+    // Evolution API envía diferentes eventos
+    const event = (payload.event || "").toLowerCase();
+
+    // Manejar eventos de conexión para actualizar el estado de la sesión
+    if (
+      event === "connection.update" ||
+      event === "qrcode.updated" ||
+      payload.event === "CONNECTION_UPDATE" ||
+      payload.event === "QRCODE_UPDATED"
+    ) {
+      const instanceName = payload.instance;
+      const state = payload.data?.state || payload.data?.connection;
+      if (instanceName && (state === "open" || state === "connected")) {
+        const supabase = getSupabaseAdmin() as any;
+        await supabase
+          .from("wa_sessions")
+          .update({ status: "connected", updated_at: new Date().toISOString() })
+          .eq("instance", instanceName);
+        console.log(`[Webhook] Instancia ${instanceName} marcada como connected`);
+      }
+      return NextResponse.json({ ok: true, event: payload.event });
+    }
+
     if (event !== "messages.upsert" && payload.event !== "MESSAGES_UPSERT") {
       return NextResponse.json({ ok: true, ignored: true, event: payload.event });
     }
@@ -52,13 +73,22 @@ export async function POST(req: Request) {
     const phone = remoteJid.replace("@s.whatsapp.net", "");
 
     // 5. Identificar el tenant por la instancia de WhatsApp
+    // No filtramos por status — si Evolution API nos envía mensajes, la instancia está activa
     const { data: waSession } = await supabaseAdmin
       .from("wa_sessions")
       .select("tenant_id, instance")
       .eq("instance", instanceName)
-      .eq("status", "connected")
       .returns<any>()
-      .single();
+      .maybeSingle();
+
+    // Auto-marcar como connected si aún no lo está
+    if (waSession && (waSession as any).status !== "connected") {
+      const db = supabaseAdmin as any;
+      await db
+        .from("wa_sessions")
+        .update({ status: "connected", updated_at: new Date().toISOString() })
+        .eq("instance", instanceName);
+    }
 
     if (!waSession) {
       console.warn(`[Webhook] No tenant found for instance: ${instanceName}`);
