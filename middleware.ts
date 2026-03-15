@@ -62,6 +62,9 @@ export async function middleware(req: NextRequest) {
         console.error('Middleware Supabase error:', e);
     }
 
+    // Pasar el pathname como header para que el layout pueda leerlo
+    res.headers.set("x-pathname", req.nextUrl.pathname);
+
     return res;
 }
 

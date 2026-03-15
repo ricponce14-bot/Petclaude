@@ -183,6 +183,9 @@ export default function SteppedRegisterForm({ initialPlan = "monthly", onSuccess
             const setupData = await setupRes.json();
             if (!setupRes.ok) throw new Error(setupData.error || "Error al guardar configuración.");
 
+            // Refrescar sesión para que el JWT incluya el tenant_id recién asignado
+            await supabase.auth.refreshSession();
+
             // 3. Stripe checkout
             const checkoutRes = await fetch("/api/stripe/checkout", {
                 method: "POST",
