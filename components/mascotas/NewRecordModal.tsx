@@ -26,7 +26,7 @@ export default function NewRecordModal({ petId }: { petId: string }) {
         try {
             // Obtener el tenant_id activo
             const { data: { session } } = await supabase.auth.getSession();
-            const tenantId = session?.user?.user_metadata?.tenant_id;
+            const tenantId = session?.user?.app_metadata?.tenant_id || session?.user?.user_metadata?.tenant_id;
 
             if (!tenantId) {
                 throw new Error("No hay sesión activa de veterinaria.");

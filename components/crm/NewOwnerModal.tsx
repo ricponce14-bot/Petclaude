@@ -40,7 +40,7 @@ export default function NewOwnerModal({ onClose, onCreated }: { onClose: () => v
 
     // 0. Obtener el tenant_id de la sesión actual
     const { data: { session } } = await supabase.auth.getSession();
-    const tenant_id = session?.user.user_metadata.tenant_id;
+    const tenant_id = session?.user.app_metadata?.tenant_id || session?.user.user_metadata?.tenant_id;
 
     if (!tenant_id) {
       setError("Error de autenticación: No se encontró la veterinaria (tenant_id).");
