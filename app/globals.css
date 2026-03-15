@@ -12,7 +12,7 @@
     --foreground:   #1A1A1A;
     --border:       #F0E6D8;
     --input:        #FFF3E3;
-    --ring:         rgba(155, 93, 229, 0.35);
+    --ring:         rgba(77, 161, 138, 0.35);
     --radius:       20px;
 
     /* Acciones principales */
@@ -20,7 +20,7 @@
     --primary-foreground: #ffffff;
 
     /* Branding / Nav */
-    --brand:              #9B5DE5;
+    --brand:              #4DA18A;
     --brand-foreground:   #ffffff;
 
     /* Positivo / Salud */
@@ -38,7 +38,7 @@
     --muted-foreground:   #9e8a7a;
 
     /* Sidebar oscuro */
-    --sidebar-bg:   #130626;
+    --sidebar-bg:   #1a1a2e;
     --sidebar-item: rgba(255,255,255,0.06);
     --sidebar-active: #FF8C42;
 
@@ -101,11 +101,13 @@
   }
 
   .bento-card-purple {
-    @apply bento-card bg-purple-50 border-purple-100;
+    @apply bento-card bg-mint/8 border-mint/20;
   }
 
   .bento-card-teal {
-    @apply bento-card bg-teal-50 border-teal-50;
+    @apply rounded-[32px] bg-mint border-mint-dark
+           shadow-[0_4px_32px_rgba(0,0,0,0.06)]
+           transition-all duration-300;
   }
 
   .bento-card-cream {
@@ -114,8 +116,8 @@
 
   /* Legado — no romper */
   .bento-card-light    { @apply bento-card; }
-  .bento-card-dark     { @apply bento-card bg-purple-50 border-purple-100; }
-  .bento-card-lavender { @apply bento-card bg-purple-50 border-purple-100; }
+  .bento-card-dark     { @apply rounded-[32px] bg-[#1a1a2e] border-[#2a2a4e] shadow-[0_4px_32px_rgba(0,0,0,0.15)] transition-all duration-300; }
+  .bento-card-lavender { @apply bento-card bg-mint/8 border-mint/20; }
 
   /* ── Botones ──────────────────────────────────── */
   .btn-primary {
@@ -131,9 +133,9 @@
   .btn-brand {
     @apply inline-flex items-center justify-center gap-2
            px-6 py-3 rounded-[20px] font-bold text-sm text-white
-           bg-purple
-           shadow-[0_8px_24px_rgba(155,93,229,0.25)]
-           hover:bg-purple-dark hover:-translate-y-0.5
+           bg-mint
+           shadow-[0_8px_24px_rgba(77,161,138,0.25)]
+           hover:bg-mint-dark hover:-translate-y-0.5
            active:scale-[0.96] active:translate-y-0
            transition-all duration-200;
   }
@@ -149,8 +151,8 @@
 
   .btn-ghost {
     @apply inline-flex items-center justify-center gap-1.5
-           text-sm font-semibold text-purple           border border-purple-100 rounded-[16px] px-4 py-1.5
-           hover:bg-purple-50 transition-colors duration-200;
+           text-sm font-semibold text-mint           border border-mint/30 rounded-[16px] px-4 py-1.5
+           hover:bg-mint/10 transition-colors duration-200;
   }
 
   /* Legado */
@@ -188,12 +190,12 @@
 
   /* ── Text tokens ─────────────────────────────── */
   .text-gradient         { @apply text-carbon; }
-  .text-gradient-primary { @apply text-orange-DEFAULT; }
-  .text-gradient-premium { @apply text-purple-DEFAULT; }
+  .text-gradient-primary { @apply text-orange; }
+  .text-gradient-premium { @apply text-mint; }
 
   /* ── Sombras semánticas ───────────────────────── */
   .shadow-soft-teal   { box-shadow: 0 10px 40px -10px rgba(0,245,212,0.25); }
-  .shadow-soft-purple { box-shadow: 0 10px 40px -10px rgba(155,93,229,0.20); }
+  .shadow-soft-purple { box-shadow: 0 10px 40px -10px rgba(77,161,138,0.20); }
   .shadow-soft-cream  { box-shadow: 0 10px 40px -10px rgba(255,249,240,0.8); }
   .shadow-soft-orange { box-shadow: 0 10px 40px -10px rgba(255,140,66,0.25); }
 

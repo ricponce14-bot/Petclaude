@@ -9,7 +9,7 @@ import ModalShell from "@/components/ui/ModalShell";
 const inputCls = `w-full bg-[#FFF3E3] border border-[#F0E6D8] rounded-[16px]
   px-4 py-2.5 text-sm font-medium text-[#1A1A1A]
   placeholder:text-[#BBA898] outline-none
-  focus:border-[#9B5DE5] focus:ring-4 focus:ring-purple-100 focus:bg-white
+  focus:border-[#4DA18A] focus:ring-4 focus:ring-mint/20 focus:bg-white
   transition-all duration-200`;
 
 const labelCls = "block text-xs font-bold text-[#9e8a7a] uppercase tracking-wide mb-1.5";
@@ -61,10 +61,10 @@ export default function NewRecordModal({ petId }: { petId: string }) {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 bg-[#9B5DE5] text-white
+        className="flex items-center gap-2 bg-[#4DA18A] text-white
                    px-4 py-2 rounded-[18px] text-sm font-bold
                    shadow-[0_8px_24px_rgba(155,93,229,0.25)]
-                   hover:bg-[#7A3FBF] transition-colors"
+                   hover:bg-[#3d8a75] transition-colors"
       >
         <Plus size={15} strokeWidth={2.5} />
         Nuevo registro
@@ -94,10 +94,10 @@ export default function NewRecordModal({ petId }: { petId: string }) {
                 onChange={e => setFormData({ ...formData, type: e.target.value })}
                 className={inputCls}
               >
-                <option value="bath">🛁 Baño / Estética</option>
-                <option value="vaccine">💉 Vacunación</option>
-                <option value="checkup">🔍 Chequeo general</option>
-                <option value="surgery">✂️ Cirugía / Otro</option>
+                <option value="bath">Baño / Estética</option>
+                <option value="vaccine">Vacunación</option>
+                <option value="checkup">Chequeo general</option>
+                <option value="surgery">Cirugía / Otro</option>
               </select>
             </div>
 
@@ -143,9 +143,9 @@ export default function NewRecordModal({ petId }: { petId: string }) {
                 type="submit"
                 disabled={loading}
                 className="w-full flex items-center justify-center gap-2
-                           bg-[#9B5DE5] text-white font-bold py-3.5 rounded-[20px] text-sm
+                           bg-[#4DA18A] text-white font-bold py-3.5 rounded-[20px] text-sm
                            shadow-[0_8px_24px_rgba(155,93,229,0.25)]
-                           hover:bg-[#7A3FBF] transition-colors disabled:opacity-60"
+                           hover:bg-[#3d8a75] transition-colors disabled:opacity-60"
               >
                 {loading
                   ? <><Loader2 size={16} className="animate-spin" /> Guardando...</>

@@ -7,9 +7,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { Pet } from "@/lib/supabase/types";
 
 const SPECIES_CONFIG: Record<string, { label: string; emoji: string; bg: string; text: string; border: string }> = {
-  dog:   { label: "Perro", emoji: "🐕", bg: "bg-[#FFF4EC]", text: "text-[#FF8C42]", border: "border-orange-100" },
-  cat:   { label: "Gato",  emoji: "🐈", bg: "bg-purple-50",  text: "text-[#9B5DE5]", border: "border-purple-100" },
-  other: { label: "Otro",  emoji: "🐾", bg: "bg-teal-50",    text: "text-[#00C4AA]", border: "border-teal-50"   },
+  dog:   { label: "Perro", emoji: "",    bg: "bg-[#FFF4EC]", text: "text-[#FF8C42]", border: "border-orange-100" },
+  cat:   { label: "Gato",  emoji: "",    bg: "bg-[#E8F5F1]",  text: "text-[#4DA18A]", border: "border-mint/20"   },
+  other: { label: "Otro",  emoji: "",    bg: "bg-[#E8F5F1]",  text: "text-[#4DA18A]", border: "border-mint/20"   },
 };
 
 const TEMPERAMENT_BADGE: Record<string, { label: string; cls: string }> = {
@@ -54,10 +54,10 @@ export default function MascotasPage() {
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
           <Link
             href="/clientes"
-            className="flex items-center gap-2 bg-[#9B5DE5] text-white
+            className="flex items-center gap-2 bg-[#4DA18A] text-white
                        px-5 py-2.5 rounded-[20px] text-sm font-bold
-                       shadow-[0_8px_24px_rgba(155,93,229,0.25)]
-                       hover:bg-[#7A3FBF] transition-colors"
+                       shadow-[0_8px_24px_rgba(77,161,138,0.25)]
+                       hover:bg-[#3d8a75] transition-colors"
           >
             <Plus size={17} strokeWidth={2.5} /> Nueva mascota
           </Link>
@@ -69,15 +69,15 @@ export default function MascotasPage() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.38, delay: 0.05 }}
-        className="flex gap-3 items-start bg-purple-50 border border-purple-100
-                   rounded-[24px] p-4 text-sm text-[#7A3FBF]"
+        className="flex gap-3 items-start bg-[#E8F5F1] border border-mint/20
+                   rounded-[24px] p-4 text-sm text-[#3d8a75]"
       >
-        <div className="w-8 h-8 rounded-[12px] bg-purple-100 flex items-center justify-center shrink-0">
-          <Info size={16} className="text-[#9B5DE5]" />
+        <div className="w-8 h-8 rounded-[12px] bg-mint/20 flex items-center justify-center shrink-0">
+          <Info size={16} className="text-[#4DA18A]" />
         </div>
         <p className="font-medium pt-0.5">
           Las mascotas pertenecen a un dueño. Para crear una nueva, ve al{" "}
-          <Link href="/clientes" className="font-bold underline text-[#9B5DE5] hover:text-[#7A3FBF]">
+          <Link href="/clientes" className="font-bold underline text-[#4DA18A] hover:text-[#3d8a75]">
             Directorio de Clientes
           </Link>.
         </p>
@@ -98,7 +98,7 @@ export default function MascotasPage() {
           className="w-full pl-11 pr-5 py-3.5 bg-[#FFF3E3] border border-[#F0E6D8]
                      rounded-[20px] text-sm font-medium text-[#1A1A1A]
                      placeholder:text-[#BBA898] outline-none
-                     focus:border-[#9B5DE5] focus:ring-4 focus:ring-purple-100 focus:bg-white
+                     focus:border-[#4DA18A] focus:ring-4 focus:ring-mint/20 focus:bg-white
                      transition-all duration-200"
         />
       </motion.div>
@@ -116,8 +116,8 @@ export default function MascotasPage() {
           animate={{ opacity: 1 }}
           className="text-center py-20 rounded-[32px] bg-white border border-[#F0E6D8]"
         >
-          <div className="inline-flex w-16 h-16 rounded-[20px] bg-purple-50 items-center justify-center mb-4">
-            <PawPrint size={28} className="text-[#9B5DE5]" />
+          <div className="inline-flex w-16 h-16 rounded-[20px] bg-[#E8F5F1] items-center justify-center mb-4">
+            <PawPrint size={28} className="text-[#4DA18A]" />
           </div>
           <p className="text-[#9e8a7a] font-bold text-base">No se encontraron mascotas</p>
         </motion.div>

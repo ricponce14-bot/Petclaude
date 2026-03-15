@@ -53,28 +53,17 @@ export default function Sidebar() {
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
       className="relative h-full flex flex-col overflow-hidden
-                 bg-[#130626] border-r border-white/5
-                 rounded-r-[32px] z-20 shadow-[4px_0_32px_rgba(19,6,38,0.25)]"
+                 bg-[#1a1a2e] border-r border-white/5
+                 rounded-r-[32px] z-20 shadow-[4px_0_32px_rgba(10,10,30,0.25)]"
       style={{ flexShrink: 0 }}
     >
       {/* ── Logo ─────────────────────────────────────── */}
-      <div className="flex items-center h-16 px-4 border-b border-white/10 shrink-0">
-        <div className="w-10 h-10 rounded-[14px] bg-[#FF8C42] flex items-center justify-center shrink-0 shadow-[0_4px_16px_rgba(255,140,66,0.4)]">
-          <span className="text-white font-black text-base leading-none">L</span>
-        </div>
-        <AnimatePresence>
-          {expanded && (
-            <motion.span
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -8 }}
-              transition={{ duration: 0.18 }}
-              className="ml-3 text-white font-black text-base tracking-tight whitespace-nowrap"
-            >
-              Ladrido
-            </motion.span>
-          )}
-        </AnimatePresence>
+      <div className="flex items-center h-16 px-3 border-b border-white/10 shrink-0 overflow-hidden">
+        <img
+          src="/images/logo-white.png"
+          alt="Ladrido"
+          className={`object-contain transition-all duration-200 shrink-0 ${expanded ? "h-8 w-auto max-w-[140px]" : "h-8 w-8"}`}
+        />
       </div>
 
       {/* ── Nav ──────────────────────────────────────── */}
@@ -227,7 +216,7 @@ function NavItem({
             exit={{ opacity: 0, x: -4, scale: 0.92 }}
             transition={{ duration: 0.14 }}
             className="absolute left-[68px] top-1/2 -translate-y-1/2 z-50
-                       bg-[#1E0A3C] text-white text-xs font-semibold
+                       bg-[#2a2a4e] text-white text-xs font-semibold
                        px-3 py-1.5 rounded-[12px] whitespace-nowrap
                        shadow-[0_8px_24px_rgba(0,0,0,0.3)]
                        border border-white/10 pointer-events-none"

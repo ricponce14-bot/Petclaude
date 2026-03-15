@@ -15,8 +15,8 @@ type Variant = "white" | "orange" | "purple" | "teal" | "cream";
 const variantClasses: Record<Variant, string> = {
   white:  "bg-white border-[#F0E6D8]",
   orange: "bg-[#FFF4EC] border-orange-100",
-  purple: "bg-purple-50 border-purple-100",
-  teal:   "bg-teal-50 border-teal-50",
+  purple: "bg-mint/8 border-mint/20",
+  teal:   "bg-[#E8F5F1] border-mint/20",
   cream:  "bg-[#FFF3E3] border-[#F0E6D8]",
 };
 
@@ -77,9 +77,9 @@ export function StatCard({
   delay?: number;
 }) {
   const colorMap = {
-    orange: { bg: "bg-[#FFF4EC]", text: "text-[#FF8C42]", border: "border-orange-100" },
-    purple: { bg: "bg-purple-50",  text: "text-[#9B5DE5]", border: "border-purple-100" },
-    teal:   { bg: "bg-teal-50",    text: "text-[#00C4AA]", border: "border-teal-50"   },
+    orange: { bg: "bg-[#FFF4EC]",  text: "text-[#FF8C42]", border: "border-orange-100" },
+    purple: { bg: "bg-[#E8F5F1]",  text: "text-[#4DA18A]", border: "border-mint/20"    },
+    teal:   { bg: "bg-[#E8F5F1]",  text: "text-[#4DA18A]", border: "border-mint/20"    },
   };
   const c = colorMap[color];
 

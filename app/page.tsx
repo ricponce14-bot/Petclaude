@@ -184,7 +184,7 @@ export default function LandingPage() {
                                 <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                                     <Bot size={24} className="text-white" />
                                 </div>
-                                <span className="text-xs bg-white/20 text-white px-3 py-1 rounded-full font-bold">Estrella ✨</span>
+                                <span className="text-xs bg-white/20 text-white px-3 py-1 rounded-full font-bold">Destacada</span>
                             </div>
                             <h3 className="text-xl md:text-2xl font-black text-white mb-3">Bot de WhatsApp con IA</h3>
                             <p className="text-white/75 text-sm leading-relaxed mb-6">
@@ -236,7 +236,7 @@ export default function LandingPage() {
                                 24h antes de cada cita, tu bot envía un mensaje de WhatsApp al cliente. Él confirma o reagenda sin que tú muevas un dedo.
                             </p>
                             <div className="bg-white/15 rounded-xl p-4 text-white/80 text-xs font-mono">
-                                "Hola María 👋 Mañana a las 10:00 tienes cita para Luna..."
+                                "Hola María, mañana a las 10:00 tienes cita para Luna..."
                             </div>
                         </div>
 

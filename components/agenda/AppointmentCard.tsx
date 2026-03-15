@@ -7,11 +7,11 @@ import { Check, X, Phone, Send, Loader2, Clock } from "lucide-react";
 import type { Appointment } from "@/lib/supabase/types";
 
 const TYPE_LABELS: Record<string, string> = {
-  bath:         "🛁 Baño",
-  haircut:      "✂️ Corte",
-  bath_haircut: "🛁✂️ Baño + Corte",
-  vaccine:      "💉 Vacuna",
-  checkup:      "🔍 Revisión",
+  bath:         "Baño",
+  haircut:      "Corte",
+  bath_haircut: "Baño + Corte",
+  vaccine:      "Vacuna",
+  checkup:      "Revision",
   other:        "Otro",
 };
 

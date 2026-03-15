@@ -103,11 +103,11 @@ export default function NewAppointmentModal({
           <div>
             <label className={labelCls}>Tipo de servicio</label>
             <select {...register("type")} className={inputCls}>
-              <option value="bath">🛁 Baño</option>
-              <option value="haircut">✂️ Corte</option>
-              <option value="bath_haircut">🛁✂️ Baño + Corte</option>
-              <option value="vaccine">💉 Vacuna</option>
-              <option value="checkup">🔍 Revisión</option>
+              <option value="bath">Baño</option>
+              <option value="haircut">Corte</option>
+              <option value="bath_haircut">Baño + Corte</option>
+              <option value="vaccine">Vacuna</option>
+              <option value="checkup">Revision</option>
               <option value="other">Otro</option>
             </select>
           </div>

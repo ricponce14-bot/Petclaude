@@ -22,8 +22,8 @@ interface ModalShellProps {
 
 const ACCENT = {
   orange: { dot: "bg-[#FF8C42]", close: "hover:bg-orange-50 hover:text-[#FF8C42]" },
-  purple: { dot: "bg-[#9B5DE5]", close: "hover:bg-purple-50 hover:text-[#9B5DE5]" },
-  teal:   { dot: "bg-[#00C4AA]", close: "hover:bg-teal-50 hover:text-[#00C4AA]"   },
+  purple: { dot: "bg-[#4DA18A]", close: "hover:bg-mint/10 hover:text-[#4DA18A]"   },
+  teal:   { dot: "bg-[#4DA18A]", close: "hover:bg-mint/10 hover:text-[#4DA18A]"   },
 };
 
 export default function ModalShell({

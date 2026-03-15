@@ -8,9 +8,9 @@ import NewOwnerModal from "@/components/crm/NewOwnerModal";
 import type { Owner } from "@/lib/supabase/types";
 
 const AVATAR_COLORS = [
-  { bg: "bg-orange-100", text: "text-[#FF8C42]" },
-  { bg: "bg-purple-100", text: "text-[#9B5DE5]" },
-  { bg: "bg-teal-50",    text: "text-[#00C4AA]" },
+  { bg: "bg-orange-100",  text: "text-[#FF8C42]" },
+  { bg: "bg-[#E8F5F1]",  text: "text-[#4DA18A]" },
+  { bg: "bg-[#FFF4EC]",  text: "text-[#FF8C42]" },
 ];
 
 export default function ClientesPage() {
@@ -156,10 +156,10 @@ export default function ClientesPage() {
                       {owner.pets?.map((pet: any) => (
                         <span
                           key={pet.id}
-                          className="text-[11px] font-bold bg-purple-50 text-[#9B5DE5]
+                          className="text-[11px] font-bold bg-[#E8F5F1] text-[#4DA18A]
                                      px-2.5 py-1 rounded-full"
                         >
-                          🐾 {pet.name}
+                          {pet.name}
                         </span>
                       ))}
                     </div>

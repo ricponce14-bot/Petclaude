@@ -30,9 +30,8 @@ const inputCls = `w-full bg-[#FFF3E3] border border-[#F0E6D8] rounded-[16px]
 
 const labelCls = "block text-xs font-bold text-[#9e8a7a] uppercase tracking-wide mb-1.5";
 
-const SectionTitle = ({ emoji, label, color }: { emoji: string; label: string; color: string }) => (
+const SectionTitle = ({ label, color }: { label: string; color: string }) => (
   <div className={`flex items-center gap-2 mb-3 pb-2 border-b border-[#F0E6D8]`}>
-    <span className="text-base">{emoji}</span>
     <p className={`text-xs font-black uppercase tracking-widest ${color}`}>{label}</p>
   </div>
 );
@@ -97,7 +96,7 @@ export default function NewOwnerModal({ onClose, onCreated }: { onClose: () => v
 
         {/* ── Dueño ─────────────────────────────────── */}
         <div>
-          <SectionTitle emoji="👤" label="Dueño" color="text-[#FF8C42]" />
+          <SectionTitle label="Dueño" color="text-[#FF8C42]" />
           <div className="space-y-3">
             <div>
               <label className={labelCls}>Nombre completo</label>
@@ -114,7 +113,7 @@ export default function NewOwnerModal({ onClose, onCreated }: { onClose: () => v
 
         {/* ── Mascota ───────────────────────────────── */}
         <div>
-          <SectionTitle emoji="🐾" label="Mascota" color="text-[#9B5DE5]" />
+          <SectionTitle label="Mascota" color="text-[#4DA18A]" />
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div>
@@ -131,17 +130,17 @@ export default function NewOwnerModal({ onClose, onCreated }: { onClose: () => v
               <div>
                 <label className={labelCls}>Especie</label>
                 <select {...register("species")} className={inputCls}>
-                  <option value="dog">🐕 Perro</option>
-                  <option value="cat">🐈 Gato</option>
-                  <option value="other">🐾 Otro</option>
+                  <option value="dog">Perro</option>
+                  <option value="cat">Gato</option>
+                  <option value="other">Otro</option>
                 </select>
               </div>
               <div>
                 <label className={labelCls}>Temperamento</label>
                 <select {...register("temperament")} className={inputCls}>
-                  <option value="friendly">😊 Amigable</option>
-                  <option value="nervous">😰 Nervioso</option>
-                  <option value="aggressive">😤 Agresivo</option>
+                  <option value="friendly">Amigable</option>
+                  <option value="nervous">Nervioso</option>
+                  <option value="aggressive">Agresivo</option>
                 </select>
               </div>
             </div>

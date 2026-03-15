@@ -292,7 +292,6 @@ export default function ConversacionesPage() {
                   {conv.owner_name && <p className="text-[10px] text-slate-400 font-mono">{conv.phone}</p>}
                   <div className="flex items-center gap-2 mt-0.5">
                     <p className="text-xs text-slate-400 truncate flex-1">
-                      {conv.direction === "inbound" ? "👤 " : "🤖 "}
                       {conv.last_message?.slice(0, 45)}
                     </p>
                     {conv.state && STATE_LABELS[conv.state] && (
