@@ -2,41 +2,58 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─────────────────────────────────────────────────
-   TOKENS — Spa Canino Light Mode
-───────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════
+   TOKENS — Pet-Alegre Design System
+═══════════════════════════════════════════════════ */
 @layer base {
   :root {
-    --background:   #F9FAFB;
-    --foreground:   #2D3748;
-    --border:       #e2e8f0;
-    --input:        #f1f5f9;
-    --ring:         rgba(77, 161, 138, 0.4);
-    --radius:       0.75rem;
+    /* Fondo principal: crema cálido */
+    --background:   #FFF9F0;
+    --foreground:   #1A1A1A;
+    --border:       #F0E6D8;
+    --input:        #FFF3E3;
+    --ring:         rgba(155, 93, 229, 0.35);
+    --radius:       20px;
 
-    --primary:            #4DA18A;
+    /* Acciones principales */
+    --primary:            #FF8C42;
     --primary-foreground: #ffffff;
+
+    /* Branding / Nav */
+    --brand:              #9B5DE5;
+    --brand-foreground:   #ffffff;
+
+    /* Positivo / Salud */
+    --success:            #00F5D4;
+    --success-foreground: #1A1A1A;
+
+    /* Semánticos legado (no romper componentes existentes) */
     --secondary:          #E7A977;
     --secondary-foreground: #ffffff;
-    --accent:             #E7A977;
+    --accent:             #FF8C42;
     --accent-foreground:  #ffffff;
     --destructive:        #ef4444;
     --destructive-foreground: #ffffff;
-    --muted:              #f8fafc;
-    --muted-foreground:   #64748b;
+    --muted:              #FFF3E3;
+    --muted-foreground:   #9e8a7a;
 
-    /* Legacy tokens */
-    --cream:         #f5f0e8;
-    --cream-warm:    #ede8dc;
+    /* Sidebar oscuro */
+    --sidebar-bg:   #130626;
+    --sidebar-item: rgba(255,255,255,0.06);
+    --sidebar-active: #FF8C42;
+
+    /* Legacy tokens (mantener compatibilidad) */
+    --cream:         #FFF9F0;
+    --cream-warm:    #FFF3E3;
     --charcoal:      #1a1a2e;
     --charcoal-mid:  #16213e;
     --lavender:      #a78bfa;
   }
 }
 
-/* ─────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════
    BASE RESETS
-───────────────────────────────────────────────── */
+═══════════════════════════════════════════════════ */
 @layer base {
   * {
     @apply border-border;
@@ -44,134 +61,173 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    background-color: var(--background);
+    color: var(--foreground);
+    @apply antialiased;
     overflow-y: scroll;
-    /* Prevent iOS bounce scroll bleed */
     overscroll-behavior-y: none;
+    font-feature-settings: "cv02","cv03","cv04","cv11";
   }
 
-  /* Safe input font size on iOS (prevents auto-zoom) */
+  /* Prevenir auto-zoom en iOS */
   input, select, textarea {
     font-size: max(16px, 1em);
   }
 
-  /* Better touch targets */
+  /* Mejor touch */
   button, a, [role="button"] {
     touch-action: manipulation;
   }
 }
 
-/* ─────────────────────────────────────────────────
-   UTILITIES
-───────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════
+   UTILITIES — Pet-Alegre
+═══════════════════════════════════════════════════ */
 @layer utilities {
 
-  /* Glassmorphism */
-  .glass {
-    @apply bg-white/60 backdrop-blur-xl border border-white/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)];
-  }
-
-  .glass-dark {
-    @apply bg-charcoal/80 backdrop-blur-xl border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.3)];
-  }
-
-  /* Premium dark card */
-  .card-dark {
-    @apply bg-charcoal-mid border border-white/10 rounded-3xl;
-  }
-
-  /* Text accent — color sólido, sin gradientes */
-  .text-gradient {
-    @apply text-ink;
-  }
-
-  .text-gradient-primary {
-    @apply text-mint;
-  }
-
-  .text-gradient-premium {
-    @apply text-mint;
-  }
-
-  /* Color shadows */
-  .shadow-soft-teal {
-    box-shadow: 0 10px 40px -10px rgba(20, 184, 166, 0.2);
-  }
-
-  .shadow-soft-purple {
-    box-shadow: 0 10px 40px -10px rgba(168, 85, 247, 0.2);
-  }
-
-  .shadow-soft-cream {
-    box-shadow: 0 10px 40px -10px rgba(245, 240, 232, 0.8);
-  }
-
-  /* Bento card base */
+  /* ── Bento Cards ─────────────────────────────── */
   .bento-card {
-    @apply rounded-xl border overflow-hidden transition-all duration-300;
+    @apply rounded-[32px] bg-white border border-[#F0E6D8]
+           shadow-[0_4px_32px_rgba(0,0,0,0.06)]
+           transition-all duration-300;
   }
 
-  .bento-card-light {
-    @apply bento-card bg-white border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.10)] hover:-translate-y-0.5;
+  .bento-card:hover {
+    @apply shadow-[0_12px_48px_rgba(0,0,0,0.10)] -translate-y-0.5;
   }
 
-  .bento-card-dark {
-    @apply bento-card bg-mint border-mint/20 shadow-[0_4px_24px_rgba(77,161,138,0.15)] hover:shadow-[0_8px_32px_rgba(77,161,138,0.25)] hover:-translate-y-0.5;
+  .bento-card-orange {
+    @apply bento-card bg-[#FFF4EC] border-orange-100;
+  }
+
+  .bento-card-purple {
+    @apply bento-card bg-purple-50 border-purple-100;
   }
 
   .bento-card-teal {
-    @apply bento-card bg-mint border-mint/20 hover:-translate-y-0.5;
+    @apply bento-card bg-teal-50 border-teal-50;
   }
 
-  .bento-card-lavender {
-    @apply bento-card bg-white border-sand/30 shadow-[0_4px_24px_rgba(231,169,119,0.08)] hover:-translate-y-0.5;
+  .bento-card-cream {
+    @apply bento-card bg-cream-warm border-[#F0E6D8];
   }
 
-  /* Botones — Spa Canino */
+  /* Legado — no romper */
+  .bento-card-light    { @apply bento-card; }
+  .bento-card-dark     { @apply bento-card bg-purple-50 border-purple-100; }
+  .bento-card-lavender { @apply bento-card bg-purple-50 border-purple-100; }
+
+  /* ── Botones ──────────────────────────────────── */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-mint text-white rounded-xl font-bold text-sm
-           shadow-md shadow-mint/20 hover:bg-mint-dark hover:-translate-y-0.5
-           active:scale-[0.97] active:translate-y-0 transition-all duration-200;
+    @apply inline-flex items-center justify-center gap-2
+           px-6 py-3 rounded-[20px] font-bold text-sm text-white
+           bg-orange-DEFAULT
+           shadow-[0_8px_24px_rgba(255,140,66,0.30)]
+           hover:bg-orange-dark hover:-translate-y-0.5
+           active:scale-[0.96] active:translate-y-0
+           transition-all duration-200;
+  }
+
+  .btn-brand {
+    @apply inline-flex items-center justify-center gap-2
+           px-6 py-3 rounded-[20px] font-bold text-sm text-white
+           bg-purple-DEFAULT
+           shadow-[0_8px_24px_rgba(155,93,229,0.25)]
+           hover:bg-purple-dark hover:-translate-y-0.5
+           active:scale-[0.96] active:translate-y-0
+           transition-all duration-200;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-mint rounded-xl font-bold text-sm
-           border border-mint hover:bg-mint/5 hover:-translate-y-0.5
-           active:scale-[0.97] active:translate-y-0 transition-all duration-200;
+    @apply inline-flex items-center justify-center gap-2
+           px-6 py-3 rounded-[20px] font-bold text-sm
+           bg-white text-orange-DEFAULT
+           border border-orange-100
+           hover:bg-orange-50 hover:-translate-y-0.5
+           active:scale-[0.96] active:translate-y-0
+           transition-all duration-200;
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-1.5 text-sm font-semibold text-mint
-           border border-mint/40 rounded-xl px-4 py-1.5
-           hover:bg-mint/10 transition-colors duration-200;
+    @apply inline-flex items-center justify-center gap-1.5
+           text-sm font-semibold text-purple-DEFAULT
+           border border-purple-100 rounded-[16px] px-4 py-1.5
+           hover:bg-purple-50 transition-colors duration-200;
   }
 
+  /* Legado */
   .btn-dark {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-charcoal text-cream rounded-xl font-bold text-sm
-           hover:bg-charcoal-mid hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200;
+    @apply inline-flex items-center justify-center gap-2
+           px-6 py-3 bg-[#130626] text-white rounded-[20px] font-bold text-sm
+           hover:bg-purple-900 hover:-translate-y-0.5
+           active:scale-[0.96] transition-all duration-200;
   }
 
-  /* Blob animation (landing) */
-  .animate-blob {
-    animation: blob 7s infinite;
+  /* ── Inputs ───────────────────────────────────── */
+  .input-pet {
+    @apply w-full bg-cream-warm border border-[#F0E6D8] rounded-[16px]
+           px-4 py-3 text-carbon placeholder:text-[#BBA898]
+           outline-none text-base
+           transition-all duration-200
+           focus:border-orange-DEFAULT focus:ring-4 focus:ring-orange-100
+           focus:bg-white;
   }
+
+  /* ── Glassmorphism (mantener legado) ─────────── */
+  .glass {
+    @apply bg-white/60 backdrop-blur-xl border border-white/80
+           shadow-[0_8px_30px_rgb(0,0,0,0.04)];
+  }
+
+  .glass-dark {
+    @apply bg-[#130626]/80 backdrop-blur-xl border border-white/10
+           shadow-[0_20px_40px_rgba(0,0,0,0.3)];
+  }
+
+  .card-dark {
+    @apply bg-[#16213e] border border-white/10 rounded-[32px];
+  }
+
+  /* ── Text tokens ─────────────────────────────── */
+  .text-gradient         { @apply text-carbon; }
+  .text-gradient-primary { @apply text-orange-DEFAULT; }
+  .text-gradient-premium { @apply text-purple-DEFAULT; }
+
+  /* ── Sombras semánticas ───────────────────────── */
+  .shadow-soft-teal   { box-shadow: 0 10px 40px -10px rgba(0,245,212,0.25); }
+  .shadow-soft-purple { box-shadow: 0 10px 40px -10px rgba(155,93,229,0.20); }
+  .shadow-soft-cream  { box-shadow: 0 10px 40px -10px rgba(255,249,240,0.8); }
+  .shadow-soft-orange { box-shadow: 0 10px 40px -10px rgba(255,140,66,0.25); }
+
+  /* ── Skeleton ────────────────────────────────── */
+  .skeleton {
+    @apply bg-gradient-to-r from-cream-warm via-white to-cream-warm
+           bg-[length:200%_100%] animate-[shimmer_1.5s_infinite];
+  }
+
+  /* ── Scroll ──────────────────────────────────── */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+
+  /* ── Animaciones helpers ─────────────────────── */
+  .animate-blob    { animation: blob 7s infinite; }
+  .animate-float   { animation: float-up 3s ease-in-out infinite; }
+  .animate-fade-up { animation: fade-in-up 0.5s ease forwards; }
   .animation-delay-2000 { animation-delay: 2s; }
   .animation-delay-4000 { animation-delay: 4s; }
-
-  /* Shimmer skeleton */
-  .skeleton {
-    @apply bg-gradient-to-r from-slate-100 via-slate-50 to-slate-100 bg-[length:200%_100%] animate-[shimmer_1.5s_infinite];
-  }
 }
 
-/* ─────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════
    KEYFRAMES
-───────────────────────────────────────────────── */
+═══════════════════════════════════════════════════ */
 @keyframes blob {
-  0%   { transform: translate(0, 0) scale(1); }
-  33%  { transform: translate(30px, -50px) scale(1.1); }
-  66%  { transform: translate(-20px, 20px) scale(0.9); }
-  100% { transform: translate(0, 0) scale(1); }
+  0%   { transform: translate(0,0) scale(1); }
+  33%  { transform: translate(30px,-50px) scale(1.1); }
+  66%  { transform: translate(-20px,20px) scale(0.9); }
+  100% { transform: translate(0,0) scale(1); }
 }
 
 @keyframes shimmer {
@@ -180,8 +236,8 @@
 }
 
 @keyframes float-up {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-8px); }
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-8px); }
 }
 
 @keyframes fade-in-up {
@@ -189,21 +245,12 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.animate-float   { animation: float-up 3s ease-in-out infinite; }
-.animate-fade-up { animation: fade-in-up 0.5s ease forwards; }
-
-/* ─────────────────────────────────────────────────
-   SCROLL
-───────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════
+   SCROLL GLOBAL
+═══════════════════════════════════════════════════ */
 html { scroll-behavior: smooth; }
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar        { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track  { background: transparent; }
-::-webkit-scrollbar-thumb  { background: #cbd5e1; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.scrollbar-hide::-webkit-scrollbar { display: none; }
+::-webkit-scrollbar-thumb  { background: #F0E6D8; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #d4c5b5; }
