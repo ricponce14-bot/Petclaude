@@ -8,8 +8,8 @@ import type { Pet } from "@/lib/supabase/types";
 
 const SPECIES_CONFIG: Record<string, { label: string; emoji: string; bg: string; text: string; border: string }> = {
   dog:   { label: "Perro", emoji: "",    bg: "bg-[#FFF4EC]", text: "text-[#FF8C42]", border: "border-orange-100" },
-  cat:   { label: "Gato",  emoji: "",    bg: "bg-[#E8F5F1]",  text: "text-[#4DA18A]", border: "border-mint/20"   },
-  other: { label: "Otro",  emoji: "",    bg: "bg-[#E8F5F1]",  text: "text-[#4DA18A]", border: "border-mint/20"   },
+  cat:   { label: "Gato",  emoji: "",    bg: "bg-[#E8F5F1]",  text: "text-[#4DA18A]", border: "border-[#c8e6de]"   },
+  other: { label: "Otro",  emoji: "",    bg: "bg-[#E8F5F1]",  text: "text-[#4DA18A]", border: "border-[#c8e6de]"   },
 };
 
 const TEMPERAMENT_BADGE: Record<string, { label: string; cls: string }> = {
@@ -69,10 +69,10 @@ export default function MascotasPage() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.38, delay: 0.05 }}
-        className="flex gap-3 items-start bg-[#E8F5F1] border border-mint/20
+        className="flex gap-3 items-start bg-[#E8F5F1] border border-[#c8e6de]
                    rounded-[24px] p-4 text-sm text-[#3d8a75]"
       >
-        <div className="w-8 h-8 rounded-[12px] bg-mint/20 flex items-center justify-center shrink-0">
+        <div className="w-8 h-8 rounded-[12px] bg-[#d4ece6] flex items-center justify-center shrink-0">
           <Info size={16} className="text-[#4DA18A]" />
         </div>
         <p className="font-medium pt-0.5">
@@ -98,7 +98,7 @@ export default function MascotasPage() {
           className="w-full pl-11 pr-5 py-3.5 bg-[#FFF3E3] border border-[#F0E6D8]
                      rounded-[20px] text-sm font-medium text-[#1A1A1A]
                      placeholder:text-[#BBA898] outline-none
-                     focus:border-[#4DA18A] focus:ring-4 focus:ring-mint/20 focus:bg-white
+                     focus:border-[#4DA18A] focus:ring-4 focus:ring-[#b5d9ce] focus:bg-white
                      transition-all duration-200"
         />
       </motion.div>

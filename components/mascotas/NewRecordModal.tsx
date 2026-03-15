@@ -9,7 +9,7 @@ import ModalShell from "@/components/ui/ModalShell";
 const inputCls = `w-full bg-[#FFF3E3] border border-[#F0E6D8] rounded-[16px]
   px-4 py-2.5 text-sm font-medium text-[#1A1A1A]
   placeholder:text-[#BBA898] outline-none
-  focus:border-[#4DA18A] focus:ring-4 focus:ring-mint/20 focus:bg-white
+  focus:border-[#4DA18A] focus:ring-4 focus:ring-[#b5d9ce] focus:bg-white
   transition-all duration-200`;
 
 const labelCls = "block text-xs font-bold text-[#9e8a7a] uppercase tracking-wide mb-1.5";

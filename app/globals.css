@@ -101,7 +101,7 @@
   }
 
   .bento-card-purple {
-    @apply bento-card bg-mint/8 border-mint/20;
+    @apply bento-card bg-[#E8F5F1] border-[#c8e6de];
   }
 
   .bento-card-teal {
@@ -117,7 +117,7 @@
   /* Legado — no romper */
   .bento-card-light    { @apply bento-card; }
   .bento-card-dark     { @apply rounded-[32px] bg-[#1a1a2e] border-[#2a2a4e] shadow-[0_4px_32px_rgba(0,0,0,0.15)] transition-all duration-300; }
-  .bento-card-lavender { @apply bento-card bg-mint/8 border-mint/20; }
+  .bento-card-lavender { @apply bento-card bg-[#E8F5F1] border-[#c8e6de]; }
 
   /* ── Botones ──────────────────────────────────── */
   .btn-primary {
@@ -151,8 +151,8 @@
 
   .btn-ghost {
     @apply inline-flex items-center justify-center gap-1.5
-           text-sm font-semibold text-mint           border border-mint/30 rounded-[16px] px-4 py-1.5
-           hover:bg-mint/10 transition-colors duration-200;
+           text-sm font-semibold text-mint           border border-[#b5d9ce] rounded-[16px] px-4 py-1.5
+           hover:bg-[#E8F5F1] transition-colors duration-200;
   }
 
   /* Legado */
