@@ -262,6 +262,55 @@ async function routeToHandler(
             reply: `💈 *Servicios y precios*\n\n${priceLines}\n\n¿Quieres agendar una cita? Responde *1* o escríbeme 🐾`,
             newState: "inicio",
           };
+        case "consultar_citas": {
+          const supabaseAdmin = getSupabaseAdmin();
+          const db4citas = supabaseAdmin as any;
+          const { data: rawOwner4citas } = await db4citas
+            .from("owners")
+            .select("id, name")
+            .eq("tenant_id", tenantId)
+            .eq("whatsapp", session.phone)
+            .maybeSingle();
+
+          const owner4citas = rawOwner4citas as { id: string; name: string } | null;
+          if (!owner4citas) {
+            return {
+              reply: `No encontré una cuenta registrada con este número 🐾\n\nEscribe *1* para agendar tu primera cita y registrarte.`,
+              newState: "inicio",
+            };
+          }
+
+          const now = new Date().toISOString();
+          const { data: citasData } = await db4citas
+            .from("appointments")
+            .select("scheduled_at, type, status, pets(name)")
+            .eq("owner_id", owner4citas.id)
+            .in("status", ["scheduled", "confirmed"])
+            .gte("scheduled_at", now)
+            .order("scheduled_at", { ascending: true })
+            .limit(3);
+
+          if (!citasData || citasData.length === 0) {
+            return {
+              reply: `Hola ${owner4citas.name} 👋\n\nNo tienes citas próximas agendadas.\n\n¿Quieres agendar una? Escribe *1* 🐾`,
+              newState: "inicio",
+            };
+          }
+
+          const lines = (citasData as any[]).map((c: any) => {
+            const fecha = new Date(c.scheduled_at);
+            const dia = fecha.toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long", timeZone: "America/Mexico_City" });
+            const hora = fecha.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit", hour12: true, timeZone: "America/Mexico_City" });
+            const tipo = (c.type as string).replace("_", " + ");
+            const pet = c.pets?.name ?? "tu mascota";
+            return `📅 *${dia}* a las *${hora}*\n🐕 ${pet} — ${tipo}`;
+          });
+
+          return {
+            reply: `Hola ${owner4citas.name} 👋 Aquí tus próximas citas:\n\n${lines.join("\n\n")}\n\n¿Necesitas reagendar? Escribe *4* 🐾`,
+            newState: "inicio",
+          };
+        }
         case "cancelar_cita":
           return {
             reply: `Para cancelar tu cita, escríbenos directamente o llámanos. Si necesitas reagendar, responde *4* y te ayudamos 🐾`,

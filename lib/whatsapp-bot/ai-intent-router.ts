@@ -9,6 +9,7 @@ export type Intent =
   | "reagendar_cita"
   | "cancelar_cita"
   | "consultar_precios"
+  | "consultar_citas"
   | "menu"
   | "fuera_de_scope";
 
@@ -51,6 +52,7 @@ Clasifica el mensaje del cliente en UNO de estos intents:
 - reagendar_cita: quiere cambiar una cita existente (ej: "cambiar mi cita", "no puedo ese día", "mover mi cita", "reagendar")
 - cancelar_cita: quiere cancelar una cita (ej: "cancelar mi cita", "ya no voy", "quiero cancelar")
 - consultar_precios: pregunta por precios o servicios (ej: "cuánto cuesta", "qué servicios tienen", "precios", "cuánto cobran")
+- consultar_citas: quiere ver sus citas próximas (ej: "mis citas", "cuándo es mi cita", "tengo cita esta semana", "a qué hora es mi cita", "ver mis citas", "cuándo vengo")
 - menu: quiere ver el menú o ayuda general (ej: "hola", "buenas", "opciones", "menú", "ayuda", "inicio", "1", "2", "3", "4")
 - fuera_de_scope: mensaje no relacionado con el negocio
 
@@ -83,6 +85,7 @@ Usa "low" si el mensaje es ambiguo. Nunca respondas con texto adicional.`;
       "reagendar_cita",
       "cancelar_cita",
       "consultar_precios",
+      "consultar_citas",
       "menu",
       "fuera_de_scope",
     ];
