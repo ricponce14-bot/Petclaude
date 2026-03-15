@@ -1,126 +1,196 @@
 "use client";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Search, Plus, User, Info, PawPrint } from "lucide-react";
+import { Search, Plus, User, PawPrint, Info } from "lucide-react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import type { Pet } from "@/lib/supabase/types";
 
+const SPECIES_CONFIG: Record<string, { label: string; emoji: string; bg: string; text: string; border: string }> = {
+  dog:   { label: "Perro", emoji: "🐕", bg: "bg-[#FFF4EC]", text: "text-[#FF8C42]", border: "border-orange-100" },
+  cat:   { label: "Gato",  emoji: "🐈", bg: "bg-purple-50",  text: "text-[#9B5DE5]", border: "border-purple-100" },
+  other: { label: "Otro",  emoji: "🐾", bg: "bg-teal-50",    text: "text-[#00C4AA]", border: "border-teal-50"   },
+};
+
+const TEMPERAMENT_BADGE: Record<string, { label: string; cls: string }> = {
+  friendly:   { label: "Amigable",  cls: "bg-teal-50 text-[#00C4AA]" },
+  nervous:    { label: "Nervioso",  cls: "bg-orange-50 text-[#FF8C42]" },
+  aggressive: { label: "Agresivo",  cls: "bg-red-50 text-red-500" },
+};
+
 export default function MascotasPage() {
-    const supabase = createClient();
-    const [pets, setPets] = useState<Pet[]>([]);
-    const [search, setSearch] = useState("");
-    const [loading, setLoading] = useState(true);
+  const supabase = createClient();
+  const [pets, setPets]       = useState<Pet[]>([]);
+  const [search, setSearch]   = useState("");
+  const [loading, setLoading] = useState(true);
 
-    const fetchPets = async () => {
-        setLoading(true);
-        // Fetch las mascotas junto con el nombre del dueño
-        const query = supabase
-            .from("pets")
-            .select("*, owner:owners(id, name, whatsapp)")
-            .order("name");
+  const fetchPets = async () => {
+    setLoading(true);
+    const query = supabase.from("pets").select("*, owner:owners(id, name, whatsapp)").order("name");
+    if (search) query.ilike("name", `%${search}%`);
+    const { data } = await query;
+    setPets((data as any[]) ?? []);
+    setLoading(false);
+  };
 
-        if (search) query.ilike("name", `%${search}%`);
-        const { data } = await query;
-        setPets((data as any[]) ?? []);
-        setLoading(false);
-    };
+  useEffect(() => { fetchPets(); }, [search]);
 
-    useEffect(() => {
-        fetchPets();
-    }, [search]);
+  return (
+    <div className="px-4 py-6 md:px-8 md:py-8 max-w-5xl mx-auto space-y-5 pb-24 md:pb-8">
 
-    // Funcion para renderizar inicial de especie
-    const getSpeciesLabel = (species: string) => {
-        switch (species) {
-            case "dog": return "D";
-            case "cat": return "G";
-            default: return "M";
-        }
-    };
-
-    return (
-        <div className="p-6 max-w-4xl mx-auto space-y-8 pb-24 md:pb-6">
-            {/* Header Premium */}
-            <div className="flex items-center justify-between mb-2">
-                <div>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight">Mascotas</h1>
-                    <p className="text-sm font-semibold text-slate-500 mt-1">
-                        {pets.length} pacientes registrados
-                    </p>
-                </div>
-                <Link
-                    href="/clientes" // Para agregar mascota, lo mandamos a clientes
-                    className="flex items-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-2xl text-sm font-bold shadow-soft-purple hover:bg-slate-800 transition-all hover:-translate-y-1 hover:shadow-xl"
-                >
-                    <Plus size={18} /> Nueva mascota
-                </Link>
-            </div>
-
-            {/* Explicación de flujo Premium */}
-            <div className="bg-blue-50/50 backdrop-blur-sm border border-blue-100/50 rounded-3xl p-4 flex gap-4 text-sm text-blue-800/80 items-start shadow-sm">
-                <div className="p-2 bg-blue-100 rounded-xl shrink-0">
-                    <Info size={20} className="text-blue-500" />
-                </div>
-                <p className="font-medium pt-1">
-                    Las mascotas siempre pertenecen a un dueño. Para crear una nueva, ve al <Link href="/clientes" className="font-bold underline text-blue-600 hover:text-blue-500">Directorio de Clientes</Link>.
-                </p>
-            </div>
-
-            {/* Buscador Premium */}
-            <div className="relative group">
-                <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-teal-500 transition-colors" />
-                <input
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                    placeholder="Buscar paciente por nombre..."
-                    className="w-full pl-11 pr-5 py-3.5 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-teal-500/20 focus:border-teal-500 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all placeholder:text-slate-400 text-slate-800"
-                />
-            </div>
-
-            {/* Lista de Mascotas Premium */}
-            {loading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {[1, 2, 3, 4].map(i => <div key={i} className="h-28 bg-slate-100 rounded-[1.5rem] animate-pulse" />)}
-                </div>
-            ) : pets.length === 0 ? (
-                <div className="text-center py-20 glass rounded-[2rem]">
-                    <PawPrint size={48} className="text-slate-300 mx-auto mb-4" />
-                    <p className="text-slate-500 font-bold text-lg">No se encontraron mascotas</p>
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    {pets.map((pet: any) => (
-                        <Link
-                            key={pet.id}
-                            href={`/mascotas/${pet.id}`}
-                            className="group flex items-start gap-4 bg-white/80 backdrop-blur-md rounded-[1.5rem] border border-slate-100 shadow-sm p-5 hover:shadow-soft-teal hover:-translate-y-1 transition-all duration-300 relative overflow-hidden"
-                        >
-                            <div className="absolute top-0 right-0 w-20 h-20 bg-orange-50 rounded-bl-full opacity-50 transition-transform group-hover:scale-110 -z-10" />
-
-                            {/* Avatar Orgánico */}
-                            <div className="w-16 h-16 rounded-2xl bg-orange-100/50 text-orange-600 flex items-center justify-center text-xl font-black shrink-0 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 overflow-hidden shadow-sm">
-                                {pet.photo_url ? (
-                                    <img src={pet.photo_url} alt={pet.name} className="w-full h-full object-cover" />
-                                ) : (
-                                    getSpeciesLabel(pet.species)
-                                )}
-                            </div>
-
-                            <div className="flex-1 min-w-0 py-1">
-                                <h3 className="font-black text-slate-900 text-lg truncate mb-0.5">{pet.name}</h3>
-                                <p className="text-sm font-semibold text-slate-500 truncate mb-3">
-                                    {pet.breed || "Raza mixta"}
-                                </p>
-
-                                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 bg-slate-50 border border-slate-100 w-fit px-2.5 py-1.5 rounded-lg">
-                                    <User size={14} className="text-slate-400" />
-                                    <span className="truncate max-w-[120px]">{pet.owner?.name || "Sin dueño"}</span>
-                                </div>
-                            </div>
-                        </Link>
-                    ))}
-                </div>
-            )}
+      {/* ── Header ─────────────────────────────────────── */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.38 }}
+        className="flex items-start justify-between gap-4"
+      >
+        <div>
+          <h1 className="text-2xl md:text-3xl font-black text-[#1A1A1A] tracking-tight">Mascotas</h1>
+          <p className="text-sm text-[#9e8a7a] font-medium mt-0.5">
+            {pets.length} pacientes registrados
+          </p>
         </div>
-    );
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <Link
+            href="/clientes"
+            className="flex items-center gap-2 bg-[#9B5DE5] text-white
+                       px-5 py-2.5 rounded-[20px] text-sm font-bold
+                       shadow-[0_8px_24px_rgba(155,93,229,0.25)]
+                       hover:bg-[#7A3FBF] transition-colors"
+          >
+            <Plus size={17} strokeWidth={2.5} /> Nueva mascota
+          </Link>
+        </motion.div>
+      </motion.div>
+
+      {/* ── Info callout ───────────────────────────────── */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.38, delay: 0.05 }}
+        className="flex gap-3 items-start bg-purple-50 border border-purple-100
+                   rounded-[24px] p-4 text-sm text-[#7A3FBF]"
+      >
+        <div className="w-8 h-8 rounded-[12px] bg-purple-100 flex items-center justify-center shrink-0">
+          <Info size={16} className="text-[#9B5DE5]" />
+        </div>
+        <p className="font-medium pt-0.5">
+          Las mascotas pertenecen a un dueño. Para crear una nueva, ve al{" "}
+          <Link href="/clientes" className="font-bold underline text-[#9B5DE5] hover:text-[#7A3FBF]">
+            Directorio de Clientes
+          </Link>.
+        </p>
+      </motion.div>
+
+      {/* ── Buscador ───────────────────────────────────── */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.38, delay: 0.08 }}
+        className="relative"
+      >
+        <Search size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#BBA898] pointer-events-none" />
+        <input
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Buscar mascota por nombre..."
+          className="w-full pl-11 pr-5 py-3.5 bg-[#FFF3E3] border border-[#F0E6D8]
+                     rounded-[20px] text-sm font-medium text-[#1A1A1A]
+                     placeholder:text-[#BBA898] outline-none
+                     focus:border-[#9B5DE5] focus:ring-4 focus:ring-purple-100 focus:bg-white
+                     transition-all duration-200"
+        />
+      </motion.div>
+
+      {/* ── Grid ───────────────────────────────────────── */}
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {[1,2,3,4].map(i => (
+            <div key={i} className="h-32 rounded-[32px] bg-[#FFF3E3] animate-pulse" />
+          ))}
+        </div>
+      ) : pets.length === 0 ? (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center py-20 rounded-[32px] bg-white border border-[#F0E6D8]"
+        >
+          <div className="inline-flex w-16 h-16 rounded-[20px] bg-purple-50 items-center justify-center mb-4">
+            <PawPrint size={28} className="text-[#9B5DE5]" />
+          </div>
+          <p className="text-[#9e8a7a] font-bold text-base">No se encontraron mascotas</p>
+        </motion.div>
+      ) : (
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+          initial="hidden"
+          animate="visible"
+          variants={{ visible: { transition: { staggerChildren: 0.06 } } }}
+        >
+          <AnimatePresence>
+            {pets.map((pet: any) => {
+              const sp = SPECIES_CONFIG[pet.species] ?? SPECIES_CONFIG.other;
+              const temp = TEMPERAMENT_BADGE[pet.temperament];
+              return (
+                <motion.div
+                  key={pet.id}
+                  variants={{
+                    hidden:  { opacity: 0, y: 20 },
+                    visible: { opacity: 1, y: 0, transition: { duration: 0.36 } },
+                  }}
+                  whileHover={{ y: -5, boxShadow: "0 16px 48px rgba(0,0,0,0.10)" }}
+                >
+                  <Link
+                    href={`/mascotas/${pet.id}`}
+                    className={`flex items-start gap-4 ${sp.bg} border ${sp.border}
+                                rounded-[32px] p-5 block
+                                shadow-[0_4px_32px_rgba(0,0,0,0.04)]
+                                transition-shadow duration-300`}
+                  >
+                    {/* Avatar especie */}
+                    <div className={`w-14 h-14 rounded-[18px] bg-white ${sp.border} border
+                                     flex items-center justify-center text-2xl shrink-0
+                                     shadow-[0_2px_12px_rgba(0,0,0,0.06)]`}>
+                      {pet.photo_url ? (
+                        <img src={pet.photo_url} alt={pet.name}
+                             className="w-full h-full object-cover rounded-[18px]" />
+                      ) : sp.emoji}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <h3 className={`font-black text-lg truncate mb-0.5 ${sp.text}`}>
+                        {pet.name}
+                      </h3>
+                      <p className="text-sm font-semibold text-[#9e8a7a] truncate mb-3">
+                        {pet.breed || "Raza mixta"} · {sp.label}
+                      </p>
+
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-[#9e8a7a]
+                                        bg-white border border-[#F0E6D8] px-2.5 py-1.5 rounded-[12px]">
+                          <User size={13} />
+                          <span className="truncate max-w-[110px]">{pet.owner?.name || "Sin dueño"}</span>
+                        </div>
+                        {temp && (
+                          <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${temp.cls}`}>
+                            {temp.label}
+                          </span>
+                        )}
+                        {pet.allergies && (
+                          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-red-50 text-red-500">
+                            Alergia
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+        </motion.div>
+      )}
+    </div>
+  );
 }
