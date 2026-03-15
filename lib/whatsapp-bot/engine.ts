@@ -31,8 +31,13 @@ export async function processMessage(
 ): Promise<BotResponse | null> {
   // 1. Obtener configuración del bot para este tenant
   const config = await getBotConfig(tenantId);
-  if (!config || !config.is_enabled) {
-    return null; // Bot desactivado → no responder
+  if (!config) {
+    console.warn(`[Engine] Sin bot_config para tenant ${tenantId}, mensaje ignorado`);
+    return null;
+  }
+  if (!config.is_enabled) {
+    console.log(`[Engine] Bot desactivado para tenant ${tenantId}, mensaje ignorado`);
+    return null;
   }
 
   // 2. Buscar o crear sesión de conversación
@@ -93,14 +98,26 @@ async function getBotConfig(tenantId: string): Promise<BotConfig | null> {
     .eq("tenant_id", tenantId)
     .single();
 
-  if (error || !data) return null;
+  if (error) {
+    console.error(`[Engine] Error al obtener bot_config para tenant ${tenantId}:`, error.message);
+    return null;
+  }
+  if (!data) {
+    console.warn(`[Engine] No existe bot_config para tenant ${tenantId}`);
+    return null;
+  }
 
   const config = data as any;
-  return {
-    ...config,
-    services: typeof config.services === "string" ? JSON.parse(config.services) : config.services,
-    business_hours: typeof config.business_hours === "string" ? JSON.parse(config.business_hours) : config.business_hours,
-  } as BotConfig;
+  try {
+    return {
+      ...config,
+      services: typeof config.services === "string" ? JSON.parse(config.services) : config.services,
+      business_hours: typeof config.business_hours === "string" ? JSON.parse(config.business_hours) : config.business_hours,
+    } as BotConfig;
+  } catch (parseErr) {
+    console.error(`[Engine] Error al parsear JSON de bot_config para tenant ${tenantId}:`, parseErr);
+    return null;
+  }
 }
 
 async function getOrCreateSession(
@@ -193,8 +210,9 @@ async function routeToHandler(
   config: BotConfig,
   tenantId: string
 ): Promise<HandlerResult> {
-  // Re-leer sesión fresca para estados críticos
-  if (session.state === "confirmar") {
+  // Re-leer sesión fresca para estados con posible race condition
+  const statesNeedingFresh: ChatState[] = ["confirmar", "seleccionar_hora", "seleccionar_fecha"];
+  if (statesNeedingFresh.includes(session.state)) {
     const supabaseAdmin = getSupabaseAdmin();
     const { data: freshSession } = await supabaseAdmin
       .from("whatsapp_chat_sessions")

@@ -2,72 +2,113 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─────────────────────────────────────────────────
+   TOKENS — Light Mode (default)
+───────────────────────────────────────────────── */
 @layer base {
   :root {
-    /* Fondo ultra suave para SaaS Premium */
-    --background: #fafafa;
-    --foreground: #0f172a;
+    --background:   #fafafa;
+    --foreground:   #0f172a;
+    --border:       #f1f5f9;
+    --input:        #f1f5f9;
+    --ring:         rgba(20, 184, 166, 0.4);
+    --radius:       1.5rem;
 
-    /* Paleta Principal: Teal Suave (Menos saturado, más orgánico) */
-    --primary: #14b8a6;
+    --primary:            #14b8a6;
     --primary-foreground: #ffffff;
-
-    /* Acentos pasteles */
-    --secondary: #8b5cf6;
+    --secondary:          #a78bfa;
     --secondary-foreground: #ffffff;
-
-    --accent: #f97316;
-    --accent-foreground: #ffffff;
-
-    --destructive: #ef4444;
+    --accent:             #f97316;
+    --accent-foreground:  #ffffff;
+    --destructive:        #ef4444;
     --destructive-foreground: #ffffff;
+    --muted:              #f8fafc;
+    --muted-foreground:   #64748b;
 
-    /* Grises cálidos para componentes */
-    --muted: #f8fafc;
-    --muted-foreground: #64748b;
+    /* Premium palette — light */
+    --cream:         #f5f0e8;
+    --cream-warm:    #ede8dc;
+    --charcoal:      #1a1a2e;
+    --charcoal-mid:  #16213e;
+    --lavender:      #a78bfa;
+  }
 
-    --border: #f1f5f9;
-    --input: #f1f5f9;
-    --ring: rgba(20, 184, 166, 0.4);
+  /* Dark Mode */
+  .dark {
+    --background:   #1a1a2e;
+    --foreground:   #f5f0e8;
+    --border:       #ffffff14;
+    --input:        #16213e;
+    --ring:         rgba(20, 184, 166, 0.5);
 
-    --radius: 1.5rem;
-    /* Bordes mucho más curvos por defecto */
+    --muted:              #16213e;
+    --muted-foreground:   #94a3b8;
+
+    --cream:         #f5f0e8;
+    --cream-warm:    #ede8dc;
   }
 }
 
+/* ─────────────────────────────────────────────────
+   BASE RESETS
+───────────────────────────────────────────────── */
 @layer base {
   * {
     @apply border-border;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
     @apply bg-background text-foreground antialiased;
-    /* Evitar que el scrollbar empuje el contenido bruscamente */
     overflow-y: scroll;
+    /* Prevent iOS bounce scroll bleed */
+    overscroll-behavior-y: none;
+  }
+
+  /* Safe input font size on iOS (prevents auto-zoom) */
+  input, select, textarea {
+    font-size: max(16px, 1em);
+  }
+
+  /* Better touch targets */
+  button, a, [role="button"] {
+    touch-action: manipulation;
   }
 }
 
+/* ─────────────────────────────────────────────────
+   UTILITIES
+───────────────────────────────────────────────── */
 @layer utilities {
 
-  /* Efectos orgánicos "No-IA" */
+  /* Glassmorphism */
   .glass {
     @apply bg-white/60 backdrop-blur-xl border border-white/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)];
   }
 
   .glass-dark {
-    @apply bg-slate-900/80 backdrop-blur-xl border border-slate-800 shadow-[0_20px_40px_rgba(0,0,0,0.3)];
+    @apply bg-charcoal/80 backdrop-blur-xl border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.3)];
   }
 
-  /* Textura de texto para títulos */
+  /* Premium dark card */
+  .card-dark {
+    @apply bg-charcoal-mid border border-white/10 rounded-3xl;
+  }
+
+  /* Text gradients */
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-br from-slate-900 via-slate-700 to-slate-800;
   }
 
   .text-gradient-primary {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-emerald-600;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-emerald-500;
   }
 
-  /* Sombras orgánicas de color */
+  .text-gradient-premium {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-teal-400 via-emerald-400 to-lavender;
+  }
+
+  /* Color shadows */
   .shadow-soft-teal {
     box-shadow: 0 10px 40px -10px rgba(20, 184, 166, 0.2);
   }
@@ -76,58 +117,102 @@
     box-shadow: 0 10px 40px -10px rgba(168, 85, 247, 0.2);
   }
 
-  /* Animaciones custom para landing (los blobs) */
+  .shadow-soft-cream {
+    box-shadow: 0 10px 40px -10px rgba(245, 240, 232, 0.8);
+  }
+
+  /* Bento card base */
+  .bento-card {
+    @apply rounded-3xl border overflow-hidden transition-all duration-300;
+  }
+
+  .bento-card-light {
+    @apply bento-card bg-white border-slate-100 hover:shadow-lg hover:shadow-slate-100 hover:-translate-y-0.5;
+  }
+
+  .bento-card-dark {
+    @apply bento-card bg-charcoal border-white/10 hover:shadow-xl hover:shadow-black/20 hover:-translate-y-0.5;
+  }
+
+  .bento-card-teal {
+    @apply bento-card bg-gradient-to-br from-teal-500 to-emerald-500 border-teal-400/30 hover:-translate-y-0.5;
+  }
+
+  .bento-card-lavender {
+    @apply bento-card bg-gradient-to-br from-violet-500/10 to-purple-500/10 border-violet-200 hover:-translate-y-0.5;
+  }
+
+  /* Micro-interactions */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-teal-500 text-white rounded-2xl font-bold text-sm
+           shadow-lg shadow-teal-500/25 hover:bg-teal-600 hover:shadow-teal-500/40 hover:-translate-y-0.5
+           active:scale-[0.97] active:translate-y-0 transition-all duration-200;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-slate-700 rounded-2xl font-bold text-sm
+           border border-slate-200 hover:bg-slate-50 hover:border-slate-300 hover:-translate-y-0.5
+           active:scale-[0.97] active:translate-y-0 transition-all duration-200;
+  }
+
+  .btn-dark {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-charcoal text-cream rounded-2xl font-bold text-sm
+           hover:bg-charcoal-mid hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200;
+  }
+
+  /* Blob animation (landing) */
   .animate-blob {
     animation: blob 7s infinite;
   }
+  .animation-delay-2000 { animation-delay: 2s; }
+  .animation-delay-4000 { animation-delay: 4s; }
 
-  .animation-delay-2000 {
-    animation-delay: 2s;
-  }
-
-  .animation-delay-4000 {
-    animation-delay: 4s;
+  /* Shimmer skeleton */
+  .skeleton {
+    @apply bg-gradient-to-r from-slate-100 via-slate-50 to-slate-100 bg-[length:200%_100%] animate-[shimmer_1.5s_infinite];
   }
 }
 
+/* ─────────────────────────────────────────────────
+   KEYFRAMES
+───────────────────────────────────────────────── */
 @keyframes blob {
-  0% {
-    transform: translate(0px, 0px) scale(1);
-  }
-
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
-  }
-
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-
-  100% {
-    transform: translate(0px, 0px) scale(1);
-  }
+  0%   { transform: translate(0, 0) scale(1); }
+  33%  { transform: translate(30px, -50px) scale(1.1); }
+  66%  { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0, 0) scale(1); }
 }
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
-/* Custom scrollbar orgánico */
-::-webkit-scrollbar {
-  width: 10px;
+@keyframes float-up {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 10px;
-  border: 3px solid #fafafa;
-}
+.animate-float   { animation: float-up 3s ease-in-out infinite; }
+.animate-fade-up { animation: fade-in-up 0.5s ease forwards; }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+/* ─────────────────────────────────────────────────
+   SCROLL
+───────────────────────────────────────────────── */
+html { scroll-behavior: smooth; }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: #cbd5e1; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
+.scrollbar-hide::-webkit-scrollbar { display: none; }

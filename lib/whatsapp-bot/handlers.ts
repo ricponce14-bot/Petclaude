@@ -3,6 +3,9 @@
 
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { format, parse, addDays } from "date-fns";
+import { fromZonedTime, toZonedTime } from "date-fns-tz";
+
+const MEXICO_TZ = "America/Mexico_City";
 import { es } from "date-fns/locale";
 import { getAvailableDates, getAvailableSlots } from "./availability";
 import type { BotConfig, WhatsappChatSession, ChatState } from "@/lib/supabase/types";
@@ -275,7 +278,9 @@ export async function handleConfirmar(
       };
     }
 
-    const scheduledAt = new Date(`${selected_date}T${selected_time}:00-06:00`);    // Buscar si el teléfono pertenece a un owner existente
+    const scheduledAt = fromZonedTime(`${selected_date}T${selected_time}:00`, MEXICO_TZ);
+
+    // Buscar si el teléfono pertenece a un owner existente
     const supabaseAdmin = getSupabaseAdmin();
     const { data: owner } = await supabaseAdmin
       .from("owners")
@@ -360,9 +365,10 @@ export async function handleConfirmar(
       };
     }
 
-    // Formatear mensaje de confirmación
-    const dateLabel = format(new Date(`${selected_date}T${selected_time}:00`), "EEEE d 'de' MMMM", { locale: es });
-    const timeLabel = format(new Date(`${selected_date}T${selected_time}:00`), "h:mm a");
+    // Formatear mensaje de confirmación (mostrar en hora México)
+    const apptMexicoTime = toZonedTime(scheduledAt, MEXICO_TZ);
+    const dateLabel = format(apptMexicoTime, "EEEE d 'de' MMMM", { locale: es });
+    const timeLabel = format(apptMexicoTime, "h:mm a");
     const confirmation = config.confirmation_template
       .replace("{servicio}", service?.label || session.selected_service || "")
       .replace("{fecha}", dateLabel)
@@ -695,7 +701,7 @@ export async function handleReagendarHora(
   }
 
   const selectedSlot = slots[index];
-  const newScheduledAt = new Date(`${session.selected_date}T${selectedSlot.time}:00`);
+  const newScheduledAt = fromZonedTime(`${session.selected_date}T${selectedSlot.time}:00`, MEXICO_TZ);
   // Actualizar la cita existente
   const { error: updateErr } = await supabaseAdmin
     .from("appointments")
@@ -717,8 +723,9 @@ export async function handleReagendarHora(
     };
   }
 
-  const dateLabel = format(newScheduledAt, "EEEE d 'de' MMMM", { locale: es });
-  const timeLabel = format(newScheduledAt, "h:mm a");
+  const reagendaMexicoTime = toZonedTime(newScheduledAt, MEXICO_TZ);
+  const dateLabel = format(reagendaMexicoTime, "EEEE d 'de' MMMM", { locale: es });
+  const timeLabel = format(reagendaMexicoTime, "h:mm a");
 
   return {
     reply: `✅ ¡Cita reagendada exitosamente!\n\n📅 Nueva fecha: *${dateLabel}*\n🕐 Nueva hora: *${timeLabel}*\n\n¡Te esperamos! 🐕`,

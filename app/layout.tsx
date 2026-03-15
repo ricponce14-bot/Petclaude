@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Outfit } from 'next/font/google';
 import './globals.css';
 
@@ -7,6 +7,17 @@ const outfit = Outfit({ subsets: ['latin'] });
 export const metadata: Metadata = {
     title: 'Ladrido | Gestión de Estéticas Caninas y Veterinarias',
     description: 'Automatiza tus recordatorios, agenda y control de pacientes por WhatsApp. Micro-SaaS para clínicas veterinarias y estéticas caninas en México.',
+};
+
+export const viewport: Viewport = {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+    viewportFit: 'cover',
+    themeColor: [
+        { media: '(prefers-color-scheme: light)', color: '#fafafa' },
+        { media: '(prefers-color-scheme: dark)', color: '#1a1a2e' },
+    ],
 };
 
 export const dynamic = 'force-dynamic';

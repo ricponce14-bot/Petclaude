@@ -158,13 +158,49 @@ export default function InventoryPage() {
               placeholder="Buscar productos o categorías..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-teal-500/20 outline-none"
+              className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-teal-500/20 outline-none"
             />
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full">
+        {/* Vista Mobile — Cards */}
+        <div className="sm:hidden divide-y divide-slate-100">
+          {loading ? (
+            <div className="p-6 text-center">
+              <Loader2 className="animate-spin mx-auto text-teal-500 mb-2" />
+              <p className="text-sm text-slate-400">Cargando inventario...</p>
+            </div>
+          ) : filteredItems.length === 0 ? (
+            <div className="p-8 text-center text-slate-400 text-sm">No se encontraron productos.</div>
+          ) : filteredItems.map(item => (
+            <div key={item.id} className="p-4 flex items-start gap-3 hover:bg-slate-50/50 transition-colors">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${item.stock <= item.min_stock ? "bg-amber-50" : "bg-teal-50"}`}>
+                <Package size={18} className={item.stock <= item.min_stock ? "text-amber-500" : "text-teal-500"} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-2">
+                  <p className="font-bold text-slate-900 text-sm truncate">{item.name}</p>
+                  <div className="flex gap-1 shrink-0">
+                    <button onClick={() => openEdit(item)} className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-teal-600 transition-colors"><Edit2 size={15} /></button>
+                    <button onClick={() => handleDelete(item.id)} className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors"><Trash2 size={15} /></button>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 mt-1 flex-wrap">
+                  <span className="text-xs px-2 py-0.5 bg-slate-100 rounded-md text-slate-500 font-bold">{item.category}</span>
+                  <span className={`text-xs font-black flex items-center gap-1 ${item.stock <= item.min_stock ? "text-amber-600" : "text-slate-700"}`}>
+                    {item.stock <= item.min_stock && <AlertTriangle size={11} />}
+                    Stock: {item.stock}
+                  </span>
+                  <span className="text-xs text-slate-500 font-bold">${item.price}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Vista Desktop — Tabla */}
+        <div className="hidden sm:block overflow-x-auto">
+          <table className="w-full min-w-[600px]">
             <thead>
               <tr className="text-left text-xs font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
                 <th className="px-6 py-4">Producto</th>
@@ -200,7 +236,7 @@ export default function InventoryPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div className={`flex items-center gap-2 font-black ${item.stock <= item.min_stock ? "text-amber-600" : "text-slate-900"}`}>
-                        {item.stock} 
+                        {item.stock}
                         {item.stock <= item.min_stock && <AlertTriangle size={14} />}
                       </div>
                       <p className="text-[10px] text-slate-400 font-bold">Min: {item.min_stock}</p>

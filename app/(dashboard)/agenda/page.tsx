@@ -38,18 +38,19 @@ export default function AgendaPage() {
   const days = Array.from({ length: 7 }, (_, i) => addDays(subDays(new Date(), 3), i));
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-8">
+    <div className="p-4 md:p-6 max-w-4xl mx-auto space-y-4 md:space-y-8 pb-24 md:pb-8">
       {/* Header Premium */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-2 md:mb-4">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Agenda</h1>
-          <p className="text-sm font-semibold text-slate-500 mt-1 capitalize">
+          <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Agenda</h1>
+          <p className="text-xs md:text-sm font-semibold text-slate-500 mt-0.5 md:mt-1 capitalize">
             {format(date, "EEEE d 'de' MMMM", { locale: es })} — <span className="text-teal-600 bg-teal-50 px-2 py-0.5 rounded-md">{appts.length} cita{appts.length !== 1 ? "s" : ""}</span>
           </p>
         </div>
+        {/* Botón solo visible en desktop */}
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-2xl text-sm font-bold shadow-soft-purple hover:bg-slate-800 transition-all hover:-translate-y-1 hover:shadow-xl"
+          className="hidden md:flex items-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-2xl text-sm font-bold shadow-soft-purple hover:bg-slate-800 transition-all hover:-translate-y-1 hover:shadow-xl"
         >
           <Plus size={18} /> Nueva cita
         </button>
@@ -108,6 +109,16 @@ export default function AgendaPage() {
           onCreated={fetchAppointments}
         />
       )}
+
+      {/* FAB — Solo mobile */}
+      <button
+        onClick={() => setShowModal(true)}
+        className="md:hidden fixed bottom-20 right-4 z-40 w-14 h-14 bg-teal-500 text-white rounded-2xl shadow-lg shadow-teal-500/30 flex items-center justify-center hover:bg-teal-600 active:scale-95 transition-all"
+        aria-label="Nueva cita"
+        style={{ marginBottom: "env(safe-area-inset-bottom)" }}
+      >
+        <Plus size={26} strokeWidth={2.5} />
+      </button>
     </div>
   );
 }
