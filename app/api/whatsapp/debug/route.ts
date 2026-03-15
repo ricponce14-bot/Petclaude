@@ -22,19 +22,28 @@ export async function GET() {
     ? { exists: false, error: colErr.message, fix: "ALTER TABLE wa_messages ADD COLUMN IF NOT EXISTS direction text DEFAULT 'outbound';" }
     : { exists: true };
 
-  // 3. Total de mensajes
-  const { count, error: countErr } = await supabase
+  // 3. Conteo de mensajes por tenant
+  const { data: countByTenant, error: countErr } = await supabase
     .from("wa_messages")
-    .select("*", { count: "exact", head: true });
-  results.wa_messages_total = countErr ? { error: countErr.message } : count;
+    .select("tenant_id")
+    .order("created_at", { ascending: false })
+    .limit(500);
 
-  // 4. Últimos 3 mensajes (sin filtrar por tenant — admin bypasses RLS)
+  if (!countErr && countByTenant) {
+    const tally: Record<string, number> = {};
+    for (const r of countByTenant) {
+      tally[r.tenant_id] = (tally[r.tenant_id] || 0) + 1;
+    }
+    results.messages_per_tenant = tally;
+  }
+
+  // 4. Últimos 5 mensajes (sin filtrar — admin bypasses RLS)
   const { data: lastMsgs, error: lastErr } = await supabase
     .from("wa_messages")
     .select("id, phone, body, direction, type, created_at, tenant_id")
     .order("created_at", { ascending: false })
-    .limit(3);
-  results.last_3_messages = lastErr ? { error: lastErr.message } : lastMsgs;
+    .limit(5);
+  results.last_5_messages = lastErr ? { error: lastErr.message } : lastMsgs;
 
   // 5. Bot config
   const { data: botCfg, error: botErr } = await supabase
