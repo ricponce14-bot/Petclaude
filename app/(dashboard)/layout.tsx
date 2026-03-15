@@ -4,6 +4,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import Sidebar from "@/components/layout/Sidebar";
 import BottomNav from "@/components/layout/BottomNav";
 import MobileHeader from "@/components/layout/MobileHeader";
+import WelcomeTour from "@/components/dashboard/WelcomeTour";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = createServerSupabaseClient();
@@ -28,6 +29,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       </div>
 
       <BottomNav />
+      <WelcomeTour />
     </div>
   );
 }

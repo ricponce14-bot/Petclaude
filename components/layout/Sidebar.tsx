@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
     CalendarDays, Users, PawPrint, MessageCircle, LayoutDashboard,
-    QrCode, LogOut, CreditCard, DollarSign, Bot, Inbox, Package
+    QrCode, LogOut, CreditCard, DollarSign, Bot, Inbox, Package, Settings
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -22,6 +22,7 @@ const links = [
     { href: "/mensajes/outbox", label: "Seguimiento", icon: MessageCircle, group: "automation" },
     { href: "/bot", label: "Bot Automático", icon: Bot, group: "automation" },
     { href: "/membresia", label: "Membresía", icon: CreditCard, group: "account" },
+    { href: "/ajustes",   label: "Ajustes",   icon: Settings,   group: "account" },
 ];
 
 const GROUP_LABELS: Record<string, string> = {
