@@ -121,7 +121,7 @@
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2
            px-6 py-3 rounded-[20px] font-bold text-sm text-white
-           bg-orange-DEFAULT
+           bg-orange
            shadow-[0_8px_24px_rgba(255,140,66,0.30)]
            hover:bg-orange-dark hover:-translate-y-0.5
            active:scale-[0.96] active:translate-y-0
@@ -131,7 +131,7 @@
   .btn-brand {
     @apply inline-flex items-center justify-center gap-2
            px-6 py-3 rounded-[20px] font-bold text-sm text-white
-           bg-purple-DEFAULT
+           bg-purple
            shadow-[0_8px_24px_rgba(155,93,229,0.25)]
            hover:bg-purple-dark hover:-translate-y-0.5
            active:scale-[0.96] active:translate-y-0
@@ -141,8 +141,7 @@
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2
            px-6 py-3 rounded-[20px] font-bold text-sm
-           bg-white text-orange-DEFAULT
-           border border-orange-100
+           bg-white text-orange           border border-orange-100
            hover:bg-orange-50 hover:-translate-y-0.5
            active:scale-[0.96] active:translate-y-0
            transition-all duration-200;
@@ -150,8 +149,7 @@
 
   .btn-ghost {
     @apply inline-flex items-center justify-center gap-1.5
-           text-sm font-semibold text-purple-DEFAULT
-           border border-purple-100 rounded-[16px] px-4 py-1.5
+           text-sm font-semibold text-purple           border border-purple-100 rounded-[16px] px-4 py-1.5
            hover:bg-purple-50 transition-colors duration-200;
   }
 
