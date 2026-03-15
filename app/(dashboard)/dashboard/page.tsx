@@ -68,7 +68,7 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <div className="p-4 md:p-6 max-w-5xl mx-auto space-y-6 md:space-y-8">
+    <div className="px-4 py-5 md:px-6 md:py-6 max-w-5xl mx-auto space-y-5 md:space-y-8">
 
       {/* ─── Saludo ─── */}
       <div className="mb-2 md:mb-6">
@@ -81,7 +81,7 @@ export default async function DashboardPage() {
         </p>
       </div>
 
-      {/* ─── Stat Cards ─── */}
+      {/* ─── Stat Cards — 2×2 en móvil, 4×1 en desktop ─── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         {stats.map(({ label, value, icon: Icon, href, cardBg, iconBg, iconColor, valueColor }) => (
           <Link

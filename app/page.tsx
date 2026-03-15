@@ -63,7 +63,7 @@ export default function LandingPage() {
                                 El CRM para estéticas caninas
                             </div>
 
-                            <h1 className="text-4xl xs:text-5xl md:text-6xl font-black tracking-tight mb-5 leading-[1.08] text-ink">
+                            <h1 className="text-3xl xs:text-5xl md:text-6xl font-black tracking-tight mb-5 leading-[1.1] text-ink">
                                 Gestiona tu<br />
                                 estética canina<br />
                                 <span className="text-mint">de forma inteligente</span>
@@ -76,11 +76,11 @@ export default function LandingPage() {
                             <div className="flex flex-col xs:flex-row gap-3">
                                 <button
                                     onClick={() => openRegister("monthly")}
-                                    className="btn-primary text-sm xs:text-base px-7 xs:px-8 py-3.5"
+                                    className="btn-primary text-sm xs:text-base px-7 xs:px-8 py-4 w-full xs:w-auto"
                                 >
                                     Empezar prueba gratis <ArrowRight size={16} />
                                 </button>
-                                <a href="#features" className="btn-secondary text-sm xs:text-base px-7 xs:px-8 py-3.5">
+                                <a href="#features" className="btn-secondary text-sm xs:text-base px-7 xs:px-8 py-4 w-full xs:w-auto text-center">
                                     Ver funciones
                                 </a>
                             </div>
@@ -367,7 +367,7 @@ export default function LandingPage() {
                     </p>
                     <button
                         onClick={() => openRegister("monthly")}
-                        className="btn-primary text-base px-8 py-4"
+                        className="btn-primary text-base px-8 py-4 w-full sm:w-auto"
                     >
                         Empezar ahora — gratis <ArrowRight size={18} />
                     </button>
