@@ -8,6 +8,7 @@ import { fromZonedTime, toZonedTime } from "date-fns-tz";
 const MEXICO_TZ = "America/Mexico_City";
 import { es } from "date-fns/locale";
 import { getAvailableDates, getAvailableSlots } from "./availability";
+import { extractRegistrationData } from "./ai-intent-router";
 import type { BotConfig, WhatsappChatSession, ChatState } from "@/lib/supabase/types";
 
 export interface HandlerResult {
@@ -17,12 +18,114 @@ export interface HandlerResult {
 }
 
 // ============================================================
+// Helper interno: verificar si un teléfono ya está registrado
+// ============================================================
+async function checkOwnerExists(phone: string, tenantId: string): Promise<boolean> {
+  const db = getSupabaseAdmin() as any;
+  const { data } = await db
+    .from("owners")
+    .select("id")
+    .eq("tenant_id", tenantId)
+    .eq("whatsapp", phone)
+    .maybeSingle();
+  return !!data;
+}
+
+// ============================================================
+// Helper interno: crear owner + mascota y retomar intent original
+// ============================================================
+async function createOwnerAndPet(
+  ownerName: string,
+  petName: string,
+  breed: string | null,
+  size: string | null,
+  phone: string,
+  tenantId: string,
+  config: BotConfig,
+  pendingIntent: string
+): Promise<HandlerResult> {
+  const db = getSupabaseAdmin() as any;
+
+  // Idempotencia: si ya existe, no crear duplicado
+  const { data: existingOwner } = await db
+    .from("owners")
+    .select("id")
+    .eq("tenant_id", tenantId)
+    .eq("whatsapp", phone)
+    .maybeSingle();
+
+  let ownerId: string;
+
+  if (existingOwner) {
+    ownerId = existingOwner.id;
+  } else {
+    const { data: newOwner, error: ownerErr } = await db
+      .from("owners")
+      .insert({ tenant_id: tenantId, name: ownerName, whatsapp: phone })
+      .select("id")
+      .single();
+
+    if (ownerErr || !newOwner) {
+      console.error("[Onboarding] Error creando owner:", ownerErr?.message);
+      return {
+        reply: "😔 Hubo un problema al registrarte. Por favor contacta directamente a la estética.\n\nEscribe cualquier cosa para volver al menú.",
+        newState: "inicio",
+        updates: { selected_service: null, selected_date: null }
+      };
+    }
+
+    ownerId = newOwner.id;
+
+    // Crear mascota
+    await db.from("pets").insert({
+      tenant_id: tenantId,
+      owner_id: ownerId,
+      name: petName,
+      breed: breed || null,
+      species: "dog",
+      temperament: "friendly",
+      notes: size ? `Tamaño: ${size}` : null,
+    });
+  }
+
+  const successMsg = `✅ ¡Listo ${ownerName}! *${petName}* ya está en nuestro sistema. 🐾\n\n`;
+
+  if (pendingIntent === "agendar_cita") {
+    const services = config.services || [];
+    const serviceList = services
+      .map((s, i) => `${i + 1}️⃣ ${s.label} — $${s.price}`)
+      .join("\n");
+    return {
+      reply: successMsg + `Ahora dime, ¿qué servicio necesitas para ${petName}? 🐕\n\n${serviceList}\n\nEscribe el número del servicio`,
+      newState: "seleccionar_servicio",
+      updates: { selected_service: null, selected_date: null, owner_id: ownerId }
+    };
+  }
+
+  return {
+    reply: successMsg + config.welcome_message + "\n4️⃣ Reagendar cita",
+    newState: "inicio",
+    updates: { selected_service: null, selected_date: null, owner_id: ownerId }
+  };
+}
+
+// ============================================================
 // INICIO — Menú principal
 // ============================================================
 export async function handleInicio(input: string, config: BotConfig, tenantId: string, phone: string): Promise<HandlerResult> {
   const clean = input.trim();
 
   if (clean === "1") {
+    // Verificar si el cliente ya está registrado
+    const ownerExists = await checkOwnerExists(phone, tenantId);
+    if (!ownerExists) {
+      return {
+        reply: "¡Hola! 🐾 Veo que es tu *primera vez* con nosotros. ¡Bienvenido!\n\n¿Cuál es tu nombre?",
+        newState: "onboarding_nombre",
+        updates: { selected_service: "pending:agendar_cita" }
+      };
+    }
+
     // Agendar cita → mostrar servicios
     const services = config.services || [];
     const serviceList = services
@@ -660,6 +763,91 @@ export async function handleReagendarFecha(
     newState: "reagendar_hora",
     updates: { selected_date: format(selectedDate, "yyyy-MM-dd") }
   };
+}
+
+// ============================================================
+// ONBOARDING — Nuevo cliente: pedir nombre
+// ============================================================
+export async function handleOnboardingNombre(
+  input: string,
+  config: BotConfig,
+  _tenantId: string,
+  session: WhatsappChatSession
+): Promise<HandlerResult> {
+  const extracted = await extractRegistrationData(input, "nombre");
+
+  if (!extracted?.owner_name) {
+    return {
+      reply: "No pude entender tu nombre 😅\n\n¿Puedes escribirlo? Ejemplo: *Juan Pérez*",
+      newState: "onboarding_nombre"
+    };
+  }
+
+  const ownerName = extracted.owner_name;
+  const pendingIntent = (session.selected_service ?? "pending:agendar_cita").replace("pending:", "");
+
+  // Si también proporcionó datos de la mascota, registrar todo de una vez
+  if (extracted.pet_name) {
+    return createOwnerAndPet(
+      ownerName,
+      extracted.pet_name,
+      extracted.breed,
+      extracted.size,
+      session.phone,
+      session.tenant_id,
+      config,
+      pendingIntent
+    );
+  }
+
+  // Solo obtuvimos el nombre → pedir datos de la mascota
+  return {
+    reply: `¡Perfecto, ${ownerName}! 🐕\n\n¿Cómo se llama tu mascota? Cuéntame su nombre, raza y tamaño (pequeño, mediano o grande).\n\nEjemplo: *Toby, Labrador, grande*`,
+    newState: "onboarding_mascota",
+    updates: { selected_date: ownerName } // Temp: nombre del dueño en selected_date
+  };
+}
+
+// ============================================================
+// ONBOARDING — Nuevo cliente: pedir datos de mascota
+// ============================================================
+export async function handleOnboardingMascota(
+  input: string,
+  config: BotConfig,
+  _tenantId: string,
+  session: WhatsappChatSession
+): Promise<HandlerResult> {
+  const ownerName = session.selected_date; // Recuperado del almacenamiento temporal
+
+  if (!ownerName) {
+    return {
+      reply: "Ocurrió un error en el registro 😔 ¿Puedes escribir tu nombre nuevamente?",
+      newState: "onboarding_nombre",
+      updates: { selected_date: null }
+    };
+  }
+
+  const extracted = await extractRegistrationData(input, "mascota", ownerName);
+
+  if (!extracted?.pet_name) {
+    return {
+      reply: `No pude entender los datos de tu mascota 😅\n\n¿Puedes escribirlos así?\n\nEjemplo: *Toby, Pug, pequeño*`,
+      newState: "onboarding_mascota"
+    };
+  }
+
+  const pendingIntent = (session.selected_service ?? "pending:agendar_cita").replace("pending:", "");
+
+  return createOwnerAndPet(
+    ownerName,
+    extracted.pet_name,
+    extracted.breed,
+    extracted.size,
+    session.phone,
+    session.tenant_id,
+    config,
+    pendingIntent
+  );
 }
 
 export async function handleReagendarHora(

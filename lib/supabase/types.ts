@@ -5,7 +5,7 @@ export type AppointmentStatus = "scheduled" | "confirmed" | "completed" | "cance
 export type AppointmentType   = "bath" | "haircut" | "bath_haircut" | "vaccine" | "checkup" | "other";
 export type WaMessageType     = "reminder" | "winback" | "birthday" | "manual" | "bot_reply" | "bot_incoming";
 export type WaStatus          = "pending" | "sent" | "failed";
-export type ChatState         = "inicio" | "seleccionar_servicio" | "seleccionar_fecha" | "seleccionar_hora" | "confirmar" | "finalizado" | "esperando_confirmacion" | "reagendar_seleccionar" | "reagendar_fecha" | "reagendar_hora";
+export type ChatState         = "inicio" | "seleccionar_servicio" | "seleccionar_fecha" | "seleccionar_hora" | "confirmar" | "finalizado" | "esperando_confirmacion" | "reagendar_seleccionar" | "reagendar_fecha" | "reagendar_hora" | "onboarding_nombre" | "onboarding_mascota";
 
 export interface Tenant {
   id: string;

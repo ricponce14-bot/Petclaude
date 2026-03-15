@@ -101,3 +101,77 @@ Usa "low" si el mensaje es ambiguo. Nunca respondas con texto adicional.`;
     return null;
   }
 }
+
+// ============================================================
+// Extractor de datos de registro (onboarding)
+// ============================================================
+
+export interface RegistrationExtract {
+  owner_name: string | null;
+  pet_name: string | null;
+  breed: string | null;
+  size: string | null;
+}
+
+/**
+ * Extrae datos de registro (nombre del dueño y/o datos de la mascota)
+ * de un mensaje en lenguaje natural.
+ * - step "nombre": espera nombre del dueño (y opcionalmente datos de mascota)
+ * - step "mascota": espera datos de la mascota (nombre, raza, tamaño)
+ */
+export async function extractRegistrationData(
+  message: string,
+  step: "nombre" | "mascota",
+  ownerName?: string
+): Promise<RegistrationExtract | null> {
+  try {
+    const openai = getOpenAI();
+
+    const systemPrompt =
+      step === "nombre"
+        ? `Eres un extractor de datos para una estética canina en México.
+El cliente respondió al mensaje "¿Cuál es tu nombre?".
+Extrae los siguientes campos del mensaje:
+- owner_name: El nombre del dueño (REQUERIDO — extrae solo el nombre propio)
+- pet_name: El nombre de la mascota (si lo mencionó, si no es null)
+- breed: La raza de la mascota (si la mencionó, si no es null)
+- size: El tamaño — SOLO "pequeño", "mediano" o "grande" (si lo mencionó o puedes inferirlo de la raza, si no es null)
+
+Responde SOLO con JSON válido sin texto adicional:
+{"owner_name": "...", "pet_name": null, "breed": null, "size": null}`
+        : `Eres un extractor de datos para una estética canina en México.
+El dueño se llama "${ownerName ?? ""}". El cliente respondió al mensaje "¿Cómo se llama tu mascota, cuál es su raza y tamaño?".
+Extrae los siguientes campos del mensaje:
+- pet_name: El nombre de la mascota (REQUERIDO)
+- breed: La raza (si la mencionó, si no es null)
+- size: El tamaño — SOLO "pequeño", "mediano" o "grande" (si lo mencionó o puedes inferirlo de la raza, si no es null)
+
+Responde SOLO con JSON válido sin texto adicional:
+{"owner_name": null, "pet_name": "...", "breed": null, "size": null}`;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: message },
+      ],
+      max_tokens: 100,
+      temperature: 0,
+      response_format: { type: "json_object" },
+    });
+
+    const raw = response.choices[0]?.message?.content;
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw) as RegistrationExtract;
+    return {
+      owner_name: parsed.owner_name || null,
+      pet_name: parsed.pet_name || null,
+      breed: parsed.breed || null,
+      size: parsed.size || null,
+    };
+  } catch (err: any) {
+    console.error("[AI Router] Error al extraer datos de registro:", err.message);
+    return null;
+  }
+}

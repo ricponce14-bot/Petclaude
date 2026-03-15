@@ -13,6 +13,8 @@ import {
   handleReagendarSeleccionar,
   handleReagendarFecha,
   handleReagendarHora,
+  handleOnboardingNombre,
+  handleOnboardingMascota,
   type HandlerResult
 } from "./handlers";
 import { classifyIntent } from "./ai-intent-router";
@@ -229,9 +231,25 @@ async function routeToHandler(
     const aiResult = await classifyIntent(text, config.welcome_message.split("*")[1] ?? "Ladrido", config.services);
     if (aiResult && aiResult.confidence === "high") {
       switch (aiResult.intent) {
-        case "agendar_cita":
-          // Saltar el menú e ir directo a selección de servicio
+        case "agendar_cita": {
+          // Verificar si el cliente está registrado antes de iniciar el flujo
+          const supabaseAdmin = getSupabaseAdmin();
+          const { data: ownerCheck } = await supabaseAdmin
+            .from("owners")
+            .select("id")
+            .eq("tenant_id", tenantId)
+            .eq("whatsapp", session.phone)
+            .returns<any>()
+            .maybeSingle();
+          if (!ownerCheck) {
+            return {
+              reply: "¡Hola! 🐾 Veo que es tu *primera vez* con nosotros. ¡Bienvenido!\n\n¿Cuál es tu nombre?",
+              newState: "onboarding_nombre" as ChatState,
+              updates: { selected_service: "pending:agendar_cita" }
+            };
+          }
           return handleSeleccionarServicio("__ai_trigger__", config);
+        }
         case "reagendar_cita":
           // Ir directo al flujo de reagendar
           return handleReagendarSeleccionar("1", config, tenantId, { ...session, state: "reagendar_seleccionar" });
@@ -287,6 +305,12 @@ async function routeToHandler(
 
     case "reagendar_hora":
       return handleReagendarHora(text, config, tenantId, session);
+
+    case "onboarding_nombre":
+      return handleOnboardingNombre(text, config, tenantId, session);
+
+    case "onboarding_mascota":
+      return handleOnboardingMascota(text, config, tenantId, session);
 
     default:
       return handleInicio(text, config, tenantId, session.phone);
