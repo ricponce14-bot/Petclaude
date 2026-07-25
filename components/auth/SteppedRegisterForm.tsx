@@ -184,19 +184,9 @@ export default function SteppedRegisterForm({ initialPlan = "monthly", onSuccess
             // Refrescar sesión para que el JWT incluya el tenant_id recién asignado
             await supabase.auth.refreshSession();
 
-            // 3. Stripe checkout
-            const checkoutRes = await fetch("/api/stripe/checkout", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: authData.user.email, id: authData.user.id, plan: initialPlan })
-            });
-
-            const { url, error: checkoutError, details } = await checkoutRes.json();
-            if (checkoutError) throw new Error(details ? `${checkoutError}: ${details}` : checkoutError);
-            if (!url) throw new Error("No se pudo obtener URL de pago.");
-
-            if (onSuccess) onSuccess(url);
-            else window.location.href = url;
+            // Ir directo al dashboard (sin Stripe por ahora)
+            if (onSuccess) onSuccess("/dashboard");
+            else window.location.href = "/dashboard";
 
         } catch (err: any) {
             setError(err.message || "Ocurrió un error inesperado.");
