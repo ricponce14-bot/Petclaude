@@ -18,7 +18,7 @@ export default function BottomNav() {
   return (
     <nav
       className="md:hidden fixed bottom-0 left-0 right-0 z-50
-                 bg-white border-t border-[#F0E6D8]"
+                 bg-white border-t border-[#EADDC8]"
       style={{
         boxShadow: "0 -4px 24px rgba(0,0,0,0.07)",
         paddingBottom: "env(safe-area-inset-bottom)",
@@ -38,7 +38,7 @@ export default function BottomNav() {
                 {isActive && (
                   <motion.div
                     layoutId="bottom-nav-indicator"
-                    className="absolute -top-1.5 w-8 h-1 rounded-full bg-[#FF8C42]"
+                    className="absolute -top-1.5 w-8 h-1 rounded-full bg-[#E8542F]"
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   />
                 )}
@@ -53,13 +53,13 @@ export default function BottomNav() {
                   <Icon
                     size={21}
                     strokeWidth={isActive ? 2.5 : 1.8}
-                    className={isActive ? "text-[#FF8C42]" : "text-[#BBA898]"}
+                    className={isActive ? "text-[#E8542F]" : "text-[#B3A18D]"}
                   />
                 </motion.div>
               </div>
 
               <span className={`text-[10px] leading-none font-semibold transition-colors duration-200
-                                ${isActive ? "text-[#FF8C42] font-bold" : "text-[#BBA898]"}`}>
+                                ${isActive ? "text-[#E8542F] font-bold" : "text-[#B3A18D]"}`}>
                 {label}
               </span>
             </Link>

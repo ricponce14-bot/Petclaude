@@ -155,7 +155,7 @@ export default function MembresiaClient({ tenant, userEmail, userId }: Props) {
                     </div>
 
                     {/* Anual */}
-                    <div className="bg-mint rounded-xl border border-mint/20 shadow-[0_4px_24px_rgba(77,161,138,0.2)] p-6 flex flex-col relative overflow-hidden">
+                    <div className="bg-mint rounded-xl border border-mint/20 shadow-[0_4px_24px_rgba(14,140,109,0.2)] p-6 flex flex-col relative overflow-hidden">
                         <div className="absolute top-3 right-3 bg-white/20 text-white text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full flex items-center gap-1">
                             <Heart size={10} className="fill-white" /> Recomendado
                         </div>

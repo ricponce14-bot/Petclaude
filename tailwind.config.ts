@@ -18,53 +18,53 @@ const config: Config = {
         foreground: "var(--foreground)",
         border:     "var(--border)",
 
-        // ── Paleta Pet-Alegre (nueva) ─────────────────────
+        // ── Paleta "Barro y Jade" (Apúntame) ──────────────
         orange: {
-          DEFAULT: "#FF8C42",
-          light:   "#FFB07C",
-          dark:    "#E6722A",
-          50:      "#FFF4EC",
-          100:     "#FFE4CC",
+          DEFAULT: "#E8542F",
+          light:   "#F0916B",
+          dark:    "#C73E1D",
+          50:      "#FAEFE5",
+          100:     "#F6DCC8",
         },
         purple: {
-          DEFAULT: "#9B5DE5",
-          light:   "#B97FF0",
-          dark:    "#7A3FBF",
-          50:      "#F3EAFF",
-          100:     "#E2CCFF",
-          900:     "#1E0A3C",
-          950:     "#130626",
+          DEFAULT: "#7A4FC9",
+          light:   "#9C77DC",
+          dark:    "#5D38A6",
+          50:      "#F1EAFB",
+          100:     "#DFD0F5",
+          900:     "#241239",
+          950:     "#170B26",
         },
-        // Verde Menta vibrante (diferente al antiguo mint)
+        // Jade (verde profundo, sustituye al teal neón)
         teal: {
-          DEFAULT: "#00F5D4",
-          light:   "#80FAE9",
-          dark:    "#00C4AA",
-          50:      "#EAFFFC",
+          DEFAULT: "#17B08A",
+          light:   "#6BCDB2",
+          dark:    "#0E8C6D",
+          50:      "#E8F5F0",
         },
-        carbon: "#1A1A1A",
+        carbon: "#241C15",
         cream:  {
-          DEFAULT: "#FFF9F0",
-          warm:    "#FFF3E3",
-          muted:   "#F5EDE0",
+          DEFAULT: "#FBF5EC",
+          warm:    "#F7ECDD",
+          muted:   "#F1E6D4",
         },
 
         // ── Legado (para no romper código existente) ──────
         mint: {
-          DEFAULT: "#4DA18A",
-          dark:    "#3d8a75",
-          light:   "#6ab8a1",
+          DEFAULT: "#0E8C6D",
+          dark:    "#0B7057",
+          light:   "#3FAE8C",
         },
         sand: {
-          DEFAULT: "#E7A977",
-          dark:    "#d4935f",
-          light:   "#f0bf96",
+          DEFAULT: "#E9A13B",
+          dark:    "#C98426",
+          light:   "#F2C06E",
         },
-        ink:      "#2D3748",
+        ink:      "#241C15",
         charcoal: {
-          DEFAULT: "#1a1a2e",
-          mid:     "#16213e",
-          light:   "#0f3460",
+          DEFAULT: "#1E1410",
+          mid:     "#17100C",
+          light:   "#2A1C12",
         },
         lavender: {
           DEFAULT: "#a78bfa",
@@ -86,14 +86,14 @@ const config: Config = {
       boxShadow: {
         bento:    "0 4px 32px rgba(0,0,0,0.06)",
         "bento-hover": "0 12px 48px rgba(0,0,0,0.12)",
-        orange:   "0 8px 24px rgba(255,140,66,0.30)",
-        purple:   "0 8px 24px rgba(155,93,229,0.25)",
-        teal:     "0 8px 24px rgba(0,245,212,0.25)",
-        glow:     "0 0 32px rgba(155,93,229,0.20)",
+        orange:   "0 8px 24px rgba(232,84,47,0.30)",
+        purple:   "0 8px 24px rgba(122,79,201,0.25)",
+        teal:     "0 8px 24px rgba(23,176,138,0.25)",
+        glow:     "0 0 32px rgba(122,79,201,0.20)",
       },
 
       fontFamily: {
-        sans: ["var(--font-sans)", "Inter", "system-ui", "sans-serif"],
+        sans: ["Metropolis", "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
       },
 
       animation: {

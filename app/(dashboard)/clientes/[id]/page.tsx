@@ -11,8 +11,8 @@ import { useRouter } from "next/navigation";
 import EditOwnerModal from "@/components/crm/EditOwnerModal";
 
 const STATUS_LABEL: Record<string, { label: string; cls: string }> = {
-  scheduled: { label: "Agendada",   cls: "bg-orange-50 text-[#FF8C42]" },
-  confirmed: { label: "Confirmada", cls: "bg-teal-50 text-[#00C4AA]" },
+  scheduled: { label: "Agendada",   cls: "bg-orange-50 text-[#E8542F]" },
+  confirmed: { label: "Confirmada", cls: "bg-teal-50 text-[#0E8C6D]" },
   completed: { label: "Completada", cls: "bg-slate-100 text-slate-500" },
   cancelled: { label: "Cancelada",  cls: "bg-red-50 text-red-500" },
   no_show:   { label: "No asistió", cls: "bg-red-50 text-red-400" },
@@ -175,9 +175,9 @@ export default function ClienteDetailPage() {
                 <div className="w-full md:w-80 space-y-6">
                     <div className="flex items-center justify-between px-2">
                         <h2 className="text-xl font-black text-slate-900 flex items-center gap-2">
-                            <CalendarDays className="text-[#FF8C42]" size={22} /> Historial
+                            <CalendarDays className="text-[#E8542F]" size={22} /> Historial
                         </h2>
-                        <span className="bg-orange-100 text-[#FF8C42] text-xs font-black px-2.5 py-1 rounded-full">{appts.length}</span>
+                        <span className="bg-orange-100 text-[#E8542F] text-xs font-black px-2.5 py-1 rounded-full">{appts.length}</span>
                     </div>
 
                     <div className="grid gap-3">

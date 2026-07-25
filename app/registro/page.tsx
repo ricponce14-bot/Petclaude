@@ -2,6 +2,7 @@
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import SteppedRegisterForm from "@/components/auth/SteppedRegisterForm";
+import Logo from "@/components/ui/Logo";
 
 export default function RegistroPage() {
     const params = useSearchParams();
@@ -12,7 +13,7 @@ export default function RegistroPage() {
             {/* Header minimal */}
             <header className="px-6 py-4 flex justify-between items-center">
                 <Link href="/">
-                    <img src="/images/logo-color.png" alt="Apúntame" className="h-8 w-auto object-contain" />
+                    <Logo size="md" />
                 </Link>
                 <Link href="/login" className="text-sm font-semibold text-slate-500 hover:text-slate-900 transition-colors">
                     Ya tengo cuenta →

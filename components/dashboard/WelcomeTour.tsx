@@ -2,6 +2,7 @@
 // components/dashboard/WelcomeTour.tsx
 import { useState, useEffect } from "react";
 import { X, QrCode, Bot, Users, CalendarDays, ArrowRight } from "lucide-react";
+import Logo from "@/components/ui/Logo";
 
 const STORAGE_KEY = "ladrido_welcomed_v1";
 
@@ -63,7 +64,7 @@ export default function WelcomeTour() {
                 <div className="flex items-start justify-between p-5 pb-4 border-b border-slate-100">
                     <div>
                         <div className="flex items-center gap-2 mb-1">
-                            <img src="/images/logo-color.png" alt="Apúntame" className="h-6 w-auto object-contain" />
+                            <Logo size="sm" />
                         </div>
                         <h2 className="text-lg font-black text-ink">¡Bienvenido a Apúntame!</h2>
                         <p className="text-slate-400 text-xs mt-0.5">Sigue estos pasos para empezar</p>

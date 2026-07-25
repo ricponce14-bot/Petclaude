@@ -43,10 +43,10 @@ export default function PageShell({ children, title, subtitle, action, className
         <motion.div variants={itemVariants} className="flex items-start justify-between mb-6 gap-4">
           <div>
             {title && (
-              <h1 className="text-2xl font-black text-[#1A1A1A] leading-tight">{title}</h1>
+              <h1 className="text-2xl font-black text-[#241C15] leading-tight">{title}</h1>
             )}
             {subtitle && (
-              <p className="text-sm text-[#9e8a7a] mt-0.5">{subtitle}</p>
+              <p className="text-sm text-[#8B7A6A] mt-0.5">{subtitle}</p>
             )}
           </div>
           {action && <div className="shrink-0">{action}</div>}

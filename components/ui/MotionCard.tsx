@@ -13,11 +13,11 @@ import { cn } from "@/lib/utils";
 type Variant = "white" | "orange" | "purple" | "teal" | "cream";
 
 const variantClasses: Record<Variant, string> = {
-  white:  "bg-white border-[#F0E6D8]",
-  orange: "bg-[#FFF4EC] border-orange-100",
-  purple: "bg-[#E8F5F1] border-[#c8e6de]",
-  teal:   "bg-[#E8F5F1] border-[#c8e6de]",
-  cream:  "bg-[#FFF3E3] border-[#F0E6D8]",
+  white:  "bg-white border-[#EADDC8]",
+  orange: "bg-[#FAEFE5] border-orange-100",
+  purple: "bg-[#E9F3EE] border-[#C4E0D5]",
+  teal:   "bg-[#E9F3EE] border-[#C4E0D5]",
+  cream:  "bg-[#F7ECDD] border-[#EADDC8]",
 };
 
 interface MotionCardProps {
@@ -77,9 +77,9 @@ export function StatCard({
   delay?: number;
 }) {
   const colorMap = {
-    orange: { bg: "bg-[#FFF4EC]",  text: "text-[#FF8C42]", border: "border-orange-100" },
-    purple: { bg: "bg-[#E8F5F1]",  text: "text-[#4DA18A]", border: "border-[#c8e6de]"    },
-    teal:   { bg: "bg-[#E8F5F1]",  text: "text-[#4DA18A]", border: "border-[#c8e6de]"    },
+    orange: { bg: "bg-[#FAEFE5]",  text: "text-[#E8542F]", border: "border-orange-100" },
+    purple: { bg: "bg-[#E9F3EE]",  text: "text-[#0E8C6D]", border: "border-[#C4E0D5]"    },
+    teal:   { bg: "bg-[#E9F3EE]",  text: "text-[#0E8C6D]", border: "border-[#C4E0D5]"    },
   };
   const c = colorMap[color];
 
@@ -96,8 +96,8 @@ export function StatCard({
           <span className={c.text}>{icon}</span>
         </div>
       )}
-      <p className="text-3xl font-black text-[#1A1A1A] leading-none mb-1">{value}</p>
-      <p className="text-sm text-[#9e8a7a] font-medium">{label}</p>
+      <p className="text-3xl font-black text-[#241C15] leading-none mb-1">{value}</p>
+      <p className="text-sm text-[#8B7A6A] font-medium">{label}</p>
     </motion.div>
   );
 }

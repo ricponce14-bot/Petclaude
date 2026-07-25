@@ -54,7 +54,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     plan === "past_due";
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: "#FFF9F0" }}>
+    <div className="flex h-screen overflow-hidden" style={{ background: "#FBF5EC" }}>
       {/* Sidebar - Solo en Desktop */}
       <div className="hidden md:flex h-full">
         <Sidebar />

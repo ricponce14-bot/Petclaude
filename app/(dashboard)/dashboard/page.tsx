@@ -55,11 +55,11 @@ export default async function DashboardPage() {
       {/* ── Citas del día ──────────────────────────────── */}
       <MotionCard delay={0.25} className="overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#F0E6D8]">
-          <h2 className="font-black text-[#1A1A1A] text-base md:text-lg">Citas de hoy</h2>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#EADDC8]">
+          <h2 className="font-black text-[#241C15] text-base md:text-lg">Citas de hoy</h2>
           <Link
             href="/agenda"
-            className="text-sm font-bold text-[#FF8C42] hover:text-[#E6722A] transition-colors"
+            className="text-sm font-bold text-[#E8542F] hover:text-[#C73E1D] transition-colors"
           >
             Ver agenda →
           </Link>
@@ -67,31 +67,31 @@ export default async function DashboardPage() {
 
         {!todayAppts?.length ? (
           <div className="text-center py-14 px-6">
-            <div className="inline-flex w-14 h-14 rounded-[18px] bg-[#FFF4EC] text-[#FF8C42] items-center justify-center mb-3">
+            <div className="inline-flex w-14 h-14 rounded-[18px] bg-[#FAEFE5] text-[#E8542F] items-center justify-center mb-3">
               <CalendarDays size={26} />
             </div>
-            <p className="text-[#9e8a7a] font-medium text-sm">No hay citas programadas para hoy</p>
+            <p className="text-[#8B7A6A] font-medium text-sm">No hay citas programadas para hoy</p>
           </div>
         ) : (
-          <ul className="divide-y divide-[#F0E6D8]">
+          <ul className="divide-y divide-[#EADDC8]">
             {(todayAppts as any[]).map((appt, i) => (
               <li
                 key={appt.id}
-                className="flex items-center gap-3 px-6 py-3.5 hover:bg-[#FFF9F0] transition-colors"
+                className="flex items-center gap-3 px-6 py-3.5 hover:bg-[#FBF5EC] transition-colors"
                 style={{ animationDelay: `${i * 0.05}s` }}
               >
                 {/* Hora */}
-                <span className="text-xs font-black text-[#FF8C42] w-12 shrink-0 text-center
+                <span className="text-xs font-black text-[#E8542F] w-12 shrink-0 text-center
                                  bg-orange-50 border border-orange-100 px-2 py-1.5 rounded-[12px]">
                   {format(new Date(appt.scheduled_at), "HH:mm")}
                 </span>
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <p className="font-bold text-[#1A1A1A] text-sm truncate">
+                  <p className="font-bold text-[#241C15] text-sm truncate">
                     {appt.cliente_nombre || appt.owners?.name || "Cliente"}
                   </p>
-                  <p className="text-xs text-[#9e8a7a] font-medium truncate">
+                  <p className="text-xs text-[#8B7A6A] font-medium truncate">
                     {appt.servicio || "Cita"}
                   </p>
                 </div>
@@ -100,8 +100,8 @@ export default async function DashboardPage() {
                 <div className="flex gap-1.5 items-center shrink-0">
                   <span className={`text-[10px] uppercase tracking-wide px-2.5 py-1 rounded-full font-bold ${
                     appt.status === "confirmed"
-                      ? "bg-teal-50 text-[#00C4AA]"
-                      : "bg-[#FFF4EC] text-[#FF8C42]"
+                      ? "bg-teal-50 text-[#0E8C6D]"
+                      : "bg-[#FAEFE5] text-[#E8542F]"
                   }`}>
                     {appt.status === "confirmed" ? "✓ conf." : "• pend."}
                   </span>

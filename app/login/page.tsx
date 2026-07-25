@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Loader2, Mail, Lock, ArrowRight } from "lucide-react";
+import Logo from "@/components/ui/Logo";
 
 type View = "login" | "forgot";
 
@@ -52,11 +53,7 @@ export default function LoginPage() {
 
           {/* Logo + título */}
           <div className="text-center mb-7">
-            <img
-              src="/images/logo-color.png"
-              alt="Apúntame"
-              className="w-[140px] h-auto mx-auto mb-4 object-contain"
-            />
+            <div className="flex justify-center mb-4"><Logo size="lg" /></div>
             <h1 className="text-xl font-black text-ink">
               {view === "login" ? "Bienvenido de vuelta" : "Recuperar contraseña"}
             </h1>

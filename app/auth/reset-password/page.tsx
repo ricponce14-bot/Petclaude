@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { Loader2, Lock, CheckCircle2 } from "lucide-react";
+import Logo from "@/components/ui/Logo";
 
 export default function ResetPasswordPage() {
   const supabase = createClient();
@@ -48,7 +49,7 @@ export default function ResetPasswordPage() {
       <div className="w-full max-w-sm">
         <div className="bg-white rounded-2xl shadow-[0_8px_40px_rgba(0,0,0,0.08)] border border-slate-100 p-8">
           <div className="text-center mb-7">
-            <img src="/images/logo-color.png" alt="Apúntame" className="w-[130px] h-auto mx-auto mb-4 object-contain" />
+            <div className="flex justify-center mb-4"><Logo size="lg" /></div>
             <h1 className="text-xl font-black text-ink">Nueva contraseña</h1>
             <p className="text-slate-400 text-sm mt-1">Elige una contraseña segura</p>
           </div>

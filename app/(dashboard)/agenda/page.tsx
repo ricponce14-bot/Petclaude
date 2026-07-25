@@ -43,11 +43,11 @@ export default function AgendaPage() {
         className="flex items-start justify-between gap-4"
       >
         <div>
-          <h1 className="text-2xl md:text-3xl font-black text-[#1A1A1A] tracking-tight">Agenda</h1>
-          <p className="text-sm text-[#9e8a7a] font-medium mt-0.5 capitalize">
+          <h1 className="text-2xl md:text-3xl font-black text-[#241C15] tracking-tight">Agenda</h1>
+          <p className="text-sm text-[#8B7A6A] font-medium mt-0.5 capitalize">
             {format(date, "EEEE d 'de' MMMM", { locale: es })}
             {" "}·{" "}
-            <span className="text-[#FF8C42] font-bold">
+            <span className="text-[#E8542F] font-bold">
               {appts.length} cita{appts.length !== 1 ? "s" : ""}
             </span>
           </p>
@@ -56,10 +56,10 @@ export default function AgendaPage() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setShowModal(true)}
-          className="hidden md:flex items-center gap-2 bg-[#FF8C42] text-white
+          className="hidden md:flex items-center gap-2 bg-[#E8542F] text-white
                      px-5 py-2.5 rounded-[20px] text-sm font-bold
-                     shadow-[0_8px_24px_rgba(255,140,66,0.30)]
-                     hover:bg-[#E6722A] transition-colors"
+                     shadow-[0_8px_24px_rgba(232,84,47,0.30)]
+                     hover:bg-[#C73E1D] transition-colors"
         >
           <Plus size={17} strokeWidth={2.5} /> Nueva cita
         </motion.button>
@@ -70,13 +70,13 @@ export default function AgendaPage() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.38, delay: 0.06 }}
-        className="flex items-center gap-2 bg-white border border-[#F0E6D8]
+        className="flex items-center gap-2 bg-white border border-[#EADDC8]
                    rounded-[32px] p-3 shadow-[0_4px_32px_rgba(0,0,0,0.06)]"
       >
         <button
           onClick={() => setDate(d => subDays(d, 1))}
-          className="p-2 hover:bg-[#FFF3E3] rounded-[14px] transition-colors text-[#9e8a7a]
-                     hover:text-[#FF8C42] shrink-0"
+          className="p-2 hover:bg-[#F7ECDD] rounded-[14px] transition-colors text-[#8B7A6A]
+                     hover:text-[#E8542F] shrink-0"
         >
           <ChevronLeft size={20} />
         </button>
@@ -92,8 +92,8 @@ export default function AgendaPage() {
                 className={`flex flex-col items-center px-3.5 py-2.5 rounded-[18px]
                             text-xs font-bold min-w-[58px] transition-all duration-200
                             ${isActive
-                              ? "bg-[#FF8C42] text-white shadow-[0_8px_20px_-4px_rgba(255,140,66,0.45)] -translate-y-0.5"
-                              : "text-[#9e8a7a] hover:bg-[#FFF3E3] hover:text-[#FF8C42]"
+                              ? "bg-[#E8542F] text-white shadow-[0_8px_20px_-4px_rgba(232,84,47,0.45)] -translate-y-0.5"
+                              : "text-[#8B7A6A] hover:bg-[#F7ECDD] hover:text-[#E8542F]"
                             }`}
               >
                 <span className="uppercase tracking-widest opacity-80 text-[9px]">
@@ -107,8 +107,8 @@ export default function AgendaPage() {
 
         <button
           onClick={() => setDate(d => addDays(d, 1))}
-          className="p-2 hover:bg-[#FFF3E3] rounded-[14px] transition-colors text-[#9e8a7a]
-                     hover:text-[#FF8C42] shrink-0"
+          className="p-2 hover:bg-[#F7ECDD] rounded-[14px] transition-colors text-[#8B7A6A]
+                     hover:text-[#E8542F] shrink-0"
         >
           <ChevronRight size={20} />
         </button>
@@ -118,22 +118,22 @@ export default function AgendaPage() {
       {loading ? (
         <div className="space-y-3">
           {[1,2,3].map(i => (
-            <div key={i} className="h-24 rounded-[28px] bg-[#FFF3E3] animate-pulse" />
+            <div key={i} className="h-24 rounded-[28px] bg-[#F7ECDD] animate-pulse" />
           ))}
         </div>
       ) : appts.length === 0 ? (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="text-center py-16 rounded-[32px] bg-white border border-[#F0E6D8]"
+          className="text-center py-16 rounded-[32px] bg-white border border-[#EADDC8]"
         >
-          <div className="inline-flex w-14 h-14 rounded-[18px] bg-[#FFF4EC] items-center justify-center mb-3">
-            <CalendarDays size={24} className="text-[#FF8C42]" />
+          <div className="inline-flex w-14 h-14 rounded-[18px] bg-[#FAEFE5] items-center justify-center mb-3">
+            <CalendarDays size={24} className="text-[#E8542F]" />
           </div>
-          <p className="text-[#9e8a7a] font-medium text-sm">No hay citas este día</p>
+          <p className="text-[#8B7A6A] font-medium text-sm">No hay citas este día</p>
           <button
             onClick={() => setShowModal(true)}
-            className="mt-3 text-sm font-bold text-[#FF8C42] hover:text-[#E6722A] transition-colors"
+            className="mt-3 text-sm font-bold text-[#E8542F] hover:text-[#C73E1D] transition-colors"
           >
             + Agendar una cita
           </button>
@@ -175,8 +175,8 @@ export default function AgendaPage() {
         whileTap={{ scale: 0.93 }}
         onClick={() => setShowModal(true)}
         className="md:hidden fixed bottom-20 right-4 z-40
-                   w-14 h-14 bg-[#FF8C42] text-white rounded-[20px]
-                   shadow-[0_8px_24px_rgba(255,140,66,0.45)]
+                   w-14 h-14 bg-[#E8542F] text-white rounded-[20px]
+                   shadow-[0_8px_24px_rgba(232,84,47,0.45)]
                    flex items-center justify-center"
         aria-label="Nueva cita"
         style={{ marginBottom: "env(safe-area-inset-bottom)" }}

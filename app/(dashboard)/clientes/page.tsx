@@ -8,9 +8,9 @@ import NewOwnerModal from "@/components/crm/NewOwnerModal";
 import type { Owner } from "@/lib/supabase/types";
 
 const AVATAR_COLORS = [
-  { bg: "bg-orange-100",  text: "text-[#FF8C42]" },
-  { bg: "bg-[#E8F5F1]",  text: "text-[#4DA18A]" },
-  { bg: "bg-[#FFF4EC]",  text: "text-[#FF8C42]" },
+  { bg: "bg-orange-100",  text: "text-[#E8542F]" },
+  { bg: "bg-[#E9F3EE]",  text: "text-[#0E8C6D]" },
+  { bg: "bg-[#FAEFE5]",  text: "text-[#E8542F]" },
 ];
 
 export default function ClientesPage() {
@@ -42,8 +42,8 @@ export default function ClientesPage() {
         className="flex items-start justify-between gap-4"
       >
         <div>
-          <h1 className="text-2xl md:text-3xl font-black text-[#1A1A1A] tracking-tight">Directorio</h1>
-          <p className="text-sm text-[#9e8a7a] font-medium mt-0.5">
+          <h1 className="text-2xl md:text-3xl font-black text-[#241C15] tracking-tight">Directorio</h1>
+          <p className="text-sm text-[#8B7A6A] font-medium mt-0.5">
             {owners.length} clientes registrados
           </p>
         </div>
@@ -51,10 +51,10 @@ export default function ClientesPage() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 bg-[#FF8C42] text-white
+          className="flex items-center gap-2 bg-[#E8542F] text-white
                      px-5 py-2.5 rounded-[20px] text-sm font-bold
-                     shadow-[0_8px_24px_rgba(255,140,66,0.30)]
-                     hover:bg-[#E6722A] transition-colors"
+                     shadow-[0_8px_24px_rgba(232,84,47,0.30)]
+                     hover:bg-[#C73E1D] transition-colors"
         >
           <Plus size={17} strokeWidth={2.5} /> Nuevo cliente
         </motion.button>
@@ -67,16 +67,16 @@ export default function ClientesPage() {
         transition={{ duration: 0.38, delay: 0.06 }}
         className="relative"
       >
-        <Search size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#BBA898]
+        <Search size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#B3A18D]
                                      pointer-events-none transition-colors" />
         <input
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Buscar cliente por nombre..."
-          className="w-full pl-11 pr-5 py-3.5 bg-[#FFF3E3] border border-[#F0E6D8]
-                     rounded-[20px] text-sm font-medium text-[#1A1A1A]
-                     placeholder:text-[#BBA898] outline-none
-                     focus:border-[#FF8C42] focus:ring-4 focus:ring-orange-100 focus:bg-white
+          className="w-full pl-11 pr-5 py-3.5 bg-[#F7ECDD] border border-[#EADDC8]
+                     rounded-[20px] text-sm font-medium text-[#241C15]
+                     placeholder:text-[#B3A18D] outline-none
+                     focus:border-[#E8542F] focus:ring-4 focus:ring-orange-100 focus:bg-white
                      transition-all duration-200"
         />
       </motion.div>
@@ -85,22 +85,22 @@ export default function ClientesPage() {
       {loading ? (
         <div className="grid gap-4 sm:grid-cols-2">
           {[1,2,3,4].map(i => (
-            <div key={i} className="h-28 rounded-[32px] bg-[#FFF3E3] animate-pulse" />
+            <div key={i} className="h-28 rounded-[32px] bg-[#F7ECDD] animate-pulse" />
           ))}
         </div>
       ) : owners.length === 0 ? (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="text-center py-20 rounded-[32px] bg-white border border-[#F0E6D8]"
+          className="text-center py-20 rounded-[32px] bg-white border border-[#EADDC8]"
         >
-          <div className="inline-flex w-16 h-16 rounded-[20px] bg-[#FFF4EC] items-center justify-center mb-4">
-            <Users size={28} className="text-[#FF8C42]" />
+          <div className="inline-flex w-16 h-16 rounded-[20px] bg-[#FAEFE5] items-center justify-center mb-4">
+            <Users size={28} className="text-[#E8542F]" />
           </div>
-          <p className="text-[#9e8a7a] font-bold text-base mb-2">No hay clientes todavía</p>
+          <p className="text-[#8B7A6A] font-bold text-base mb-2">No hay clientes todavía</p>
           <button
             onClick={() => setShowModal(true)}
-            className="text-sm font-bold text-[#FF8C42] hover:text-[#E6722A] transition-colors"
+            className="text-sm font-bold text-[#E8542F] hover:text-[#C73E1D] transition-colors"
           >
             + Registrar el primero
           </button>
@@ -128,7 +128,7 @@ export default function ClientesPage() {
                   <Link
                     href={`/clientes/${owner.id}`}
                     className="flex flex-col bg-white rounded-[32px]
-                               border border-[#F0E6D8]
+                               border border-[#EADDC8]
                                shadow-[0_4px_32px_rgba(0,0,0,0.06)]
                                p-5 block transition-shadow duration-300"
                   >
@@ -140,20 +140,20 @@ export default function ClientesPage() {
                         {owner.name.charAt(0).toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-bold text-[#1A1A1A] text-base truncate">{owner.name}</p>
-                        <p className="text-xs text-[#9e8a7a] font-medium flex items-center gap-1.5 mt-0.5">
-                          <Phone size={11} className="text-[#FF8C42]" />
+                        <p className="font-bold text-[#241C15] text-base truncate">{owner.name}</p>
+                        <p className="text-xs text-[#8B7A6A] font-medium flex items-center gap-1.5 mt-0.5">
+                          <Phone size={11} className="text-[#E8542F]" />
                           {owner.whatsapp}
                         </p>
                       </div>
                     </div>
 
                     {/* Notas / CTA */}
-                    <div className="flex items-center justify-between pt-3 border-t border-[#F0E6D8]">
-                      <span className="text-xs text-[#9e8a7a] font-medium truncate max-w-[70%]">
+                    <div className="flex items-center justify-between pt-3 border-t border-[#EADDC8]">
+                      <span className="text-xs text-[#8B7A6A] font-medium truncate max-w-[70%]">
                         {owner.notes ? owner.notes : "Sin notas"}
                       </span>
-                      <span className="text-[11px] font-bold text-[#FF8C42]">Ver historial →</span>
+                      <span className="text-[11px] font-bold text-[#E8542F]">Ver historial →</span>
                     </div>
                   </Link>
                 </motion.div>

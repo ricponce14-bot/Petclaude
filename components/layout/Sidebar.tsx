@@ -8,6 +8,7 @@ import {
   Sparkles, LogOut, CreditCard, DollarSign, Bot, Inbox, Package, Settings
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import Logo, { LogoMark } from "@/components/ui/Logo";
 
 const links = [
   { href: "/dashboard",          label: "Inicio",         icon: LayoutDashboard, group: "main" },
@@ -52,20 +53,16 @@ export default function Sidebar() {
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
       className="relative h-full flex flex-col overflow-hidden
-                 bg-[#1a1a2e] border-r border-white/5
+                 bg-[#1E1410] border-r border-white/5
                  rounded-r-[32px] z-20 shadow-[4px_0_32px_rgba(10,10,30,0.25)]"
       style={{ flexShrink: 0 }}
     >
       {/* ── Logo ─────────────────────────────────────── */}
       <div className="flex items-center h-16 px-3 border-b border-white/10 shrink-0 overflow-hidden">
         {expanded ? (
-          <span className="text-xl font-black text-white tracking-tight whitespace-nowrap">
-            Apúntame<span className="text-[#FF8C42]">.mx</span>
-          </span>
+          <Logo variant="dark" size="sm" className="whitespace-nowrap" />
         ) : (
-          <div className="w-8 h-8 rounded-[10px] bg-[#FF8C42] flex items-center justify-center shrink-0">
-            <span className="text-white font-black text-sm">A</span>
-          </div>
+          <LogoMark size={32} />
         )}
       </div>
 
@@ -163,7 +160,7 @@ function NavItem({
           className={`relative flex items-center gap-3 px-3 py-2.5 rounded-[16px]
                       cursor-pointer transition-colors duration-200 overflow-hidden
                       ${isActive
-                        ? "bg-[#FF8C42]/15 text-white"
+                        ? "bg-[#E8542F]/15 text-white"
                         : "text-white/40 hover:bg-white/6 hover:text-white/80"
                       }`}
         >
@@ -172,7 +169,7 @@ function NavItem({
             <motion.div
               layoutId="active-dot"
               className="absolute left-0 top-1/2 -translate-y-1/2
-                         w-1 h-5 rounded-r-full bg-[#FF8C42]"
+                         w-1 h-5 rounded-r-full bg-[#E8542F]"
               transition={{ type: "spring", stiffness: 380, damping: 30 }}
             />
           )}
@@ -181,7 +178,7 @@ function NavItem({
             <Icon
               size={18}
               strokeWidth={isActive ? 2.5 : 1.8}
-              className={isActive ? "text-[#FF8C42]" : ""}
+              className={isActive ? "text-[#E8542F]" : ""}
             />
             {/* Halo naranja al hover */}
             {hovered && !isActive && (
@@ -189,7 +186,7 @@ function NavItem({
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1.8, opacity: 0.15 }}
                 exit={{ scale: 0, opacity: 0 }}
-                className="absolute inset-0 rounded-full bg-[#FF8C42]"
+                className="absolute inset-0 rounded-full bg-[#E8542F]"
               />
             )}
           </div>
@@ -219,7 +216,7 @@ function NavItem({
             exit={{ opacity: 0, x: -4, scale: 0.92 }}
             transition={{ duration: 0.14 }}
             className="absolute left-[68px] top-1/2 -translate-y-1/2 z-50
-                       bg-[#2a2a4e] text-white text-xs font-semibold
+                       bg-[#3A2A20] text-white text-xs font-semibold
                        px-3 py-1.5 rounded-[12px] whitespace-nowrap
                        shadow-[0_8px_24px_rgba(0,0,0,0.3)]
                        border border-white/10 pointer-events-none"

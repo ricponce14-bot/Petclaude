@@ -15,13 +15,13 @@ const schema = z.object({
 });
 type FormData = z.infer<typeof schema>;
 
-const inputCls = `w-full bg-[#FFF3E3] border border-[#F0E6D8] rounded-[16px]
-  px-4 py-2.5 text-sm font-medium text-[#1A1A1A]
-  placeholder:text-[#BBA898] outline-none
-  focus:border-[#FF8C42] focus:ring-4 focus:ring-orange-100 focus:bg-white
+const inputCls = `w-full bg-[#F7ECDD] border border-[#EADDC8] rounded-[16px]
+  px-4 py-2.5 text-sm font-medium text-[#241C15]
+  placeholder:text-[#B3A18D] outline-none
+  focus:border-[#E8542F] focus:ring-4 focus:ring-orange-100 focus:bg-white
   transition-all duration-200`;
 
-const labelCls = "block text-xs font-bold text-[#9e8a7a] uppercase tracking-wide mb-1.5";
+const labelCls = "block text-xs font-bold text-[#8B7A6A] uppercase tracking-wide mb-1.5";
 
 export default function NewOwnerModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
   const supabase = createClient();
@@ -89,16 +89,16 @@ export default function NewOwnerModal({ onClose, onCreated }: { onClose: () => v
           </div>
         )}
 
-        <div className="border-t border-[#F0E6D8] pt-4">
+        <div className="border-t border-[#EADDC8] pt-4">
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             type="submit"
             disabled={saving}
             className="w-full flex items-center justify-center gap-2
-                       bg-[#FF8C42] text-white font-bold py-3.5 rounded-[20px] text-sm
-                       shadow-[0_8px_24px_rgba(255,140,66,0.30)]
-                       hover:bg-[#E6722A] transition-colors disabled:opacity-60"
+                       bg-[#E8542F] text-white font-bold py-3.5 rounded-[20px] text-sm
+                       shadow-[0_8px_24px_rgba(232,84,47,0.30)]
+                       hover:bg-[#C73E1D] transition-colors disabled:opacity-60"
           >
             {saving
               ? <><Loader2 size={16} className="animate-spin" /> Guardando...</>

@@ -36,19 +36,19 @@ export default function MobileHeader() {
   return (
     <header
       className="md:hidden fixed top-0 left-0 right-0 h-14 z-40
-                 bg-[#FFF9F0]/95 backdrop-blur-xl
-                 border-b border-[#F0E6D8]
+                 bg-[#FBF5EC]/95 backdrop-blur-xl
+                 border-b border-[#EADDC8]
                  px-4 flex items-center justify-between"
       style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
       {/* Logo + título */}
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-[12px] bg-[#FF8C42] flex items-center justify-center
-                        shadow-[0_4px_12px_rgba(255,140,66,0.30)]">
+        <div className="w-8 h-8 rounded-[12px] bg-[#E8542F] flex items-center justify-center
+                        shadow-[0_4px_12px_rgba(232,84,47,0.30)]">
           <span className="text-white font-black text-sm leading-none">L</span>
         </div>
-        <span className="text-sm font-bold text-[#1A1A1A]
-                         border-l border-[#F0E6D8] pl-3">
+        <span className="text-sm font-bold text-[#241C15]
+                         border-l border-[#EADDC8] pl-3">
           {title}
         </span>
       </div>
@@ -60,9 +60,9 @@ export default function MobileHeader() {
             href="/ajustes"
             aria-label="Ajustes"
             className="flex items-center justify-center w-10 h-10
-                       bg-[#FFF3E3] text-[#9e8a7a] rounded-[14px]
-                       border border-[#F0E6D8]
-                       hover:bg-orange-50 hover:text-[#FF8C42]
+                       bg-[#F7ECDD] text-[#8B7A6A] rounded-[14px]
+                       border border-[#EADDC8]
+                       hover:bg-orange-50 hover:text-[#E8542F]
                        transition-colors duration-200"
           >
             <Settings size={17} />
@@ -74,8 +74,8 @@ export default function MobileHeader() {
           onClick={handleLogout}
           aria-label="Cerrar sesión"
           className="flex items-center justify-center w-10 h-10
-                     bg-[#FFF3E3] text-[#9e8a7a] rounded-[14px]
-                     border border-[#F0E6D8]
+                     bg-[#F7ECDD] text-[#8B7A6A] rounded-[14px]
+                     border border-[#EADDC8]
                      hover:bg-red-50 hover:text-red-500
                      transition-colors duration-200"
         >

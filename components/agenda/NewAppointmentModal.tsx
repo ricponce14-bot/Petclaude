@@ -7,13 +7,13 @@ import { motion } from "framer-motion";
 import ModalShell from "@/components/ui/ModalShell";
 import type { Owner, BotService } from "@/lib/supabase/types";
 
-const inputCls = `w-full bg-[#FFF3E3] border border-[#F0E6D8] rounded-[16px]
-  px-4 py-3 text-sm font-medium text-[#1A1A1A]
-  placeholder:text-[#BBA898] outline-none
-  focus:border-[#FF8C42] focus:ring-4 focus:ring-orange-100 focus:bg-white
+const inputCls = `w-full bg-[#F7ECDD] border border-[#EADDC8] rounded-[16px]
+  px-4 py-3 text-sm font-medium text-[#241C15]
+  placeholder:text-[#B3A18D] outline-none
+  focus:border-[#E8542F] focus:ring-4 focus:ring-orange-100 focus:bg-white
   transition-all duration-200`;
 
-const labelCls = "block text-xs font-bold text-[#9e8a7a] uppercase tracking-wide mb-1.5";
+const labelCls = "block text-xs font-bold text-[#8B7A6A] uppercase tracking-wide mb-1.5";
 
 export default function NewAppointmentModal({
   defaultDate, onClose, onCreated,
@@ -113,13 +113,13 @@ export default function NewAppointmentModal({
             {owners.length > 0 && (
               <button type="button" onClick={() => setClientMode("existing")}
                 className={`flex-1 py-2 rounded-[14px] text-xs font-bold transition-colors
-                  ${clientMode === "existing" ? "bg-[#FF8C42] text-white" : "bg-[#FFF3E3] text-[#9e8a7a]"}`}>
+                  ${clientMode === "existing" ? "bg-[#E8542F] text-white" : "bg-[#F7ECDD] text-[#8B7A6A]"}`}>
                 Cliente existente
               </button>
             )}
             <button type="button" onClick={() => setClientMode("new")}
               className={`flex-1 py-2 rounded-[14px] text-xs font-bold transition-colors
-                ${clientMode === "new" ? "bg-[#FF8C42] text-white" : "bg-[#FFF3E3] text-[#9e8a7a]"}`}>
+                ${clientMode === "new" ? "bg-[#E8542F] text-white" : "bg-[#F7ECDD] text-[#8B7A6A]"}`}>
               Cliente nuevo
             </button>
           </div>
@@ -146,12 +146,12 @@ export default function NewAppointmentModal({
             <div className="flex gap-2 mb-2">
               <button type="button" onClick={() => setServicioMode("catalog")}
                 className={`flex-1 py-2 rounded-[14px] text-xs font-bold transition-colors
-                  ${servicioMode === "catalog" ? "bg-[#00C4AA] text-white" : "bg-[#FFF3E3] text-[#9e8a7a]"}`}>
+                  ${servicioMode === "catalog" ? "bg-[#0E8C6D] text-white" : "bg-[#F7ECDD] text-[#8B7A6A]"}`}>
                 Del catálogo
               </button>
               <button type="button" onClick={() => { setServicioMode("custom"); setServicio(""); }}
                 className={`flex-1 py-2 rounded-[14px] text-xs font-bold transition-colors
-                  ${servicioMode === "custom" ? "bg-[#00C4AA] text-white" : "bg-[#FFF3E3] text-[#9e8a7a]"}`}>
+                  ${servicioMode === "custom" ? "bg-[#0E8C6D] text-white" : "bg-[#F7ECDD] text-[#8B7A6A]"}`}>
                 Otro
               </button>
             </div>
@@ -170,7 +170,7 @@ export default function NewAppointmentModal({
               placeholder="Ej. Corte de cabello, Masaje, Consulta..." className={inputCls} />
           )}
           {services.length === 0 && (
-            <p className="text-[11px] text-[#BBA898] mt-1.5">
+            <p className="text-[11px] text-[#B3A18D] mt-1.5">
               Tip: define tus servicios en <span className="font-bold">Bot Automático</span> para elegirlos rápido.
             </p>
           )}
@@ -202,14 +202,14 @@ export default function NewAppointmentModal({
 
         {error && <p className="text-xs text-red-500 font-medium">{error}</p>}
 
-        <div className="border-t border-[#F0E6D8] pt-4">
+        <div className="border-t border-[#EADDC8] pt-4">
           <motion.button
             whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
             type="button" onClick={submit} disabled={saving}
             className="w-full flex items-center justify-center gap-2
-                       bg-[#FF8C42] text-white font-bold py-3.5 rounded-[20px] text-sm
-                       shadow-[0_8px_24px_rgba(255,140,66,0.30)]
-                       hover:bg-[#E6722A] transition-colors disabled:opacity-60"
+                       bg-[#E8542F] text-white font-bold py-3.5 rounded-[20px] text-sm
+                       shadow-[0_8px_24px_rgba(232,84,47,0.30)]
+                       hover:bg-[#C73E1D] transition-colors disabled:opacity-60"
           >
             {saving ? <Loader2 size={16} className="animate-spin" /> : "Agendar cita"}
           </motion.button>

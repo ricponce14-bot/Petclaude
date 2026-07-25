@@ -21,9 +21,9 @@ interface ModalShellProps {
 }
 
 const ACCENT = {
-  orange: { dot: "bg-[#FF8C42]", close: "hover:bg-orange-50 hover:text-[#FF8C42]" },
-  purple: { dot: "bg-[#4DA18A]", close: "hover:bg-[#E8F5F1] hover:text-[#4DA18A]"   },
-  teal:   { dot: "bg-[#4DA18A]", close: "hover:bg-[#E8F5F1] hover:text-[#4DA18A]"   },
+  orange: { dot: "bg-[#E8542F]", close: "hover:bg-orange-50 hover:text-[#E8542F]" },
+  purple: { dot: "bg-[#0E8C6D]", close: "hover:bg-[#E9F3EE] hover:text-[#0E8C6D]"   },
+  teal:   { dot: "bg-[#0E8C6D]", close: "hover:bg-[#E9F3EE] hover:text-[#0E8C6D]"   },
 };
 
 export default function ModalShell({
@@ -45,7 +45,7 @@ export default function ModalShell({
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
         className="fixed inset-0 z-50 flex items-center justify-center p-4
-                   bg-[#1A1A1A]/50 backdrop-blur-sm"
+                   bg-[#241C15]/50 backdrop-blur-sm"
         onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       >
         <motion.div
@@ -68,9 +68,9 @@ export default function ModalShell({
             <div className="flex items-center gap-3">
               <span className={`w-2.5 h-2.5 rounded-full ${ac.dot} shrink-0`} />
               <div>
-                <h2 className="font-black text-[#1A1A1A] text-lg leading-tight">{title}</h2>
+                <h2 className="font-black text-[#241C15] text-lg leading-tight">{title}</h2>
                 {subtitle && (
-                  <p className="text-xs text-[#9e8a7a] font-medium mt-0.5">{subtitle}</p>
+                  <p className="text-xs text-[#8B7A6A] font-medium mt-0.5">{subtitle}</p>
                 )}
               </div>
             </div>
@@ -79,7 +79,7 @@ export default function ModalShell({
               whileTap={{ scale: 0.9 }}
               onClick={onClose}
               className={`w-9 h-9 rounded-[14px] flex items-center justify-center
-                          text-[#9e8a7a] transition-colors duration-200 ${ac.close}`}
+                          text-[#8B7A6A] transition-colors duration-200 ${ac.close}`}
             >
               <X size={18} />
             </motion.button>

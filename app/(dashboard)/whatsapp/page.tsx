@@ -43,7 +43,7 @@ function CopyButton({ text, label = "Copiar link" }: { text: string; label?: str
         } catch { /* clipboard no disponible */ }
       }}
       className="flex items-center gap-2 px-3.5 py-2 rounded-[14px] text-xs font-bold
-                 bg-teal-50 text-[#00C4AA] hover:bg-[#00C4AA] hover:text-white
+                 bg-teal-50 text-[#0E8C6D] hover:bg-[#0E8C6D] hover:text-white
                  border border-teal-50 transition-colors"
     >
       {copied ? <><Check size={13} /> Copiado</> : <><Copy size={13} /> {label}</>}
@@ -108,7 +108,7 @@ export default function WhatsAppPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="animate-spin w-8 h-8 border-4 border-[#00C4AA] border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-4 border-[#0E8C6D] border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -121,43 +121,43 @@ export default function WhatsAppPage() {
     <div className="p-6 max-w-2xl mx-auto space-y-6">
       {/* ── Header ─────────────────────────────────── */}
       <div>
-        <h1 className="text-2xl font-black text-[#1A1A1A] flex items-center gap-2">
-          WhatsApp <span className="text-[#9e8a7a] font-medium text-lg">·</span>
-          <span className="text-[#FF8C42]">Mía</span> <Sparkles size={18} className="text-[#FF8C42]" />
+        <h1 className="text-2xl font-black text-[#241C15] flex items-center gap-2">
+          WhatsApp <span className="text-[#8B7A6A] font-medium text-lg">·</span>
+          <span className="text-[#E8542F]">Mía</span> <Sparkles size={18} className="text-[#E8542F]" />
         </h1>
-        <p className="text-sm text-[#9e8a7a] font-medium mt-1">
+        <p className="text-sm text-[#8B7A6A] font-medium mt-1">
           Tu asistente por WhatsApp en el número central de Apúntame — sin QR de sesión, sin desconexiones.
         </p>
       </div>
 
       {/* ── Card principal: estado / activación ────── */}
-      <div className="bg-white border border-[#F0E6D8] rounded-[28px] shadow-[0_4px_24px_rgba(0,0,0,0.06)] p-6">
+      <div className="bg-white border border-[#EADDC8] rounded-[28px] shadow-[0_4px_24px_rgba(0,0,0,0.06)] p-6">
         {status?.vinculado ? (
           <div className="space-y-5">
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 flex items-center justify-center rounded-[16px] bg-teal-50 border border-teal-100">
-                <MessageCircle size={20} className="text-[#00C4AA]" />
+                <MessageCircle size={20} className="text-[#0E8C6D]" />
               </div>
               <div>
-                <p className="font-black text-[#1A1A1A]">Mía está activa 🐾</p>
-                <p className="text-xs text-[#9e8a7a] font-medium">
+                <p className="font-black text-[#241C15]">Mía está activa 🐾</p>
+                <p className="text-xs text-[#8B7A6A] font-medium">
                   {status.duenos} teléfono{status.duenos === 1 ? "" : "s"} de encargado vinculado{status.duenos === 1 ? "" : "s"}
                   {status.negocio ? ` · ${status.negocio}` : ""}
                 </p>
               </div>
             </div>
 
-            <div className="bg-[#FFF9F0] border border-[#F0E6D8] rounded-[18px] p-4 text-sm text-[#9e8a7a] font-medium leading-relaxed">
+            <div className="bg-[#FBF5EC] border border-[#EADDC8] rounded-[18px] p-4 text-sm text-[#8B7A6A] font-medium leading-relaxed">
               Escríbele a Mía desde tu WhatsApp o mándale un audio:{" "}
-              <span className="text-[#1A1A1A] font-bold">"agéndale a Laura mañana a las 4"</span>,{" "}
-              <span className="text-[#1A1A1A] font-bold">"¿cuántas citas tengo hoy?"</span>,{" "}
-              <span className="text-[#1A1A1A] font-bold">"registra un gasto de 350 de shampoo"</span>…
+              <span className="text-[#241C15] font-bold">"agéndale a Laura mañana a las 4"</span>,{" "}
+              <span className="text-[#241C15] font-bold">"¿cuántas citas tengo hoy?"</span>,{" "}
+              <span className="text-[#241C15] font-bold">"registra un gasto de 350 de shampoo"</span>…
             </div>
 
             <button
               onClick={generateActivation}
               disabled={generating}
-              className="flex items-center gap-2 text-xs font-bold text-[#9e8a7a] hover:text-[#FF8C42] transition-colors disabled:opacity-60"
+              className="flex items-center gap-2 text-xs font-bold text-[#8B7A6A] hover:text-[#E8542F] transition-colors disabled:opacity-60"
             >
               {generating ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
               Vincular otro teléfono o cambié de número
@@ -166,12 +166,12 @@ export default function WhatsAppPage() {
         ) : (
           <div className="space-y-5">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 flex items-center justify-center rounded-[16px] bg-[#FFF4EC] border border-orange-100">
-                <Sparkles size={20} className="text-[#FF8C42]" />
+              <div className="w-11 h-11 flex items-center justify-center rounded-[16px] bg-[#FAEFE5] border border-orange-100">
+                <Sparkles size={20} className="text-[#E8542F]" />
               </div>
               <div>
-                <p className="font-black text-[#1A1A1A]">Activa a Mía en tu WhatsApp</p>
-                <p className="text-xs text-[#9e8a7a] font-medium">
+                <p className="font-black text-[#241C15]">Activa a Mía en tu WhatsApp</p>
+                <p className="text-xs text-[#8B7A6A] font-medium">
                   Un solo mensaje desde tu teléfono y quedas vinculado. El código dura 15 minutos.
                 </p>
               </div>
@@ -182,9 +182,9 @@ export default function WhatsAppPage() {
                 whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
                 onClick={generateActivation}
                 disabled={generating || !status?.central_number}
-                className="w-full bg-[#FF8C42] text-white font-black py-3.5 rounded-[18px]
-                           hover:bg-[#f07d30] transition-colors disabled:opacity-60
-                           shadow-[0_8px_24px_rgba(255,140,66,0.35)]"
+                className="w-full bg-[#E8542F] text-white font-black py-3.5 rounded-[18px]
+                           hover:bg-[#C73E1D] transition-colors disabled:opacity-60
+                           shadow-[0_8px_24px_rgba(232,84,47,0.35)]"
               >
                 {generating ? "Generando código…" : "Activar WhatsApp"}
               </motion.button>
@@ -207,17 +207,17 @@ export default function WhatsAppPage() {
               exit={{ opacity: 0, height: 0 }}
               className="overflow-hidden"
             >
-              <div className="mt-5 border-t border-[#F0E6D8] pt-5 flex flex-col items-center gap-4">
-                <div className="border-4 border-[#FF8C42] rounded-[22px] p-2 bg-white">
+              <div className="mt-5 border-t border-[#EADDC8] pt-5 flex flex-col items-center gap-4">
+                <div className="border-4 border-[#E8542F] rounded-[22px] p-2 bg-white">
                   <img src={qrUrl(activation.link)} alt="QR de activación" className="w-48 h-48 rounded-[12px]" />
                 </div>
                 <div className="text-center space-y-1">
-                  <p className="text-sm font-black text-[#1A1A1A]">
-                    Escanea con tu teléfono o abre el link, y <span className="text-[#FF8C42]">envía el mensaje</span> tal cual
+                  <p className="text-sm font-black text-[#241C15]">
+                    Escanea con tu teléfono o abre el link, y <span className="text-[#E8542F]">envía el mensaje</span> tal cual
                   </p>
-                  <p className="text-xs text-[#9e8a7a] font-medium">
-                    Código <span className="font-black text-[#1A1A1A]">ACTIVAR-{activation.token}</span>
-                    {mmss && <> · expira en <span className="font-black text-[#FF8C42]">{mmss}</span></>}
+                  <p className="text-xs text-[#8B7A6A] font-medium">
+                    Código <span className="font-black text-[#241C15]">ACTIVAR-{activation.token}</span>
+                    {mmss && <> · expira en <span className="font-black text-[#E8542F]">{mmss}</span></>}
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -225,13 +225,13 @@ export default function WhatsAppPage() {
                     whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
                     href={activation.link} target="_blank" rel="noreferrer"
                     className="flex items-center gap-2 px-3.5 py-2 rounded-[14px] text-xs font-bold
-                               bg-[#00C4AA] text-white hover:bg-[#00b09a] transition-colors"
+                               bg-[#0E8C6D] text-white hover:bg-[#0B7057] transition-colors"
                   >
                     <ExternalLink size={13} /> Abrir en WhatsApp
                   </motion.a>
                   <CopyButton text={activation.link} />
                 </div>
-                <p className="text-[11px] text-[#9e8a7a] text-center font-medium">
+                <p className="text-[11px] text-[#8B7A6A] text-center font-medium">
                   En cuanto Mía reciba tu mensaje, esta página se actualiza sola. ✨
                 </p>
               </div>
@@ -242,21 +242,21 @@ export default function WhatsAppPage() {
 
       {/* ── Link público para clientes ─────────────── */}
       {status?.public?.link && (
-        <div className="bg-white border border-[#F0E6D8] rounded-[28px] shadow-[0_4px_24px_rgba(0,0,0,0.06)] p-6">
+        <div className="bg-white border border-[#EADDC8] rounded-[28px] shadow-[0_4px_24px_rgba(0,0,0,0.06)] p-6">
           <div className="flex flex-col sm:flex-row gap-5 items-center">
-            <div className="border border-[#F0E6D8] rounded-[18px] p-2 bg-white shrink-0">
+            <div className="border border-[#EADDC8] rounded-[18px] p-2 bg-white shrink-0">
               <img src={qrUrl(status.public.link, 160)} alt="QR para clientes" className="w-36 h-36 rounded-[10px]" />
             </div>
             <div className="flex-1 space-y-3 text-center sm:text-left">
               <div className="flex items-center gap-2 justify-center sm:justify-start">
-                <QrCode size={16} className="text-[#00C4AA]" />
-                <p className="font-black text-[#1A1A1A]">Tu link para clientes</p>
+                <QrCode size={16} className="text-[#0E8C6D]" />
+                <p className="font-black text-[#241C15]">Tu link para clientes</p>
               </div>
-              <p className="text-sm text-[#9e8a7a] font-medium leading-relaxed">
+              <p className="text-sm text-[#8B7A6A] font-medium leading-relaxed">
                 Compártelo en redes, tu bio o imprímelo en tu local. Cualquier cliente que lo use
-                cae directo con el bot de <span className="font-bold text-[#1A1A1A]">{status.negocio ?? "tu negocio"}</span> para
+                cae directo con el bot de <span className="font-bold text-[#241C15]">{status.negocio ?? "tu negocio"}</span> para
                 agendar su cita. Es permanente: código{" "}
-                <span className="font-black text-[#1A1A1A]">{status.public.codigo}</span>.
+                <span className="font-black text-[#241C15]">{status.public.codigo}</span>.
               </p>
               <div className="flex gap-2 justify-center sm:justify-start">
                 <CopyButton text={status.public.link} />
@@ -264,7 +264,7 @@ export default function WhatsAppPage() {
                   whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
                   href={status.public.link} target="_blank" rel="noreferrer"
                   className="flex items-center gap-2 px-3.5 py-2 rounded-[14px] text-xs font-bold
-                             bg-[#FFF4EC] text-[#FF8C42] hover:bg-[#FF8C42] hover:text-white
+                             bg-[#FAEFE5] text-[#E8542F] hover:bg-[#E8542F] hover:text-white
                              border border-orange-100 transition-colors"
                 >
                   <ExternalLink size={13} /> Probar
@@ -285,13 +285,13 @@ export default function WhatsAppPage() {
           { icon: Sun,           title: "Resumen diario 8am",       desc: "Cada mañana Mía te manda cuántas citas tienes en el día" },
           { icon: Users,         title: "Varios encargados",        desc: "Vincula más de un teléfono: todos pueden administrar por WhatsApp" },
         ].map((item) => (
-          <div key={item.title} className="flex gap-3 bg-white rounded-[18px] border border-[#F0E6D8] px-4 py-3.5">
-            <div className="w-9 h-9 flex items-center justify-center rounded-[12px] bg-[#FFF9F0] border border-[#F0E6D8] shrink-0">
-              <item.icon size={16} className="text-[#FF8C42]" />
+          <div key={item.title} className="flex gap-3 bg-white rounded-[18px] border border-[#EADDC8] px-4 py-3.5">
+            <div className="w-9 h-9 flex items-center justify-center rounded-[12px] bg-[#FBF5EC] border border-[#EADDC8] shrink-0">
+              <item.icon size={16} className="text-[#E8542F]" />
             </div>
             <div>
-              <p className="text-sm font-black text-[#1A1A1A]">{item.title}</p>
-              <p className="text-xs text-[#9e8a7a] font-medium mt-0.5 leading-relaxed">{item.desc}</p>
+              <p className="text-sm font-black text-[#241C15]">{item.title}</p>
+              <p className="text-xs text-[#8B7A6A] font-medium mt-0.5 leading-relaxed">{item.desc}</p>
             </div>
           </div>
         ))}
