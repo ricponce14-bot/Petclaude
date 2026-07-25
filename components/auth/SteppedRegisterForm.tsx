@@ -38,11 +38,9 @@ interface Props {
 
 // ─── Defaults ────────────────────────────────────────────
 const DEFAULT_SERVICES: ServiceItem[] = [
-    { key: "bath",        label: "Baño",          price: 250, duration_min: 60,  enabled: true },
-    { key: "haircut",     label: "Corte",          price: 200, duration_min: 60,  enabled: true },
-    { key: "bath_haircut",label: "Baño + Corte",   price: 400, duration_min: 90,  enabled: true },
-    { key: "vaccine",     label: "Vacuna",         price: 150, duration_min: 30,  enabled: false },
-    { key: "checkup",     label: "Chequeo",        price: 300, duration_min: 45,  enabled: false },
+    { key: "servicio_1", label: "Servicio 1", price: 250, duration_min: 60, enabled: true },
+    { key: "servicio_2", label: "Servicio 2", price: 350, duration_min: 60, enabled: true },
+    { key: "servicio_3", label: "Servicio 3", price: 500, duration_min: 90, enabled: false },
 ];
 
 const DEFAULT_HOURS: Record<string, { enabled: boolean; open: string; close: string }> = {
