@@ -90,13 +90,48 @@ export interface WaMessage {
   created_at: string;
 }
 
-export interface WaSession {
+// ============================================================
+// Multi-tenant WhatsApp (Cloud API oficial) — doc secciones 4 y 11
+// ============================================================
+
+export interface PhoneRegistryEntry {
+  telefono: string;
+  rol: "dueño" | "cliente";
+  tenant_id: string;
+  created_at: string;
+}
+
+export interface ActivationToken {
+  token: string;
+  tenant_id: string;
+  created_at: string;
+  expires_at: string;
+  used_at: string | null;
+}
+
+export interface Expense {
   id: string;
   tenant_id: string;
-  instance: string;
-  status: "connected" | "disconnected" | "qr_needed";
-  qr_code: string | null;
-  updated_at: string;
+  monto: number;
+  concepto: string | null;
+  fecha: string;
+  registrado_por: string | null;
+  created_at: string;
+}
+
+export interface WaInboundEvent {
+  id: string;
+  message_id: string | null;
+  phone_number_id: string | null;
+  from_phone: string;
+  contact_name: string | null;
+  msg_type: string | null;
+  raw: any;
+  status: "pending" | "processing" | "done" | "error";
+  attempts: number;
+  error: string | null;
+  created_at: string;
+  processed_at: string | null;
 }
 
 // ============================================================
@@ -156,7 +191,10 @@ export interface Database {
       appointments:             { Row: Appointment;          Insert: Omit<Appointment, "id" | "created_at">;          Update: Partial<Appointment> };
       clinical_records:         { Row: ClinicalRecord;       Insert: Omit<ClinicalRecord, "id" | "created_at">;      Update: Partial<ClinicalRecord> };
       wa_messages:              { Row: WaMessage;            Insert: Omit<WaMessage, "id" | "created_at">;           Update: Partial<WaMessage> };
-      wa_sessions:              { Row: WaSession;            Insert: Omit<WaSession, "id">;                          Update: Partial<WaSession> };
+      phone_registry:           { Row: PhoneRegistryEntry;   Insert: Omit<PhoneRegistryEntry, "created_at">;         Update: Partial<PhoneRegistryEntry> };
+      activation_tokens:        { Row: ActivationToken;      Insert: Omit<ActivationToken, "created_at">;            Update: Partial<ActivationToken> };
+      expenses:                 { Row: Expense;              Insert: Omit<Expense, "id" | "created_at">;             Update: Partial<Expense> };
+      wa_inbound_queue:         { Row: WaInboundEvent;       Insert: Omit<WaInboundEvent, "id" | "created_at">;      Update: Partial<WaInboundEvent> };
       bot_config:               { Row: BotConfig;            Insert: Omit<BotConfig, "id" | "created_at">;           Update: Partial<BotConfig> };
       whatsapp_chat_sessions:   { Row: WhatsappChatSession;  Insert: Omit<WhatsappChatSession, "id" | "created_at">; Update: Partial<WhatsappChatSession> };
     };

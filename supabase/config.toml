@@ -1,0 +1,3 @@
+# Configuración mínima para la integración GitHub → Supabase y el CLI.
+# `project_id` es solo un identificador local (no es el ref del proyecto cloud).
+project_id = "apuntame"

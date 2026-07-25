@@ -1,148 +1,85 @@
 // app/api/whatsapp/webhook/route.ts
-// Endpoint que recibe mensajes entrantes desde Evolution API
+// Webhook oficial de WhatsApp Cloud API (Meta).
+// Doc sección 5: parsear -> encolar -> responder 200 OK inmediato.
+// NUNCA hacer trabajo pesado (STT/LLM) aquí de forma síncrona.
 
 import { NextResponse } from "next/server";
-import { processMessage } from "@/lib/whatsapp-bot/engine";
-import { sendBotReply, logBotMessage } from "@/lib/whatsapp-bot/sender";
-import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { enqueueInbound, kickWorker } from "@/lib/whatsapp/queue";
 
-export async function POST(req: Request) {
-  try {
-    const supabaseAdmin = getSupabaseAdmin();
-    // 1. Verificar autenticación — Evolution API envía la apikey en el header
+export const runtime = "nodejs";
 
+// ============================================================
+// GET: verificación del webhook (Meta lo llama una vez al configurar)
+// ============================================================
+export async function GET(req: Request) {
+  const url = new URL(req.url);
+  const mode = url.searchParams.get("hub.mode");
+  const token = url.searchParams.get("hub.verify_token");
+  const challenge = url.searchParams.get("hub.challenge");
 
-    // 2. Parsear el payload de Evolution API
-    const payload = await req.json();
-    const event = (payload.event || "").toLowerCase();
+  const verifyToken = process.env.WHATSAPP_VERIFY_TOKEN;
 
-    // Log completo para diagnóstico
-    console.log(`[Webhook] Received event: "${payload.event || event}" from instance: "${payload.instance}"`);
-    console.log(`[Webhook] Payload keys: ${Object.keys(payload).join(", ")}`);
-
-    // Manejar eventos de conexión para actualizar el estado de la sesión
-    if (
-      event === "connection.update" ||
-      event === "qrcode.updated" ||
-      payload.event === "CONNECTION_UPDATE" ||
-      payload.event === "QRCODE_UPDATED"
-    ) {
-      const instanceName = payload.instance;
-      const state = payload.data?.state || payload.data?.connection;
-      if (instanceName && (state === "open" || state === "connected")) {
-        const supabase = getSupabaseAdmin() as any;
-        await supabase
-          .from("wa_sessions")
-          .update({ status: "connected", updated_at: new Date().toISOString() })
-          .eq("instance", instanceName);
-        console.log(`[Webhook] Instancia ${instanceName} marcada como connected`);
-      }
-      return NextResponse.json({ ok: true, event: payload.event });
-    }
-
-    if (event !== "messages.upsert" && payload.event !== "MESSAGES_UPSERT") {
-      console.log(`[Webhook] Ignoring event: ${payload.event}`);
-      return NextResponse.json({ ok: true, ignored: true, event: payload.event });
-    }
-    console.log(`[Webhook] Processing MESSAGES_UPSERT`);
-
-    const data = payload.data;
-    if (!data) {
-      return NextResponse.json({ ok: true, ignored: true });
-    }
-
-    // 3. Filtrar mensajes propios (fromMe = true → es nuestro mensaje saliente)
-    const key = data.key;
-    if (key?.fromMe) {
-      return NextResponse.json({ ok: true, ignored: "own message" });
-    }
-
-    // 4. Extraer información del mensaje
-    const instanceName = payload.instance;
-    const remoteJid = key?.remoteJid;
-    const messageContent = data.message?.conversation
-      || data.message?.extendedTextMessage?.text
-      || "";
-
-    if (!instanceName || !remoteJid || !messageContent) {
-      console.warn(`[Webhook] Incomplete data — instance: ${instanceName}, jid: ${remoteJid}, content: "${messageContent}"`);
-      console.log(`[Webhook] Full data keys: ${JSON.stringify(Object.keys(data || {}))}`);
-      console.log(`[Webhook] message keys: ${JSON.stringify(Object.keys(data?.message || {}))}`);
-      return NextResponse.json({ ok: true, ignored: "incomplete data" });
-    }
-
-    // Solo procesar chats individuales (no grupos)
-    if (remoteJid.includes("@g.us")) {
-      return NextResponse.json({ ok: true, ignored: "group message" });
-    }
-
-    // Limpiar el número de teléfono (remover @s.whatsapp.net)
-    const phone = remoteJid.replace("@s.whatsapp.net", "");
-
-    // 5. Identificar el tenant por la instancia de WhatsApp
-    // No filtramos por status — si Evolution API nos envía mensajes, la instancia está activa
-    const { data: waSession } = await supabaseAdmin
-      .from("wa_sessions")
-      .select("tenant_id, instance")
-      .eq("instance", instanceName)
-      .returns<any>()
-      .maybeSingle();
-
-    // Auto-marcar como connected si aún no lo está
-    if (waSession && (waSession as any).status !== "connected") {
-      const db = supabaseAdmin as any;
-      await db
-        .from("wa_sessions")
-        .update({ status: "connected", updated_at: new Date().toISOString() })
-        .eq("instance", instanceName);
-    }
-
-    if (!waSession) {
-      console.warn(`[Webhook] No tenant found for instance: ${instanceName}`);
-      return NextResponse.json({ ok: true, ignored: "no tenant" });
-    }
-
-    const tenantId = (waSession as any).tenant_id;
-    console.log(`[Webhook] Routing message to tenant: ${tenantId}`);
-
-    // 6. Loguear el mensaje entrante inmediatamente
-    console.log(`[Webhook] Logging inbound message from ${phone}: "${messageContent.slice(0, 50)}"`);
-    await logBotMessage(tenantId, phone, messageContent, "inbound");
-
-    // 7. Procesar con el motor del bot
-    const botResponse = await processMessage(phone, messageContent, tenantId);
-
-    if (!botResponse) {
-      console.log(`[Webhook] Bot disabled or no response for ${phone}`);
-      return NextResponse.json({ ok: true, bot_disabled: true });
-    }
-
-    // 8. Enviar respuesta directamente via Evolution API
-    const sendResult = await sendBotReply(instanceName, phone, botResponse.reply);
-
-    // 9. Loguear el mensaje de respuesta
-    if (sendResult.ok) {
-      await logBotMessage(tenantId, phone, botResponse.reply, "outbound");
-    }
-
-    return NextResponse.json({
-      ok: true,
-      sent: sendResult.ok,
-      sessionId: botResponse.sessionId
-    });
-
-  } catch (error: any) {
-    console.error("[Webhook] Error processing incoming message:", error);
-    // SIEMPRE retornar 200 al webhook para evitar reintentos de Evolution API
-    return NextResponse.json({ ok: false, error: error.message });
+  if (mode === "subscribe" && token === verifyToken && challenge) {
+    console.log("[Webhook] Verificación de Meta exitosa");
+    // Meta espera el challenge como texto plano
+    return new Response(challenge, { status: 200 });
   }
+
+  console.warn("[Webhook] Verificación fallida (token no coincide)");
+  return new Response("Forbidden", { status: 403 });
 }
 
-// GET para health check
-export async function GET() {
-  return NextResponse.json({
-    status: "ok",
-    service: "whatsapp-bot-webhook",
-    timestamp: new Date().toISOString()
-  });
+// ============================================================
+// POST: eventos entrantes de Meta
+// ============================================================
+export async function POST(req: Request) {
+  let payload: any;
+  try {
+    payload = await req.json();
+  } catch {
+    // Nunca hacer que Meta reintente por un body malformado
+    return NextResponse.json({ ok: true });
+  }
+
+  try {
+    // Estructura Meta: entry[].changes[].value.{messages,statuses,metadata,contacts}
+    const entries = payload?.entry || [];
+    let enqueued = 0;
+
+    for (const entry of entries) {
+      for (const change of entry?.changes || []) {
+        const value = change?.value;
+        if (!value) continue;
+
+        const phoneNumberId = value?.metadata?.phone_number_id;
+        const contacts = value?.contacts || [];
+
+        // Solo nos interesan mensajes entrantes (ignoramos statuses de entrega aquí;
+        // se pueden encolar aparte si se quiere tracking fino).
+        for (const message of value?.messages || []) {
+          await enqueueInbound({
+            phoneNumberId,
+            from: message.from,
+            contactName: contacts?.[0]?.profile?.name ?? null,
+            messageId: message.id,
+            type: message.type,
+            raw: message,
+          });
+          enqueued++;
+        }
+      }
+    }
+
+    // Disparar el worker sin bloquear la respuesta a Meta.
+    if (enqueued > 0) {
+      kickWorker(); // fire-and-forget
+    }
+
+    // 200 OK inmediato — no bloquear con lógica pesada (doc sección 5).
+    return NextResponse.json({ ok: true, enqueued });
+  } catch (error: any) {
+    console.error("[Webhook] Error encolando evento:", error?.message);
+    // Aún así responder 200 para evitar reintentos duplicados de Meta.
+    return NextResponse.json({ ok: true });
+  }
 }

@@ -202,7 +202,7 @@ export default function ConversacionesPage() {
       const res = await fetch("/api/whatsapp/send-message", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ owner_id: owner?.id || null, body: manualMessage }),
+        body: JSON.stringify({ owner_id: owner?.id || null, phone: selectedPhone, body: manualMessage }),
       });
       if (res.ok) {
         setManualMessage("");

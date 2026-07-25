@@ -41,16 +41,25 @@ export default function OutboxPage() {
         setProcessingId(id);
 
         try {
-            const res = await fetch('/api/whatsapp/process-queue', {
+            // Reenviar directamente por Cloud API con el teléfono y cuerpo del mensaje.
+            const msg = messages.find((m: any) => m.id === id);
+            if (!msg) return;
+
+            const res = await fetch('/api/whatsapp/send-message', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ messageId: id })
+                body: JSON.stringify({ phone: msg.phone, body: msg.body })
             });
 
             if (res.ok) {
+                // Marcar el original como enviado para que salga de la cola/fallidos.
+                await supabase.from("wa_messages")
+                    .update({ status: "sent", sent_at: new Date().toISOString(), error: null } as any)
+                    .eq("id", id);
                 fetchMessages();
             } else {
-                alert("Hubo un error al intentar enviar el mensaje.");
+                const data = await res.json().catch(() => ({}));
+                alert(data.error || "Hubo un error al intentar enviar el mensaje (¿ventana de 24h cerrada?).");
             }
         } catch (error) {
             console.error(error);

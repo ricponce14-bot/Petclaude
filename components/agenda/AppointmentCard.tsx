@@ -38,19 +38,27 @@ export default function AppointmentCard({
   const sendTicket = async () => {
     setSendingTicket(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const tenantId = session?.user?.app_metadata?.tenant_id || session?.user?.user_metadata?.tenant_id;
-      const res = await fetch("/api/whatsapp/send-ticket", {
+      // Ticket de servicio completado, enviado como texto vía Cloud API.
+      // Solo entra si la ventana de 24h está abierta (el cliente escribió hoy).
+      const serviceLabel = TYPE_LABELS[appt.type] ?? appt.type;
+      const petName = appt.pets?.name ? ` de ${appt.pets.name}` : "";
+      const priceLine = appt.price ? `\n💵 Total: *$${appt.price} MXN*` : "";
+      const body =
+        `🐾 *Servicio completado*\n\n` +
+        `¡Gracias por tu visita! El servicio *${serviceLabel}*${petName} quedó listo.${priceLine}\n\n` +
+        `¡Te esperamos pronto! ✨`;
+
+      const res = await fetch("/api/whatsapp/send-message", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ appointment_id: appt.id, tenant_id: tenantId }),
+        body: JSON.stringify({ owner_id: appt.owner_id, body }),
       });
       if (res.ok) {
         setTicketSent(true);
         setTimeout(() => setTicketSent(false), 3000);
       } else {
         const data = await res.json();
-        alert(data.error || "Error al enviar ticket");
+        alert(data.error || "Error al enviar ticket (¿el cliente escribió en las últimas 24h?)");
       }
     } catch { alert("Error de conexión"); }
     finally { setSendingTicket(false); }

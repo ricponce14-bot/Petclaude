@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   CalendarDays, Users, PawPrint, MessageCircle, LayoutDashboard,
-  QrCode, LogOut, CreditCard, DollarSign, Bot, Inbox, Package, Settings
+  Sparkles, LogOut, CreditCard, DollarSign, Bot, Inbox, Package, Settings
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -16,7 +16,7 @@ const links = [
   { href: "/mascotas",           label: "Mascotas",        icon: PawPrint,        group: "main" },
   { href: "/gastos",             label: "Gastos",          icon: DollarSign,      group: "finance" },
   { href: "/inventario",         label: "Inventario",      icon: Package,         group: "finance" },
-  { href: "/whatsapp",           label: "WhatsApp",        icon: QrCode,          group: "automation" },
+  { href: "/whatsapp",           label: "WhatsApp · Mía",  icon: Sparkles,        group: "automation" },
   { href: "/conversaciones",     label: "Chats en vivo",   icon: Inbox,           group: "automation" },
   { href: "/mensajes",           label: "Plantillas",      icon: MessageCircle,   group: "automation" },
   { href: "/bot",                label: "Bot Automático",  icon: Bot,             group: "automation" },
