@@ -8,10 +8,25 @@ export async function middleware(req: NextRequest) {
             headers: req.headers,
         },
     });
+    res.headers.set("x-pathname", req.nextUrl.pathname);
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    // Blindaje: si faltan las variables (p.ej. deploy hecho antes de
+    // configurarlas), NO tumbar todo el sitio con un 500. Dejar pasar la
+    // request y registrar el problema para diagnóstico.
+    if (!supabaseUrl || !supabaseAnonKey) {
+        console.error(
+            "[middleware] Faltan NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY. " +
+            "Configúralas en Vercel y vuelve a desplegar (se incrustan en build)."
+        );
+        return res;
+    }
 
     const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        supabaseUrl,
+        supabaseAnonKey,
         {
             cookies: {
                 get(name: string) {
@@ -61,9 +76,6 @@ export async function middleware(req: NextRequest) {
     } catch (e) {
         console.error('Middleware Supabase error:', e);
     }
-
-    // Pasar el pathname como header para que el layout pueda leerlo
-    res.headers.set("x-pathname", req.nextUrl.pathname);
 
     return res;
 }
