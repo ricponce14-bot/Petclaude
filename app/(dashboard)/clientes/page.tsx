@@ -22,7 +22,7 @@ export default function ClientesPage() {
 
   const fetchOwners = async () => {
     setLoading(true);
-    const query = supabase.from("owners").select("*, pets(id, name, breed)").order("name");
+    const query = supabase.from("owners").select("*").order("name");
     if (search) query.ilike("name", `%${search}%`);
     const { data } = await query;
     setOwners((data as any[]) ?? []);
@@ -148,20 +148,12 @@ export default function ClientesPage() {
                       </div>
                     </div>
 
-                    {/* Mascotas chips */}
-                    <div className="flex gap-1.5 flex-wrap pt-3 border-t border-[#F0E6D8]">
-                      {owner.pets?.length === 0 && (
-                        <span className="text-xs text-[#BBA898] italic">Sin mascotas</span>
-                      )}
-                      {owner.pets?.map((pet: any) => (
-                        <span
-                          key={pet.id}
-                          className="text-[11px] font-bold bg-[#E8F5F1] text-[#4DA18A]
-                                     px-2.5 py-1 rounded-full"
-                        >
-                          {pet.name}
-                        </span>
-                      ))}
+                    {/* Notas / CTA */}
+                    <div className="flex items-center justify-between pt-3 border-t border-[#F0E6D8]">
+                      <span className="text-xs text-[#9e8a7a] font-medium truncate max-w-[70%]">
+                        {owner.notes ? owner.notes : "Sin notas"}
+                      </span>
+                      <span className="text-[11px] font-bold text-[#FF8C42]">Ver historial →</span>
                     </div>
                   </Link>
                 </motion.div>

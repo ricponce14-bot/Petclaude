@@ -2,14 +2,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { CalendarDays, PawPrint, MessageCircle, LayoutDashboard, Bot } from "lucide-react";
+import { CalendarDays, Users, Sparkles, LayoutDashboard, Bot } from "lucide-react";
 
 const navItems = [
   { href: "/dashboard",       icon: LayoutDashboard, label: "Inicio"   },
   { href: "/agenda",          icon: CalendarDays,    label: "Agenda"   },
-  { href: "/mascotas",        icon: PawPrint,        label: "Mascotas" },
+  { href: "/clientes",        icon: Users,           label: "Clientes" },
+  { href: "/whatsapp",        icon: Sparkles,        label: "Mía"      },
   { href: "/bot",             icon: Bot,             label: "Bot"      },
-  { href: "/mensajes/outbox", icon: MessageCircle,   label: "Enviados" },
 ];
 
 export default function BottomNav() {

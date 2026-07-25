@@ -3,17 +3,8 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
-import { Check, X, Phone, Send, Loader2, Clock } from "lucide-react";
+import { Check, X, Phone, Send, Loader2, Clock, User } from "lucide-react";
 import type { Appointment } from "@/lib/supabase/types";
-
-const TYPE_LABELS: Record<string, string> = {
-  bath:         "Baño",
-  haircut:      "Corte",
-  bath_haircut: "Baño + Corte",
-  vaccine:      "Vacuna",
-  checkup:      "Revision",
-  other:        "Otro",
-};
 
 const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
   scheduled: { label: "Agendada",   bg: "bg-orange-50",  text: "text-[#FF8C42]" },
@@ -25,10 +16,15 @@ const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }>
 
 export default function AppointmentCard({
   appt, onUpdate,
-}: { appt: Appointment & { pets?: any; owners?: any }; onUpdate: () => void }) {
+}: { appt: Appointment & { owners?: any }; onUpdate: () => void }) {
   const supabase = createClient();
   const [sendingTicket, setSendingTicket] = useState(false);
   const [ticketSent, setTicketSent] = useState(false);
+
+  // Nombre/teléfono del cliente: cita genérica (cliente_nombre) o legacy (owners).
+  const clienteNombre = appt.cliente_nombre || appt.owners?.name || "Cliente";
+  const clienteTel = appt.cliente_telefono || appt.owners?.whatsapp || "";
+  const servicio = appt.servicio || "Cita";
 
   const updateStatus = async (status: string) => {
     await supabase.from("appointments").update({ status } as any).eq("id", appt.id);
@@ -38,27 +34,24 @@ export default function AppointmentCard({
   const sendTicket = async () => {
     setSendingTicket(true);
     try {
-      // Ticket de servicio completado, enviado como texto vía Cloud API.
-      // Solo entra si la ventana de 24h está abierta (el cliente escribió hoy).
-      const serviceLabel = TYPE_LABELS[appt.type] ?? appt.type;
-      const petName = appt.pets?.name ? ` de ${appt.pets.name}` : "";
+      // Ticket de servicio completado, vía Cloud API (ventana de 24h).
       const priceLine = appt.price ? `\n💵 Total: *$${appt.price} MXN*` : "";
       const body =
-        `🐾 *Servicio completado*\n\n` +
-        `¡Gracias por tu visita! El servicio *${serviceLabel}*${petName} quedó listo.${priceLine}\n\n` +
-        `¡Te esperamos pronto! ✨`;
+        `✨ *Servicio completado*\n\n` +
+        `¡Gracias por tu visita! Tu servicio *${servicio}* quedó listo.${priceLine}\n\n` +
+        `¡Te esperamos pronto!`;
 
       const res = await fetch("/api/whatsapp/send-message", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ owner_id: appt.owner_id, body }),
+        body: JSON.stringify({ owner_id: appt.owner_id, phone: clienteTel, body }),
       });
       if (res.ok) {
         setTicketSent(true);
         setTimeout(() => setTicketSent(false), 3000);
       } else {
         const data = await res.json();
-        alert(data.error || "Error al enviar ticket (¿el cliente escribió en las últimas 24h?)");
+        alert(data.error || "Error al enviar (¿el cliente escribió en las últimas 24h?)");
       }
     } catch { alert("Error de conexión"); }
     finally { setSendingTicket(false); }
@@ -90,36 +83,16 @@ export default function AppointmentCard({
 
         {/* ── Info ──────────────────────────────────── */}
         <div className="flex-1 min-w-0">
-          {/* Nombre + alertas */}
           <div className="flex items-center gap-2 flex-wrap mb-1.5">
-            <span className="text-base font-black text-[#1A1A1A]">{appt.pets?.name}</span>
-            {appt.pets?.allergies && (
-              <span className="text-[10px] uppercase font-bold tracking-wide
-                               bg-red-50 text-red-500 px-2 py-0.5 rounded-full">
-                Alergia
-              </span>
-            )}
-            {appt.pets?.temperament === "aggressive" && (
-              <span className="text-[10px] uppercase font-bold tracking-wide
-                               bg-orange-50 text-[#FF8C42] px-2 py-0.5 rounded-full">
-                Agresivo
-              </span>
-            )}
-            {appt.pets?.temperament === "nervous" && (
-              <span className="text-[10px] uppercase font-bold tracking-wide
-                               bg-[#FFF4EC] text-[#FF8C42] px-2 py-0.5 rounded-full">
-                Nervioso
-              </span>
-            )}
+            <User size={15} className="text-[#9e8a7a] shrink-0" />
+            <span className="text-base font-black text-[#1A1A1A]">{clienteNombre}</span>
           </div>
 
-          {/* Tipo + dueño */}
           <p className="text-sm text-[#9e8a7a] font-medium flex items-center gap-2 flex-wrap">
             <span className="bg-teal-50 text-[#00C4AA] font-bold text-xs
                              px-2.5 py-1 rounded-full">
-              {TYPE_LABELS[appt.type] ?? appt.type}
+              {servicio}
             </span>
-            <span>{appt.owners?.name}</span>
           </p>
 
           {appt.notes && (
@@ -141,18 +114,20 @@ export default function AppointmentCard({
 
           {(appt.status === "scheduled" || appt.status === "confirmed") && (
             <div className="flex gap-2 self-start sm:self-end">
-              <motion.a
-                whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.92 }}
-                href={`https://wa.me/${appt.owners?.whatsapp}`}
-                target="_blank"
-                className="w-9 h-9 flex items-center justify-center rounded-[14px]
-                           bg-teal-50 text-[#00C4AA]
-                           hover:bg-[#00C4AA] hover:text-white
-                           border border-teal-50 transition-colors"
-                title="WhatsApp"
-              >
-                <Phone size={15} />
-              </motion.a>
+              {clienteTel && (
+                <motion.a
+                  whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.92 }}
+                  href={`https://wa.me/${clienteTel.replace(/\D/g, "")}`}
+                  target="_blank"
+                  className="w-9 h-9 flex items-center justify-center rounded-[14px]
+                             bg-teal-50 text-[#00C4AA]
+                             hover:bg-[#00C4AA] hover:text-white
+                             border border-teal-50 transition-colors"
+                  title="WhatsApp"
+                >
+                  <Phone size={15} />
+                </motion.a>
+              )}
               <motion.button
                 whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.92 }}
                 onClick={() => updateStatus("completed")}
@@ -178,7 +153,7 @@ export default function AppointmentCard({
             </div>
           )}
 
-          {appt.status === "completed" && (
+          {appt.status === "completed" && clienteTel && (
             <motion.button
               whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
               onClick={sendTicket}

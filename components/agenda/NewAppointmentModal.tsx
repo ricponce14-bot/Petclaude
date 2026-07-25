@@ -1,25 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
 import { format } from "date-fns";
 import { Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import ModalShell from "@/components/ui/ModalShell";
-import type { Owner, Pet } from "@/lib/supabase/types";
-
-const schema = z.object({
-  owner_id:     z.string().uuid("Selecciona un cliente"),
-  pet_id:       z.string().uuid("Selecciona una mascota"),
-  type:         z.enum(["bath","haircut","bath_haircut","vaccine","checkup","other"]),
-  scheduled_at: z.string().min(1, "Requerido"),
-  duration_min: z.coerce.number().min(15).max(480),
-  price:        z.coerce.number().optional(),
-  notes:        z.string().optional(),
-});
-type FormData = z.infer<typeof schema>;
+import type { Owner, BotService } from "@/lib/supabase/types";
 
 const inputCls = `w-full bg-[#FFF3E3] border border-[#F0E6D8] rounded-[16px]
   px-4 py-3 text-sm font-medium text-[#1A1A1A]
@@ -34,115 +20,192 @@ export default function NewAppointmentModal({
 }: { defaultDate: Date; onClose: () => void; onCreated: () => void }) {
   const supabase = createClient();
   const [owners, setOwners] = useState<Owner[]>([]);
-  const [pets, setPets]     = useState<Pet[]>([]);
+  const [services, setServices] = useState<BotService[]>([]);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<FormData>({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      scheduled_at: format(defaultDate, "yyyy-MM-dd") + "T09:00",
-      duration_min: 60,
-      type: "bath",
-    },
-  });
-
-  const selectedOwner = watch("owner_id");
+  // Estado del formulario
+  const [clientMode, setClientMode] = useState<"existing" | "new">("existing");
+  const [ownerId, setOwnerId] = useState("");
+  const [clienteNombre, setClienteNombre] = useState("");
+  const [clienteTelefono, setClienteTelefono] = useState("");
+  const [servicioMode, setServicioMode] = useState<"catalog" | "custom">("catalog");
+  const [servicio, setServicio] = useState("");
+  const [scheduledAt, setScheduledAt] = useState(format(defaultDate, "yyyy-MM-dd") + "T09:00");
+  const [durationMin, setDurationMin] = useState(60);
+  const [price, setPrice] = useState<string>("");
+  const [notes, setNotes] = useState("");
 
   useEffect(() => {
-    supabase.from("owners").select("id, name, whatsapp").order("name").then(({ data }) => setOwners(data ?? []));
+    supabase.from("owners").select("id, name, whatsapp").order("name").then(({ data }) => {
+      setOwners(data ?? []);
+      if (!data || data.length === 0) setClientMode("new");
+    });
+    // Catálogo de servicios configurable del negocio (bot_config.services)
+    supabase.from("bot_config").select("services").maybeSingle().then(({ data }) => {
+      const raw = (data as any)?.services;
+      const parsed: BotService[] = typeof raw === "string" ? JSON.parse(raw || "[]") : (raw ?? []);
+      setServices(Array.isArray(parsed) ? parsed : []);
+      if (!parsed || parsed.length === 0) setServicioMode("custom");
+    });
   }, []);
 
-  useEffect(() => {
-    if (!selectedOwner) return;
-    supabase.from("pets").select("id, name, breed").eq("owner_id", selectedOwner).then(({ data }) => setPets(data ?? []));
-  }, [selectedOwner]);
+  const pickService = (label: string) => {
+    setServicio(label);
+    const svc = services.find((s) => s.label === label);
+    if (svc) {
+      if (svc.duration_min) setDurationMin(svc.duration_min);
+      if (svc.price != null) setPrice(String(svc.price));
+    }
+  };
 
-  const onSubmit = async (values: FormData) => {
+  const submit = async () => {
+    setError("");
+    // Validaciones
+    if (clientMode === "existing" && !ownerId) return setError("Selecciona un cliente.");
+    if (clientMode === "new" && !clienteNombre.trim()) return setError("Escribe el nombre del cliente.");
+    if (!servicio.trim()) return setError("Indica el servicio.");
+    if (!scheduledAt) return setError("Indica fecha y hora.");
+
     setSaving(true);
     const { data: { session } } = await supabase.auth.getSession();
     const tenant_id = session?.user.app_metadata?.tenant_id || session?.user.user_metadata?.tenant_id;
-    if (!tenant_id) { alert("Error de sesión"); setSaving(false); return; }
+    if (!tenant_id) { setError("Error de sesión"); setSaving(false); return; }
 
-    const { error } = await supabase.from("appointments").insert({
-      ...values,
+    // Resolver nombre/teléfono del cliente
+    let nombre = clienteNombre.trim();
+    let telefono = clienteTelefono.trim();
+    let owner_id: string | null = null;
+    if (clientMode === "existing") {
+      const o = owners.find((x) => x.id === ownerId);
+      owner_id = ownerId;
+      nombre = o?.name ?? nombre;
+      telefono = o?.whatsapp ?? telefono;
+    }
+
+    const { error: insErr } = await supabase.from("appointments").insert({
       tenant_id,
-      scheduled_at: new Date(values.scheduled_at).toISOString(),
+      owner_id,
+      cliente_nombre: nombre,
+      cliente_telefono: telefono || null,
+      servicio: servicio.trim(),
+      type: "other",
+      status: "scheduled",
+      scheduled_at: new Date(scheduledAt).toISOString(),
+      duration_min: durationMin,
+      price: price ? Number(price) : null,
+      notes: notes.trim() || null,
     } as any);
 
     setSaving(false);
-    if (!error) { onCreated(); onClose(); }
-    else alert("Error al agendar cita: " + error.message);
+    if (!insErr) { onCreated(); onClose(); }
+    else setError("Error al agendar: " + insErr.message);
   };
 
   return (
     <ModalShell title="Nueva cita" subtitle="Agenda una cita para tu cliente" onClose={onClose} accentColor="orange">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div className="space-y-4">
 
-        {/* Cliente */}
+        {/* Cliente: existente o nuevo */}
         <div>
           <label className={labelCls}>Cliente</label>
-          <select {...register("owner_id")} className={inputCls}>
-            <option value="">Seleccionar cliente...</option>
-            {owners.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
-          </select>
-          {errors.owner_id && <p className="text-xs text-red-500 mt-1">{errors.owner_id.message}</p>}
+          <div className="flex gap-2 mb-2">
+            {owners.length > 0 && (
+              <button type="button" onClick={() => setClientMode("existing")}
+                className={`flex-1 py-2 rounded-[14px] text-xs font-bold transition-colors
+                  ${clientMode === "existing" ? "bg-[#FF8C42] text-white" : "bg-[#FFF3E3] text-[#9e8a7a]"}`}>
+                Cliente existente
+              </button>
+            )}
+            <button type="button" onClick={() => setClientMode("new")}
+              className={`flex-1 py-2 rounded-[14px] text-xs font-bold transition-colors
+                ${clientMode === "new" ? "bg-[#FF8C42] text-white" : "bg-[#FFF3E3] text-[#9e8a7a]"}`}>
+              Cliente nuevo
+            </button>
+          </div>
+
+          {clientMode === "existing" ? (
+            <select value={ownerId} onChange={(e) => setOwnerId(e.target.value)} className={inputCls}>
+              <option value="">Seleccionar cliente...</option>
+              {owners.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}
+            </select>
+          ) : (
+            <div className="grid grid-cols-1 gap-2">
+              <input type="text" value={clienteNombre} onChange={(e) => setClienteNombre(e.target.value)}
+                placeholder="Nombre del cliente" className={inputCls} />
+              <input type="tel" value={clienteTelefono} onChange={(e) => setClienteTelefono(e.target.value)}
+                placeholder="WhatsApp (521...) — opcional" className={inputCls} />
+            </div>
+          )}
         </div>
 
-        {/* Mascota */}
+        {/* Servicio */}
         <div>
-          <label className={labelCls}>Mascota</label>
-          <select {...register("pet_id")} className={inputCls} disabled={!selectedOwner}>
-            <option value="">Seleccionar mascota...</option>
-            {pets.map(p => <option key={p.id} value={p.id}>{p.name}{p.breed ? ` · ${p.breed}` : ""}</option>)}
-          </select>
-          {errors.pet_id && <p className="text-xs text-red-500 mt-1">{errors.pet_id.message}</p>}
+          <label className={labelCls}>Servicio</label>
+          {services.length > 0 && (
+            <div className="flex gap-2 mb-2">
+              <button type="button" onClick={() => setServicioMode("catalog")}
+                className={`flex-1 py-2 rounded-[14px] text-xs font-bold transition-colors
+                  ${servicioMode === "catalog" ? "bg-[#00C4AA] text-white" : "bg-[#FFF3E3] text-[#9e8a7a]"}`}>
+                Del catálogo
+              </button>
+              <button type="button" onClick={() => { setServicioMode("custom"); setServicio(""); }}
+                className={`flex-1 py-2 rounded-[14px] text-xs font-bold transition-colors
+                  ${servicioMode === "custom" ? "bg-[#00C4AA] text-white" : "bg-[#FFF3E3] text-[#9e8a7a]"}`}>
+                Otro
+              </button>
+            </div>
+          )}
+          {servicioMode === "catalog" && services.length > 0 ? (
+            <select value={servicio} onChange={(e) => pickService(e.target.value)} className={inputCls}>
+              <option value="">Seleccionar servicio...</option>
+              {services.map((s) => (
+                <option key={s.key || s.label} value={s.label}>
+                  {s.label}{s.price != null ? ` · $${s.price}` : ""}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <input type="text" value={servicio} onChange={(e) => setServicio(e.target.value)}
+              placeholder="Ej. Corte de cabello, Masaje, Consulta..." className={inputCls} />
+          )}
+          {services.length === 0 && (
+            <p className="text-[11px] text-[#BBA898] mt-1.5">
+              Tip: define tus servicios en <span className="font-bold">Bot Automático</span> para elegirlos rápido.
+            </p>
+          )}
         </div>
 
-        {/* Tipo + Duración */}
+        {/* Fecha/hora + Duración */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className={labelCls}>Tipo de servicio</label>
-            <select {...register("type")} className={inputCls}>
-              <option value="bath">Baño</option>
-              <option value="haircut">Corte</option>
-              <option value="bath_haircut">Baño + Corte</option>
-              <option value="vaccine">Vacuna</option>
-              <option value="checkup">Revision</option>
-              <option value="other">Otro</option>
-            </select>
+            <label className={labelCls}>Fecha y hora</label>
+            <input type="datetime-local" value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} className={inputCls} />
           </div>
           <div>
             <label className={labelCls}>Duración (min)</label>
-            <input type="number" {...register("duration_min")} className={inputCls} />
+            <input type="number" value={durationMin} onChange={(e) => setDurationMin(Number(e.target.value))} className={inputCls} />
           </div>
-        </div>
-
-        {/* Fecha y hora */}
-        <div>
-          <label className={labelCls}>Fecha y hora</label>
-          <input type="datetime-local" {...register("scheduled_at")} className={inputCls} />
-          {errors.scheduled_at && <p className="text-xs text-red-500 mt-1">{errors.scheduled_at.message}</p>}
         </div>
 
         {/* Precio + Notas */}
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className={labelCls}>Precio (MXN)</label>
-            <input type="number" {...register("price")} placeholder="Opcional" className={inputCls} />
+            <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Opcional" className={inputCls} />
           </div>
           <div>
             <label className={labelCls}>Notas</label>
-            <input type="text" {...register("notes")} placeholder="Opcional" className={inputCls} />
+            <input type="text" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Opcional" className={inputCls} />
           </div>
         </div>
 
-        {/* Divider */}
+        {error && <p className="text-xs text-red-500 font-medium">{error}</p>}
+
         <div className="border-t border-[#F0E6D8] pt-4">
           <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-            type="submit"
-            disabled={saving}
+            whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+            type="button" onClick={submit} disabled={saving}
             className="w-full flex items-center justify-center gap-2
                        bg-[#FF8C42] text-white font-bold py-3.5 rounded-[20px] text-sm
                        shadow-[0_8px_24px_rgba(255,140,66,0.30)]
@@ -151,7 +214,7 @@ export default function NewAppointmentModal({
             {saving ? <Loader2 size={16} className="animate-spin" /> : "Agendar cita"}
           </motion.button>
         </div>
-      </form>
+      </div>
     </ModalShell>
   );
 }

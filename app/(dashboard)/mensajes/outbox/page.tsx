@@ -96,7 +96,7 @@ export default function OutboxPage() {
                         <Send className="text-teal-600" size={32} /> Seguimiento
                     </h1>
                     <p className="text-sm font-semibold text-slate-500 mt-1">
-                        Monitorea en tiempo real los mensajes enviados por Ladrido.
+                        Monitorea en tiempo real los mensajes enviados por Apúntame.
                     </p>
                 </div>
                 <div className="flex items-center gap-3">

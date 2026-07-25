@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  CalendarDays, Users, PawPrint, MessageCircle, LayoutDashboard,
+  CalendarDays, Users, MessageCircle, LayoutDashboard,
   Sparkles, LogOut, CreditCard, DollarSign, Bot, Inbox, Package, Settings
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -13,7 +13,6 @@ const links = [
   { href: "/dashboard",          label: "Inicio",         icon: LayoutDashboard, group: "main" },
   { href: "/agenda",             label: "Agenda",          icon: CalendarDays,    group: "main" },
   { href: "/clientes",           label: "Clientes",        icon: Users,           group: "main" },
-  { href: "/mascotas",           label: "Mascotas",        icon: PawPrint,        group: "main" },
   { href: "/gastos",             label: "Gastos",          icon: DollarSign,      group: "finance" },
   { href: "/inventario",         label: "Inventario",      icon: Package,         group: "finance" },
   { href: "/whatsapp",           label: "WhatsApp · Mía",  icon: Sparkles,        group: "automation" },
@@ -59,11 +58,15 @@ export default function Sidebar() {
     >
       {/* ── Logo ─────────────────────────────────────── */}
       <div className="flex items-center h-16 px-3 border-b border-white/10 shrink-0 overflow-hidden">
-        <img
-          src="/images/logo-white.png"
-          alt="Ladrido"
-          className={`object-contain transition-all duration-200 shrink-0 ${expanded ? "h-8 w-auto max-w-[140px]" : "h-8 w-8"}`}
-        />
+        {expanded ? (
+          <span className="text-xl font-black text-white tracking-tight whitespace-nowrap">
+            Apúntame<span className="text-[#FF8C42]">.mx</span>
+          </span>
+        ) : (
+          <div className="w-8 h-8 rounded-[10px] bg-[#FF8C42] flex items-center justify-center shrink-0">
+            <span className="text-white font-black text-sm">A</span>
+          </div>
+        )}
       </div>
 
       {/* ── Nav ──────────────────────────────────────── */}

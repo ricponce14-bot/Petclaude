@@ -9,10 +9,9 @@ const PAGE_TITLES: Record<string, string> = {
   "/dashboard":        "Inicio",
   "/agenda":           "Agenda",
   "/clientes":         "Clientes",
-  "/mascotas":         "Mascotas",
   "/gastos":           "Gastos",
   "/inventario":       "Inventario",
-  "/whatsapp":         "WhatsApp",
+  "/whatsapp":         "WhatsApp · Mía",
   "/conversaciones":   "Conversaciones",
   "/mensajes":         "Mensajes",
   "/mensajes/outbox":  "Enviados",
@@ -32,7 +31,7 @@ export default function MobileHeader() {
     router.refresh();
   };
 
-  const title = PAGE_TITLES[pathname] ?? "Ladrido";
+  const title = PAGE_TITLES[pathname] ?? "Apúntame";
 
   return (
     <header

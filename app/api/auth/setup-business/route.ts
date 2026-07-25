@@ -84,10 +84,10 @@ export async function POST(req: Request) {
 
         const defaultConfirmation =
             `✅ ¡Cita confirmada!\n\n` +
-            `🐕 Servicio: *{servicio}*\n` +
+            `Servicio: *{servicio}*\n` +
             `📅 Fecha: *{fecha}*\n` +
             `🕐 Hora: *{hora}*\n\n` +
-            `Te esperamos en *${businessName}*. ¡Hasta pronto! 🐾`;
+            `Te esperamos en *${businessName}*. ¡Hasta pronto! ✨`;
 
         const { error: botErr } = await supabaseAdmin
             .from("bot_config")
@@ -97,8 +97,8 @@ export async function POST(req: Request) {
                 welcome_message: defaultWelcome,
                 confirmation_template: defaultConfirmation,
                 services: services?.length ? services : [
-                    { key: "bath",         label: "Baño",        price: 250, duration_min: 60 },
-                    { key: "bath_haircut", label: "Baño + Corte", price: 400, duration_min: 90 },
+                    { key: "servicio_1", label: "Servicio 1", price: 250, duration_min: 60 },
+                    { key: "servicio_2", label: "Servicio 2", price: 400, duration_min: 90 },
                 ],
                 business_hours: businessHours || {
                     lun: { open: "09:00", close: "18:00" },

@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/client";
 import {
   MessageCircle, Send, ArrowLeft, Bot, User, Clock,
   CheckCircle2, XCircle, Search, Loader2, CalendarDays,
-  PawPrint, ChevronRight, Plus, RefreshCw, Paperclip
+  ChevronRight, Plus, RefreshCw, Paperclip
 } from "lucide-react";
 import { format, formatDistanceToNow, isPast } from "date-fns";
 import { es } from "date-fns/locale";
@@ -37,7 +37,7 @@ interface Appointment {
   scheduled_at: string;
   type: string;
   status: string;
-  pets: { name: string } | null;
+  servicio: string | null;
 }
 
 interface OwnerDetail {
@@ -184,7 +184,7 @@ export default function ConversacionesPage() {
     if (ownerData) {
       const { data: appts } = await supabase
         .from("appointments")
-        .select("id, scheduled_at, type, status, pets(name)")
+        .select("id, scheduled_at, type, status, servicio")
         .eq("owner_id", (ownerData as any).id)
         .order("scheduled_at", { ascending: false })
         .limit(10);
@@ -555,10 +555,8 @@ function AppointmentCard({ appt }: { appt: Appointment }) {
         </span>
       </div>
       <div className="flex items-center gap-1.5">
-        <PawPrint size={11} className="text-slate-400 shrink-0" />
-        <p className="text-xs font-semibold text-ink truncate">{appt.pets?.name ?? "Mascota"}</p>
-        <span className="text-slate-300 text-xs">·</span>
-        <p className="text-xs text-slate-400 truncate capitalize">{appt.type.replace("_", " ")}</p>
+        <CalendarDays size={11} className="text-slate-400 shrink-0" />
+        <p className="text-xs font-semibold text-ink truncate">{appt.servicio ?? "Cita"}</p>
       </div>
     </div>
   );

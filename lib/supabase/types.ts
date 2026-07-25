@@ -47,8 +47,12 @@ export interface Pet {
 export interface Appointment {
   id: string;
   tenant_id: string;
-  pet_id: string;
-  owner_id: string;
+  pet_id: string | null;
+  owner_id: string | null;
+  // Campos genéricos multi-sector (doc sección 4)
+  cliente_nombre: string | null;
+  cliente_telefono: string | null;
+  servicio: string | null;
   type: AppointmentType;
   status: AppointmentStatus;
   scheduled_at: string;

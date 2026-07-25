@@ -245,7 +245,7 @@ export default function SteppedRegisterForm({ initialPlan = "monthly", onSuccess
             {step === 1 && (
                 <div className="space-y-4 animate-fade-up">
                     <Field label="Nombre de tu estética">
-                        <input className={inputCls} placeholder="Estética Canina Luna"
+                        <input className={inputCls} placeholder="Barbería Luna"
                             value={form.businessName} onChange={e => set("businessName", e.target.value)} />
                     </Field>
                     <Field label="Ciudad">

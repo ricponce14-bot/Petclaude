@@ -3,15 +3,26 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { notFound, useParams } from "next/navigation";
-import { Phone, Mail, MapPin, PawPrint, Calendar, ArrowLeft, Loader2 } from "lucide-react";
+import { Phone, Mail, MapPin, CalendarDays, ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 import { useRouter } from "next/navigation";
 import EditOwnerModal from "@/components/crm/EditOwnerModal";
+
+const STATUS_LABEL: Record<string, { label: string; cls: string }> = {
+  scheduled: { label: "Agendada",   cls: "bg-orange-50 text-[#FF8C42]" },
+  confirmed: { label: "Confirmada", cls: "bg-teal-50 text-[#00C4AA]" },
+  completed: { label: "Completada", cls: "bg-slate-100 text-slate-500" },
+  cancelled: { label: "Cancelada",  cls: "bg-red-50 text-red-500" },
+  no_show:   { label: "No asistió", cls: "bg-red-50 text-red-400" },
+};
 
 export default function ClienteDetailPage() {
     const { id } = useParams();
     const supabase = createClient();
     const [owner, setOwner] = useState<any>(null);
+    const [appts, setAppts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [showEditModal, setShowEditModal] = useState(false);
     const [deleting, setDeleting] = useState(false);
@@ -21,7 +32,7 @@ export default function ClienteDetailPage() {
         setLoading(true);
         const { data, error } = await supabase
             .from("owners")
-            .select("*, pets(*)")
+            .select("*")
             .eq("id", id)
             .single();
 
@@ -30,6 +41,15 @@ export default function ClienteDetailPage() {
             return;
         }
         setOwner(data);
+
+        // Historial de citas del cliente (por owner_id).
+        const { data: apptData } = await supabase
+            .from("appointments")
+            .select("*")
+            .eq("owner_id", id)
+            .order("scheduled_at", { ascending: false })
+            .limit(50);
+        setAppts(apptData ?? []);
         setLoading(false);
     };
 
@@ -38,7 +58,7 @@ export default function ClienteDetailPage() {
     }, [id, supabase]);
 
     const handleDelete = async () => {
-        if (!confirm(`¿Estás seguro de que deseas eliminar permanentemente a ${owner.name}? Esta acción también borrará a sus mascotas y citas.`)) return;
+        if (!confirm(`¿Eliminar permanentemente a ${owner.name}? Esta acción también borrará su historial de citas.`)) return;
 
         setDeleting(true);
         const { error } = await supabase.from("owners").delete().eq("id", owner.id);
@@ -87,7 +107,6 @@ export default function ClienteDetailPage() {
                                 </div>
                             </div>
 
-                            {/* Action Menu */}
                             <div className="flex items-center gap-2">
                                 <button
                                     onClick={() => setShowEditModal(true)}
@@ -152,38 +171,36 @@ export default function ClienteDetailPage() {
                     )}
                 </div>
 
-                {/* Pets List */}
+                {/* Historial de citas */}
                 <div className="w-full md:w-80 space-y-6">
                     <div className="flex items-center justify-between px-2">
                         <h2 className="text-xl font-black text-slate-900 flex items-center gap-2">
-                            <PawPrint className="text-purple-500" size={24} /> Mascotas
+                            <CalendarDays className="text-[#FF8C42]" size={22} /> Historial
                         </h2>
-                        <span className="bg-purple-100 text-purple-600 text-xs font-black px-2.5 py-1 rounded-full">{owner.pets?.length || 0}</span>
+                        <span className="bg-orange-100 text-[#FF8C42] text-xs font-black px-2.5 py-1 rounded-full">{appts.length}</span>
                     </div>
 
-                    <div className="grid gap-4">
-                        {owner.pets?.length === 0 ? (
+                    <div className="grid gap-3">
+                        {appts.length === 0 ? (
                             <div className="bg-slate-50 border border-dashed border-slate-200 rounded-[2rem] p-8 text-center">
-                                <p className="text-slate-400 text-sm font-bold">Sin mascotas registradas</p>
+                                <p className="text-slate-400 text-sm font-bold">Sin citas registradas</p>
                             </div>
                         ) : (
-                            owner.pets.map((pet: any) => (
-                                <Link
-                                    key={pet.id}
-                                    href={`/mascotas/${pet.id}`}
-                                    className="group block bg-white border border-slate-100 rounded-3xl p-4 shadow-sm hover:shadow-soft-purple hover:-translate-y-1 transition-all duration-300"
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-2xl bg-purple-50 text-lg font-black text-purple-600 flex items-center justify-center transform group-hover:scale-110 transition-transform">
-                                            {pet.species === 'cat' ? 'G' : 'P'}
+                            appts.map((a: any) => {
+                                const st = STATUS_LABEL[a.status] ?? STATUS_LABEL.scheduled;
+                                return (
+                                    <div key={a.id} className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <span className="font-bold text-slate-900 text-sm truncate">{a.servicio || "Cita"}</span>
+                                            <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${st.cls}`}>{st.label}</span>
                                         </div>
-                                        <div>
-                                            <h4 className="font-bold text-slate-900 leading-none">{pet.name}</h4>
-                                            <p className="text-[11px] text-slate-500 font-medium mt-1 uppercase tracking-wider">{pet.breed || 'Mestizo'}</p>
-                                        </div>
+                                        <p className="text-xs text-slate-500 font-medium capitalize">
+                                            {format(new Date(a.scheduled_at), "EEE d MMM · HH:mm", { locale: es })}
+                                            {a.price ? ` · $${a.price}` : ""}
+                                        </p>
                                     </div>
-                                </Link>
-                            ))
+                                );
+                            })
                         )}
                     </div>
                 </div>

@@ -208,23 +208,6 @@ export default function SendMessageModal({ onClose, onSent }: SendMessageModalPr
                         )}
                     </div>
 
-                    {/* Pet Selector (optional) */}
-                    {selectedOwner && pets.length > 0 && (
-                        <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-1.5">Mascota (opcional)</label>
-                            <select
-                                value={selectedPetId}
-                                onChange={e => setSelectedPetId(e.target.value)}
-                                className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition-all text-slate-700 bg-slate-50 focus:bg-white text-sm"
-                            >
-                                <option value="">Sin mascota específica</option>
-                                {pets.map(p => (
-                                    <option key={p.id} value={p.id}>{p.name}</option>
-                                ))}
-                            </select>
-                        </div>
-                    )}
-
                     {/* Message Body */}
                     <div>
                         <label className="block text-sm font-bold text-slate-700 mb-1.5">Mensaje *</label>

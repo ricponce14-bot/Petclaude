@@ -12,13 +12,6 @@ const schema = z.object({
   owner_name:   z.string().min(2, "Mínimo 2 caracteres"),
   whatsapp:     z.string().min(10, "Mínimo 10 dígitos").regex(/^\d{10,15}$/, "Solo números, 10-15 dígitos"),
   owner_notes:  z.string().optional(),
-  pet_name:     z.string().min(1, "Requerido"),
-  breed:        z.string().optional(),
-  birthdate:    z.string().optional(),
-  species:      z.enum(["dog","cat","other"]),
-  allergies:    z.string().optional(),
-  temperament:  z.enum(["friendly","nervous","aggressive"]),
-  pet_notes:    z.string().optional(),
 });
 type FormData = z.infer<typeof schema>;
 
@@ -30,12 +23,6 @@ const inputCls = `w-full bg-[#FFF3E3] border border-[#F0E6D8] rounded-[16px]
 
 const labelCls = "block text-xs font-bold text-[#9e8a7a] uppercase tracking-wide mb-1.5";
 
-const SectionTitle = ({ label, color }: { label: string; color: string }) => (
-  <div className={`flex items-center gap-2 mb-3 pb-2 border-b border-[#F0E6D8]`}>
-    <p className={`text-xs font-black uppercase tracking-widest ${color}`}>{label}</p>
-  </div>
-);
-
 export default function NewOwnerModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
   const supabase = createClient();
   const [saving, setSaving] = useState(false);
@@ -43,7 +30,6 @@ export default function NewOwnerModal({ onClose, onCreated }: { onClose: () => v
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { species: "dog", temperament: "friendly" },
   });
 
   const onSubmit = async (values: FormData) => {
@@ -52,34 +38,20 @@ export default function NewOwnerModal({ onClose, onCreated }: { onClose: () => v
 
     const { data: { session } } = await supabase.auth.getSession();
     const tenant_id = session?.user.app_metadata?.tenant_id || session?.user.user_metadata?.tenant_id;
-    if (!tenant_id) { setError("Error de autenticación: No se encontró la veterinaria."); setSaving(false); return; }
+    if (!tenant_id) { setError("Error de sesión: no se encontró tu negocio."); setSaving(false); return; }
 
     let phone = values.whatsapp.replace(/\D/g, "");
     if (phone.length === 10) phone = "521" + phone;
 
-    const { data: owner, error: ownerErr } = await supabase
-      .from("owners")
-      .insert({ tenant_id, name: values.owner_name, whatsapp: phone, notes: values.owner_notes || null } as any)
-      .select().single();
-
-    if (ownerErr) { setError(ownerErr.message); setSaving(false); return; }
-
-    if ((owner as any)?.id) {
-      const { error: petErr } = await supabase.from("pets").insert({
-        tenant_id,
-        owner_id: (owner as any).id,
-        name: values.pet_name,
-        breed: values.breed || null,
-        birthdate: values.birthdate || null,
-        species: values.species,
-        allergies: values.allergies || null,
-        temperament: values.temperament,
-        notes: values.pet_notes || null,
-      } as never);
-      if (petErr) { setError(petErr.message); setSaving(false); return; }
-    }
+    const { error: ownerErr } = await supabase.from("owners").insert({
+      tenant_id,
+      name: values.owner_name,
+      whatsapp: phone,
+      notes: values.owner_notes || null,
+    } as any);
 
     setSaving(false);
+    if (ownerErr) { setError(ownerErr.message); return; }
     onCreated();
     onClose();
   };
@@ -87,74 +59,27 @@ export default function NewOwnerModal({ onClose, onCreated }: { onClose: () => v
   return (
     <ModalShell
       title="Nuevo cliente"
-      subtitle="Registra el dueño y su mascota"
+      subtitle="Registra a tu cliente"
       onClose={onClose}
       maxWidth="max-w-lg"
       accentColor="orange"
     >
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-
-        {/* ── Dueño ─────────────────────────────────── */}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <SectionTitle label="Dueño" color="text-[#FF8C42]" />
-          <div className="space-y-3">
-            <div>
-              <label className={labelCls}>Nombre completo</label>
-              <input {...register("owner_name")} placeholder="Ej. Lupita Hernández" className={inputCls} />
-              {errors.owner_name && <p className="text-xs text-red-500 mt-1">{errors.owner_name.message}</p>}
-            </div>
-            <div>
-              <label className={labelCls}>WhatsApp</label>
-              <input {...register("whatsapp")} placeholder="3317001234" className={inputCls} />
-              {errors.whatsapp && <p className="text-xs text-red-500 mt-1">{errors.whatsapp.message}</p>}
-            </div>
-          </div>
+          <label className={labelCls}>Nombre completo</label>
+          <input {...register("owner_name")} placeholder="Ej. Laura Martínez" className={inputCls} />
+          {errors.owner_name && <p className="text-xs text-red-500 mt-1">{errors.owner_name.message}</p>}
         </div>
 
-        {/* ── Mascota ───────────────────────────────── */}
         <div>
-          <SectionTitle label="Mascota" color="text-[#4DA18A]" />
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className={labelCls}>Nombre</label>
-                <input {...register("pet_name")} placeholder="Ej. Frijolito" className={inputCls} />
-                {errors.pet_name && <p className="text-xs text-red-500 mt-1">{errors.pet_name.message}</p>}
-              </div>
-              <div>
-                <label className={labelCls}>Raza</label>
-                <input {...register("breed")} placeholder="Ej. Labrador" className={inputCls} />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className={labelCls}>Especie</label>
-                <select {...register("species")} className={inputCls}>
-                  <option value="dog">Perro</option>
-                  <option value="cat">Gato</option>
-                  <option value="other">Otro</option>
-                </select>
-              </div>
-              <div>
-                <label className={labelCls}>Temperamento</label>
-                <select {...register("temperament")} className={inputCls}>
-                  <option value="friendly">Amigable</option>
-                  <option value="nervous">Nervioso</option>
-                  <option value="aggressive">Agresivo</option>
-                </select>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className={labelCls}>Fecha de nacimiento</label>
-                <input type="date" {...register("birthdate")} className={inputCls} />
-              </div>
-              <div>
-                <label className={labelCls}>Alergias</label>
-                <input {...register("allergies")} placeholder="Ej. Látex" className={inputCls} />
-              </div>
-            </div>
-          </div>
+          <label className={labelCls}>WhatsApp</label>
+          <input {...register("whatsapp")} placeholder="10 dígitos (ej. 3317001234)" className={inputCls} />
+          {errors.whatsapp && <p className="text-xs text-red-500 mt-1">{errors.whatsapp.message}</p>}
+        </div>
+
+        <div>
+          <label className={labelCls}>Notas (opcional)</label>
+          <input {...register("owner_notes")} placeholder="Ej. Cliente frecuente, prefiere sábados" className={inputCls} />
         </div>
 
         {error && (
@@ -177,7 +102,7 @@ export default function NewOwnerModal({ onClose, onCreated }: { onClose: () => v
           >
             {saving
               ? <><Loader2 size={16} className="animate-spin" /> Guardando...</>
-              : "Registrar cliente y mascota"}
+              : "Registrar cliente"}
           </motion.button>
         </div>
       </form>

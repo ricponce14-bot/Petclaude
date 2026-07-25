@@ -13,14 +13,14 @@ interface MessageTemplate {
 
 const TEMPLATE_INFO = {
     reminder: { icon: "R", title: "Recordatorio 24h", desc: "Se envia un dia antes de la cita programada." },
-    winback: { icon: "W", title: "Recuperacion (30 dias)", desc: "Se envia si la mascota no ha venido en 1 mes." },
-    birthday: { icon: "C", title: "Cumpleanos", desc: "Felicitacion el dia de su cumpleanos." },
+    winback: { icon: "W", title: "Recuperacion (30 dias)", desc: "Se envia si el cliente no ha venido en 1 mes." },
+    birthday: { icon: "C", title: "Aniversario", desc: "Mensaje especial en una fecha destacada del cliente." },
     custom: { icon: "M", title: "Personalizada (Manual)", desc: "Plantilla 100% libre para envios manuales desde el Outbox." }
 };
 
 const MAGIC_VARIABLES = [
     { label: "Cliente", tag: "{owner_name}" },
-    { label: "Mascota", tag: "{pet_name}" },
+    { label: "Servicio", tag: "{servicio}" },
     { label: "Fecha", tag: "{date}" },
     { label: "Hora", tag: "{time}" },
     { label: "Clínica", tag: "{clinic_name}" },
@@ -99,7 +99,7 @@ export default function MensajesPage() {
             const tenant_id = session?.user.app_metadata?.tenant_id || session?.user.user_metadata?.tenant_id;
 
             if (!tenant_id) {
-                alert("No se pudo identificar tu veterinaria. Por favor, re-ingresa.");
+                alert("No se pudo identificar tu negocio. Por favor, re-ingresa.");
                 setSaving(false);
                 return;
             }
@@ -134,7 +134,7 @@ export default function MensajesPage() {
                         Configuración de WhatsApp
                     </h1>
                     <p className="text-sm font-semibold text-slate-500 mt-1">
-                        Define los textos que Ladrido enviará por ti.
+                        Define los textos que Apúntame enviará por ti.
                     </p>
                 </div>
                 <Link
@@ -153,7 +153,7 @@ export default function MensajesPage() {
                 <div className="space-y-2 pt-1">
                     <p className="font-bold text-blue-900 text-base">Variables Dinámicas Mágicas</p>
                     <p className="font-medium leading-relaxed max-w-2xl">
-                        Haz clic en los botones debajo de cada campo de texto para insertar automáticamente etiquetas especiales. Ladrido las reemplazará automáticamente con la información real del cliente al momento de enviar el mensaje.
+                        Haz clic en los botones debajo de cada campo de texto para insertar automáticamente etiquetas especiales. Apúntame las reemplazará automáticamente con la información real del cliente al momento de enviar el mensaje.
                     </p>
                     <div className="flex gap-2 flex-wrap pt-1">
                         {MAGIC_VARIABLES.map(v => (

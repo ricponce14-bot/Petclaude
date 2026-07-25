@@ -83,7 +83,7 @@ export default function GastosPage() {
                         <DollarSign className="text-emerald-600" size={32} /> Control de Gastos
                     </h1>
                     <p className="text-sm font-semibold text-slate-500 mt-1">
-                        Lleva el control financiero de tu estética canina.
+                        Lleva el control financiero de tu negocio.
                     </p>
                 </div>
                 <button

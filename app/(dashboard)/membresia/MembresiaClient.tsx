@@ -75,7 +75,7 @@ export default function MembresiaClient({ tenant, userEmail, userId }: Props) {
                     <AlertTriangle size={20} className="text-slate-500 shrink-0" />
                     <div>
                         <p className="font-bold text-slate-700 text-sm">Suscripción cancelada</p>
-                        <p className="text-slate-500 text-xs mt-0.5">Tu plan fue cancelado. Reactiva para seguir usando Ladrido.</p>
+                        <p className="text-slate-500 text-xs mt-0.5">Tu plan fue cancelado. Reactiva para seguir usando Apúntame.</p>
                     </div>
                 </div>
             );
@@ -117,7 +117,7 @@ export default function MembresiaClient({ tenant, userEmail, userId }: Props) {
         <div className="px-4 py-5 md:px-6 md:py-6 max-w-3xl mx-auto space-y-6">
             <div>
                 <h1 className="text-2xl md:text-3xl font-black text-ink tracking-tight">Membresía</h1>
-                <p className="text-slate-500 text-sm mt-1">Gestiona tu suscripción a Ladrido</p>
+                <p className="text-slate-500 text-sm mt-1">Gestiona tu suscripción a Apúntame</p>
             </div>
 
             {/* Status */}

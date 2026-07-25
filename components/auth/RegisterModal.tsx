@@ -38,7 +38,7 @@ export default function RegisterModal({ isOpen, onClose, initialPlan = "monthly"
                     <div className="absolute -bottom-20 -right-10 w-48 h-48 bg-violet-500/10 rounded-full blur-3xl" />
 
                     <div className="relative z-10">
-                        <img src="/images/logo-white.png" alt="Ladrido" className="w-[130px] h-auto mb-8 object-contain" />
+                        <img src="/images/logo-white.png" alt="Apúntame" className="w-[130px] h-auto mb-8 object-contain" />
                         <h2 className="text-2xl font-black leading-tight mb-3 text-white">
                             Tu estética, en piloto automático
                         </h2>
@@ -51,7 +51,7 @@ export default function RegisterModal({ isOpen, onClose, initialPlan = "monthly"
                         {[
                             "Agenda inteligente por WhatsApp",
                             "Recordatorios automáticos 24h antes",
-                            "Control de clientes y mascotas",
+                            "Control de clientes",
                             "Gastos e inventario incluidos",
                         ].map((b, i) => (
                             <div key={i} className="flex items-center gap-3">

@@ -39,7 +39,7 @@ export default function NewExpenseModal({ onClose, onCreated }: NewExpenseModalP
             const tenantId = session?.user?.app_metadata?.tenant_id || session?.user?.user_metadata?.tenant_id;
 
             if (!tenantId) {
-                throw new Error("No se encontró tu veterinaria. Re-ingresa por favor.");
+                throw new Error("No se encontró tu negocio. Re-ingresa por favor.");
             }
 
             const { error: insertError } = await supabase.from("expenses").insert({
@@ -104,7 +104,7 @@ export default function NewExpenseModal({ onClose, onCreated }: NewExpenseModalP
                             required
                             value={formData.description}
                             onChange={e => setFormData({ ...formData, description: e.target.value })}
-                            placeholder="Ej. Compra de shampoo para perros"
+                            placeholder="Ej. Compra de insumos"
                             className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition-all text-slate-700 bg-slate-50 focus:bg-white"
                         />
                     </div>

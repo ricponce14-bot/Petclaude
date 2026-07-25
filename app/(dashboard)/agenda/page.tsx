@@ -22,7 +22,7 @@ export default function AgendaPage() {
     setLoading(true);
     const { data } = await supabase
       .from("appointments")
-      .select("*, pets(name, breed, temperament, allergies), owners(name, whatsapp)")
+      .select("*, owners(name, whatsapp)")
       .gte("scheduled_at", startOfDay(date).toISOString())
       .lte("scheduled_at", endOfDay(date).toISOString())
       .order("scheduled_at", { ascending: true });

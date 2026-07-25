@@ -28,7 +28,7 @@ export default function LandingPage() {
             {/* ─── NAVBAR ─── */}
             <header className="fixed w-full top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-slate-100 shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 md:py-5 flex items-center justify-between">
-                    <img src="/images/logo-color.png" alt="Ladrido" className="w-[120px] xs:w-[140px] md:w-[170px] h-auto object-contain" />
+                    <img src="/images/logo-color.png" alt="Apúntame" className="w-[120px] xs:w-[140px] md:w-[170px] h-auto object-contain" />
                     <div className="flex items-center gap-3 sm:gap-6">
                         <a href="#features" className="text-sm font-semibold text-slate-500 hover:text-ink transition-colors hidden md:block">Funciones</a>
                         <a href="#precios" className="text-sm font-semibold text-slate-500 hover:text-ink transition-colors hidden md:block">Precios</a>
@@ -60,12 +60,12 @@ export default function LandingPage() {
                         <div className="animate-fade-up">
                             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-mint/10 border border-mint/20 text-mint text-xs font-bold mb-6">
                                 <span className="w-1.5 h-1.5 bg-mint rounded-full animate-pulse" />
-                                El CRM para estéticas caninas
+                                El CRM para negocios de servicios
                             </div>
 
                             <h1 className="text-3xl xs:text-5xl md:text-6xl font-black tracking-tight mb-5 leading-[1.1] text-ink">
                                 Gestiona tu<br />
-                                estética canina<br />
+                                negocio<br />
                                 <span className="text-mint">de forma inteligente</span>
                             </h1>
 
@@ -203,7 +203,7 @@ export default function LandingPage() {
                                 <Calendar size={22} className="text-mint" />
                             </div>
                             <h3 className="text-lg font-black text-ink mb-2">Agenda de citas</h3>
-                            <p className="text-sm text-slate-500 leading-relaxed">Vista diaria con duración, servicio y datos de la mascota. Navega entre días con un toque.</p>
+                            <p className="text-sm text-slate-500 leading-relaxed">Vista diaria con duración, servicio y datos del cliente. Navega entre días con un toque.</p>
                         </div>
 
                         {/* Card — Historial */}
@@ -221,7 +221,7 @@ export default function LandingPage() {
                                 <Users size={22} className="text-mint" />
                             </div>
                             <h3 className="text-lg font-black text-ink mb-2">Gestión de clientes</h3>
-                            <p className="text-sm text-slate-500 leading-relaxed">CRM completo para dueños y mascotas. Búsqueda rápida y perfiles detallados.</p>
+                            <p className="text-sm text-slate-500 leading-relaxed">CRM completo para tus clientes. Búsqueda rápida y perfiles detallados.</p>
                         </div>
 
                         {/* Card Mint grande — Recordatorios */}
@@ -281,7 +281,7 @@ export default function LandingPage() {
                     <div className="grid md:grid-cols-3 gap-6 md:gap-8 relative">
                         <div className="hidden md:block absolute top-8 left-[20%] right-[20%] h-0.5 bg-gradient-to-r from-mint/20 via-mint to-mint/20" />
                         {[
-                            { n: "01", title: "Crea tu cuenta", desc: "Regístra tu estética en minutos. Agrega clientes, mascotas y empieza a agendar desde el primer día.", icon: Zap },
+                            { n: "01", title: "Crea tu cuenta", desc: "Regístra tu estética en minutos. Agrega clientes y empieza a agendar desde el primer día.", icon: Zap },
                             { n: "02", title: "Conecta WhatsApp", desc: "Escanea el código QR y el bot empezará a atender a tus clientes automáticamente.", icon: MessageSquare },
                             { n: "03", title: "Automatiza y crece", desc: "Reduce inasistencias, recupera clientes y lleva el control financiero de tu negocio.", icon: BarChart3 },
                         ].map(s => (
@@ -316,7 +316,7 @@ export default function LandingPage() {
                                 <span className="text-slate-400 font-medium">MXN / mes</span>
                             </div>
                             <ul className="space-y-2.5 mb-7">
-                                {["Citas ilimitadas", "Clientes y mascotas ilimitados", "Recordatorios por WhatsApp", "Mensajes automáticos", "Control de gastos e inventario", "Soporte técnico"].map((item, i) => (
+                                {["Citas ilimitadas", "Clientes ilimitados", "Recordatorios por WhatsApp", "Mensajes automáticos", "Control de gastos e inventario", "Soporte técnico"].map((item, i) => (
                                     <li key={i} className="flex items-center gap-3 text-slate-600 text-sm">
                                         <Check className="text-sand shrink-0" size={16} />
                                         <span>{item}</span>
@@ -363,7 +363,7 @@ export default function LandingPage() {
                         ¿Listo para transformar tu estética?
                     </h2>
                     <p className="text-base md:text-lg text-slate-500 mb-8">
-                        Únete a las estéticas caninas que ya gestionan su negocio de <span className="text-mint font-semibold">forma inteligente</span>.
+                        Únete a las negocios de servicios que ya gestionan su negocio de <span className="text-mint font-semibold">forma inteligente</span>.
                     </p>
                     <button
                         onClick={() => openRegister("monthly")}
@@ -378,7 +378,7 @@ export default function LandingPage() {
             <footer className="bg-charcoal text-white/40 pt-12 pb-8">
                 <div className="max-w-7xl mx-auto px-5 sm:px-8">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-white/10">
-                        <img src="/images/logo-white.png" alt="Ladrido" className="w-[130px] md:w-[160px] h-auto object-contain" />
+                        <img src="/images/logo-white.png" alt="Apúntame" className="w-[130px] md:w-[160px] h-auto object-contain" />
                         <div className="flex flex-wrap justify-center gap-6 text-sm font-medium">
                             <a href="#features" className="hover:text-white transition-colors">Funciones</a>
                             <a href="#precios" className="hover:text-white transition-colors">Precios</a>
@@ -387,7 +387,7 @@ export default function LandingPage() {
                         </div>
                     </div>
                     <div className="pt-6 text-center text-sm">
-                        <p>&copy; {new Date().getFullYear()} Ladrido Software. Todos los derechos reservados.</p>
+                        <p>&copy; {new Date().getFullYear()} Apúntame Software. Todos los derechos reservados.</p>
                     </div>
                 </div>
             </footer>

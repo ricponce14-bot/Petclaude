@@ -5,9 +5,8 @@ import { Bot, Save, Loader2, Plus, Trash2, Clock, Power, MessageSquare, DollarSi
 import type { BotConfig, BotService, BotBusinessHours } from "@/lib/supabase/types";
 
 const DEFAULT_SERVICES: BotService[] = [
-  { key: "bath", label: "Baño", duration_min: 60, price: 350 },
-  { key: "haircut", label: "Corte", duration_min: 90, price: 450 },
-  { key: "bath_haircut", label: "Baño + Corte", duration_min: 120, price: 600 },
+  { key: "servicio_1", label: "Servicio 1", duration_min: 60, price: 350 },
+  { key: "servicio_2", label: "Servicio 2", duration_min: 90, price: 450 },
 ];
 
 const DAY_LABELS: Record<string, string> = {
@@ -25,7 +24,7 @@ const DEFAULT_HOURS: BotBusinessHours = {
   dom: null
 };
 
-const DEFAULT_WELCOME = `¡Hola! 🐾 Bienvenido. ¿En qué podemos ayudarte?
+const DEFAULT_WELCOME = `¡Hola! ✨ Bienvenido. ¿En qué podemos ayudarte?
 
 1️⃣ Agendar cita
 2️⃣ Ver precios
@@ -37,7 +36,7 @@ const DEFAULT_CONFIRMATION = `✅ ¡Cita confirmada!
 📅 Fecha: {fecha}
 🕐 Hora: {hora}
 
-¡Te esperamos! 🐕`;
+¡Te esperamos!`;
 
 export default function BotConfigPage() {
   const supabase = createClient();
@@ -492,7 +491,7 @@ export default function BotConfigPage() {
             <div className="text-slate-300 text-xs">
               {services.length > 0 ? (
                 <div>
-                  <p className="mb-1">¿Qué servicio necesitas? 🐕</p>
+                  <p className="mb-1">¿Qué servicio necesitas? ✨</p>
                   {services.map((s, i) => (
                     <p key={i}>{i + 1}️⃣ {s.label || "Sin nombre"} — ${s.price}</p>
                   ))}

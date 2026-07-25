@@ -5,8 +5,8 @@ import './globals.css';
 const nunito = Nunito({ subsets: ['latin'], weight: ['400', '600', '700', '800', '900'] });
 
 export const metadata: Metadata = {
-    title: 'Ladrido | Gestión de Estéticas Caninas y Veterinarias',
-    description: 'Automatiza tus recordatorios, agenda y control de pacientes por WhatsApp. Micro-SaaS para clínicas veterinarias y estéticas caninas en México.',
+    title: 'Apúntame | Agendamiento de citas por WhatsApp',
+    description: 'Automatiza tus recordatorios, agenda y control de pacientes por WhatsApp. Micro-SaaS para clínicas negocios y negocios de servicios en México.',
 };
 
 export const viewport: Viewport = {

@@ -26,7 +26,7 @@ const steps = [
         icon: Users,
         color: "bg-mint/10 text-mint",
         title: "Agrega tu primer cliente",
-        desc: "Registra a tus clientes y sus mascotas para llevar un control completo.",
+        desc: "Registra a tus tus clientes para llevar un control completo.",
         href: "/clientes",
         cta: "Agregar cliente",
     },
@@ -63,9 +63,9 @@ export default function WelcomeTour() {
                 <div className="flex items-start justify-between p-5 pb-4 border-b border-slate-100">
                     <div>
                         <div className="flex items-center gap-2 mb-1">
-                            <img src="/images/logo-color.png" alt="Ladrido" className="h-6 w-auto object-contain" />
+                            <img src="/images/logo-color.png" alt="Apúntame" className="h-6 w-auto object-contain" />
                         </div>
-                        <h2 className="text-lg font-black text-ink">¡Bienvenido a Ladrido!</h2>
+                        <h2 className="text-lg font-black text-ink">¡Bienvenido a Apúntame!</h2>
                         <p className="text-slate-400 text-xs mt-0.5">Sigue estos pasos para empezar</p>
                     </div>
                     <button

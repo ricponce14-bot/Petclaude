@@ -106,7 +106,7 @@ export default function AjustesForm({ tenant, userEmail }: Props) {
                             className={`${inputCls} mt-1.5`}
                             value={name}
                             onChange={e => setName(e.target.value)}
-                            placeholder="Estética Canina Luna"
+                            placeholder="Barbería Luna"
                             required
                         />
                     </div>

@@ -54,7 +54,7 @@ export default function LoginPage() {
           <div className="text-center mb-7">
             <img
               src="/images/logo-color.png"
-              alt="Ladrido"
+              alt="Apúntame"
               className="w-[140px] h-auto mx-auto mb-4 object-contain"
             />
             <h1 className="text-xl font-black text-ink">
